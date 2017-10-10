@@ -113,12 +113,14 @@ int main(int argc, char* argv[])
 	using namespace boost::python;
 	using namespace pywrapper;
 
-
-
 	// random number generator seed **********************************************
 	//TODO URGENT: change to proper seed.
 	std::string seedStr = "123";//inputJson.at("SIMULATION").at("seed").dump();
+#ifdef LINUX
+	unsigned long int seed = (seedStr == "") ? mix(clock(), time(NULL), getpid()) : std::stoul(seedStr);
+#else
 	unsigned long int seed = (seedStr == "") ? mix(clock(), time(NULL), 1) : std::stoul(seedStr);
+#endif
 	g_rng = gsl_rng_alloc(gsl_rng_mt19937);
 	gsl_rng_set(g_rng, seed);
 	// ***************************************************************************
