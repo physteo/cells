@@ -1,0 +1,413 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="File di origine">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="File di intestazione">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="File di risorse">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="graphical\graphics\buffers\buffer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\graphics\buffers\indexBuffer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\graphics\buffers\vertexarray.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\graphics\batchrenderer2d.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\graphics\shader.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\graphics\simple2drenderer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\graphics\Window.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\maths\mat4.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\maths\vec2.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\maths\vec3.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\maths\vec4.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\graphics\Light.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\graphics\MTexturedModel.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\graphics\Player.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\graphics\Renderable.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\graphics\SimpleRenderer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\graphics\Terrain.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\graphics\TerrainRenderer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\graphics\TexturedModel.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\physics\Particle.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\physics\Pcontacts.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\physics\Pfgen.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\physics\Plinks.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\physics\Psphere.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\physics\Pworld.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\Buffers.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\Camera.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\GameComponent.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\LTexture.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\ObjFile.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\ShaderProgram.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="graphical\zzz_tmx\graphics\InstanceRenderer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="particles\Cell.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="particles\Part.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="visuals\shader\LatticeShader.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="visuals\Display.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="box\Box.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="system\System.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="system\SystemTrajectory.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="math\Vector.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="box\BoxCell.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="particles\PartSpecs.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="interactions\GaussianRandomForce.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="interactions\LJForce.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="interactions\FeneForce.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="interactions\CilForce.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\Hdf5.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="particles\CellColony.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\Hdf5types.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="visuals\LightDisplay.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="particles\SMTYSpecs.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="particles\SMTYSpecsNOCIL.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="graphical\graphics\buffers\buffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\graphics\buffers\indexBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\graphics\buffers\vertexarray.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\graphics\batchrenderer2d.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\graphics\renderable2d.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\graphics\renderer2d.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\graphics\shader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\graphics\simple2drenderer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\graphics\Window.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\maths\mat4.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\maths\math_func.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\maths\maths.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\maths\vec2.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\maths\vec3.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\maths\vec4.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\utils\fileutils.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\Light.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\MTexturedModel.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\Player.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\Renderable.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\Renderer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\SimpleRenderer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\Terrain.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\TerrainRenderer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\TexturedModel.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\levels\Level.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\maths\maths.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\physics\Particle.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\physics\Pcontacts.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\physics\Pfgen.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\physics\Plinks.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\physics\Precision.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\physics\Psphere.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\physics\Pworld.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\utils\ImageLoader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\utils\ObjLoader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\utils\quickRandom.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\utils\StringUtils.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\utils\TextFileLoader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\Buffers.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\Camera.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\GameComponent.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\LTexture.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\ObjFile.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\ShaderProgram.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\graphics\InstanceRenderer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="graphical\zzz_tmx\ObjectPool.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\Cell.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\Part.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="visuals\shader\LatticeShader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="visuals\Display.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="box\Box.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="system\System.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="system\SystemTrajectory.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Vector.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="box\BoxCell.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\CellSpecs.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\PartSpecs.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="interactions\Force.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="interactions\GaussianRandomForce.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="interactions\LJForce.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="interactions\FeneForce.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="interactions\CilForce.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\PartType.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="interactions\TwoBodyForce.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="definitions.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Hdf5.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\CellColony.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Hdf5types.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\readFile.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="visuals\LightDisplay.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="pythonInterface\wrappers.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\myOpenmp.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\SMTYSpecs.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\SMTYSpecsNOCIL.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="graphical\shaders\instance.frag" />
+    <None Include="graphical\shaders\instance.vert" />
+    <None Include="visuals\shader\superbasic.frag" />
+    <None Include="visuals\shader\superbasic.vert" />
+    <None Include="visuals\shader\superbasicNEW.frag" />
+    <None Include="visuals\shader\superbasicNEW.vert" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2FEA2097-194B-4A6C-BB8C-69DB896C51B9}</ProjectGuid>
+    <RootNamespace>coolattice</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <ProjectName>cells</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Python27\include;C:\Users\matte\source\boost;C:\Users\matte\source\repos\coolattice\Dependencies\include;C:\Program Files (x86)\HDF_Group\HDF5\1.10.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Python27\libs;C:\Users\matte\source\boost\lib32-msvc-14.1;C:\Users\matte\source\repos\coolattice\Dependencies\lib;C:\Program Files (x86)\HDF_Group\HDF5\1.10.1\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Python27\include;C:\Users\matte\source\boost;C:\Program Files (x86)\HDF_Group\HDF5\1.10.1-release\include;C:\Users\matte\source\repos\coolattice\Dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Python27\libs;C:\Users\matte\source\boost\lib32-msvc-14.1;C:\Program Files (x86)\HDF_Group\HDF5\1.10.1-release\lib;C:\Users\matte\source\repos\coolattice\Dependencies\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\matte\source\repos\coolattice\Dependencies\include;C:\Program Files (x86)\HDF_Group\HDF5\1.10.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>yes</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Users\matte\source\repos\coolattice\Dependencies\lib;C:\Program Files (x86)\HDF_Group\HDF5\1.10.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libhdf5_D.lib;libhdf5_cpp_D.lib;libhdf5_hl_cpp_D.lib;libhdf5_hl_D.lib;;gsl.lib;opengl32.lib;glew32.lib;glfw3.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\matte\source\repos\coolattice\Dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>yes</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Users\matte\source\repos\coolattice\Dependencies\lib;C:\Program Files (x86)\HDF_Group\HDF5\1.10.1-release\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libhdf5.lib;libhdf5_cpp.lib;libhdf5_hl_cpp.lib;libhdf5_hl.lib;gsl.lib;opengl32.lib;glew32.lib;glfw3.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="box\Box.cpp" />
+    <ClCompile Include="box\BoxCell.cpp" />
+    <ClCompile Include="graphical\graphics\batchrenderer2d.cpp" />
+    <ClCompile Include="graphical\graphics\buffers\buffer.cpp" />
+    <ClCompile Include="graphical\graphics\buffers\indexBuffer.cpp" />
+    <ClCompile Include="graphical\graphics\buffers\vertexarray.cpp" />
+    <ClCompile Include="graphical\graphics\shader.cpp" />
+    <ClCompile Include="graphical\graphics\simple2drenderer.cpp" />
+    <ClCompile Include="graphical\graphics\Window.cpp" />
+    <ClCompile Include="graphical\maths\mat4.cpp" />
+    <ClCompile Include="graphical\maths\vec2.cpp" />
+    <ClCompile Include="graphical\maths\vec3.cpp" />
+    <ClCompile Include="graphical\maths\vec4.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\Buffers.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\Camera.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\GameComponent.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\graphics\InstanceRenderer.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\graphics\Light.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\graphics\MTexturedModel.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\graphics\Player.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\graphics\Renderable.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\graphics\SimpleRenderer.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\graphics\Terrain.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\graphics\TerrainRenderer.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\graphics\TexturedModel.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\LTexture.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\ObjFile.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\physics\Particle.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\physics\Pcontacts.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\physics\Pfgen.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\physics\Plinks.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\physics\Psphere.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\physics\Pworld.cpp" />
+    <ClCompile Include="graphical\zzz_tmx\ShaderProgram.cpp" />
+    <ClCompile Include="interactions\CilForce.cpp" />
+    <ClCompile Include="interactions\FeneForce.cpp" />
+    <ClCompile Include="interactions\GaussianRandomForce.cpp" />
+    <ClCompile Include="interactions\LJForce.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="math\Vector.cpp" />
+    <ClCompile Include="particles\Cell.cpp" />
+    <ClCompile Include="particles\CellColony.cpp" />
+    <ClCompile Include="particles\Part.cpp" />
+    <ClCompile Include="particles\PartSpecs.cpp" />
+    <ClCompile Include="particles\SMTYSpecs.cpp" />
+    <ClCompile Include="particles\SMTYSpecsNOCIL.cpp" />
+    <ClCompile Include="system\System.cpp" />
+    <ClCompile Include="system\SystemTrajectory.cpp" />
+    <ClCompile Include="utils\Hdf5.cpp" />
+    <ClCompile Include="utils\Hdf5types.cpp" />
+    <ClCompile Include="visuals\Display.cpp" />
+    <ClCompile Include="visuals\LightDisplay.cpp" />
+    <ClCompile Include="visuals\shader\LatticeShader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="box\Box.h" />
+    <ClInclude Include="box\BoxCell.h" />
+    <ClInclude Include="graphical\graphics\batchrenderer2d.h" />
+    <ClInclude Include="graphical\graphics\buffers\buffer.h" />
+    <ClInclude Include="graphical\graphics\buffers\indexBuffer.h" />
+    <ClInclude Include="graphical\graphics\buffers\vertexarray.h" />
+    <ClInclude Include="graphical\graphics\renderable2d.h" />
+    <ClInclude Include="graphical\graphics\renderer2d.h" />
+    <ClInclude Include="graphical\graphics\shader.h" />
+    <ClInclude Include="graphical\graphics\simple2drenderer.h" />
+    <ClInclude Include="graphical\graphics\Window.h" />
+    <ClInclude Include="graphical\maths\mat4.h" />
+    <ClInclude Include="graphical\maths\maths.h" />
+    <ClInclude Include="graphical\maths\math_func.h" />
+    <ClInclude Include="graphical\maths\vec2.h" />
+    <ClInclude Include="graphical\maths\vec3.h" />
+    <ClInclude Include="graphical\maths\vec4.h" />
+    <ClInclude Include="graphical\utils\fileutils.h" />
+    <ClInclude Include="graphical\zzz_tmx\Buffers.h" />
+    <ClInclude Include="graphical\zzz_tmx\Camera.h" />
+    <ClInclude Include="graphical\zzz_tmx\GameComponent.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\InstanceRenderer.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\Light.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\MTexturedModel.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\Player.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\Renderable.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\Renderer.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\SimpleRenderer.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\Terrain.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\TerrainRenderer.h" />
+    <ClInclude Include="graphical\zzz_tmx\graphics\TexturedModel.h" />
+    <ClInclude Include="graphical\zzz_tmx\levels\Level.h" />
+    <ClInclude Include="graphical\zzz_tmx\LTexture.h" />
+    <ClInclude Include="graphical\zzz_tmx\maths\maths.h" />
+    <ClInclude Include="graphical\zzz_tmx\ObjectPool.h" />
+    <ClInclude Include="graphical\zzz_tmx\ObjFile.h" />
+    <ClInclude Include="graphical\zzz_tmx\physics\Particle.h" />
+    <ClInclude Include="graphical\zzz_tmx\physics\Pcontacts.h" />
+    <ClInclude Include="graphical\zzz_tmx\physics\Pfgen.h" />
+    <ClInclude Include="graphical\zzz_tmx\physics\Plinks.h" />
+    <ClInclude Include="graphical\zzz_tmx\physics\Precision.h" />
+    <ClInclude Include="graphical\zzz_tmx\physics\Psphere.h" />
+    <ClInclude Include="graphical\zzz_tmx\physics\Pworld.h" />
+    <ClInclude Include="graphical\zzz_tmx\ShaderProgram.h" />
+    <ClInclude Include="graphical\zzz_tmx\utils\ImageLoader.h" />
+    <ClInclude Include="graphical\zzz_tmx\utils\ObjLoader.h" />
+    <ClInclude Include="graphical\zzz_tmx\utils\quickRandom.h" />
+    <ClInclude Include="graphical\zzz_tmx\utils\StringUtils.h" />
+    <ClInclude Include="graphical\zzz_tmx\utils\TextFileLoader.h" />
+    <ClInclude Include="interactions\CilForce.h" />
+    <ClInclude Include="interactions\FeneForce.h" />
+    <ClInclude Include="interactions\Force.h" />
+    <ClInclude Include="interactions\GaussianRandomForce.h" />
+    <ClInclude Include="interactions\LJForce.h" />
+    <ClInclude Include="interactions\TwoBodyForce.h" />
+    <ClInclude Include="math\Vector.h" />
+    <ClInclude Include="definitions.h" />
+    <ClInclude Include="particles\Cell.h" />
+    <ClInclude Include="particles\CellColony.h" />
+    <ClInclude Include="particles\CellSpecs.h" />
+    <ClInclude Include="particles\Part.h" />
+    <ClInclude Include="particles\PartSpecs.h" />
+    <ClInclude Include="particles\SMTYSpecs.h" />
+    <ClInclude Include="particles\PartType.h" />
+    <ClInclude Include="particles\SMTYSpecsNOCIL.h" />
+    <ClInclude Include="pythonInterface\wrappers.h" />
+    <ClInclude Include="system\System.h" />
+    <ClInclude Include="system\SystemTrajectory.h" />
+    <ClInclude Include="utils\Hdf5.h" />
+    <ClInclude Include="utils\Hdf5types.h" />
+    <ClInclude Include="utils\myOpenmp.h" />
+    <ClInclude Include="utils\readFile.h" />
+    <ClInclude Include="visuals\Display.h" />
+    <ClInclude Include="visuals\LightDisplay.h" />
+    <ClInclude Include="visuals\shader\LatticeShader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="graphical\shaders\instance.frag" />
+    <None Include="graphical\shaders\instance.vert" />
+    <None Include="visuals\shader\superbasic.frag" />
+    <None Include="visuals\shader\superbasic.vert" />
+    <None Include="visuals\shader\superbasicNEW.frag" />
+    <None Include="visuals\shader\superbasicNEW.vert" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
