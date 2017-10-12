@@ -13,6 +13,6 @@ public:
 		: sig(sigIn), eps(epsIn), rcut2(rcut2In) {}
 	~LJForce() {}
 
-	void updateForce(Part* part1, const Part* part2, const Box* box) const override;
+	void updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const override;
 };
 

@@ -7,11 +7,6 @@ Box::Box() : m_lx(0.0), m_ly(0.0), m_periodicBoundaries(true)
 
 Box::Box(double lx, double ly, bool periodicBoundaries, int subBoxesX, int subBoxesY) : m_lx(lx), m_ly(ly), m_periodicBoundaries(periodicBoundaries)
 {	
-	//TODO: URGENT. REMOVE THE HARD CODED NUMBERS
-	//m_lx = 9.0 * 0.04;
-	//m_ly = 9.0 * 0.04;
-	//////////////////////////////////////////////
-
 	m_numberOfBoxCellsX = subBoxesX;
 	m_numberOfBoxCellsY = subBoxesY;
 
@@ -216,6 +211,9 @@ bool Box::save(Hdf5* file, const char* groupName) const
 		file->writeAttributeDouble(groupName, "lcx", m_subBoxesLengthX);
 		file->writeAttributeDouble(groupName, "lcy", m_subBoxesLengthY);
 		file->writeAttributeBool(groupName, "pbc", m_periodicBoundaries);
+		file->writeAttributeDouble(groupName, "subBoxesX", m_numberOfBoxCellsX);
+		file->writeAttributeDouble(groupName, "subBoxesY", m_numberOfBoxCellsY);
+
 		return true;
 	}
 	catch (H5::Exception &err)
@@ -238,9 +236,8 @@ bool Box::load(Hdf5* file, const char* groupName)
 		m_subBoxesLengthX = file->readAttributeDouble(groupName, "lcx");
 		m_subBoxesLengthY = file->readAttributeDouble(groupName, "lcy");
 		m_periodicBoundaries = file->readAttributeBool(groupName, "pbc");
-
-		m_numberOfBoxCellsX = static_cast<int>(m_lx / m_subBoxesLengthX);
-		m_numberOfBoxCellsY = static_cast<int>(m_ly / m_subBoxesLengthY);
+		m_numberOfBoxCellsX = file->readAttributeDouble(groupName, "subBoxesX");
+		m_numberOfBoxCellsY = file->readAttributeDouble(groupName, "subBoxesY");
 
 		createCubic();
 		return true;

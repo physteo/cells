@@ -7,7 +7,7 @@ class OneBodyForce
 {
 public:
 	virtual ~OneBodyForce() {}
-	virtual void updateForce(Part* part) const = 0;
+	virtual void updateForce(Part* part, Vector& forceVector) const = 0;
 };
 
 
@@ -18,6 +18,6 @@ public:
 public:
 	NoForce() {}
 	~NoForce() {}
-	void updateForce(Part* part) const override {};
+	void updateForce(Part* part, Vector& forceVector) const override { forceVector = Vector{}; };
 };
 

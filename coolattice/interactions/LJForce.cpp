@@ -1,7 +1,7 @@
 #include "LJForce.h"
 
 
-void LJForce::updateForce(Part* part1, const Part* part2, const Box* box) const
+void LJForce::updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const
 {
 	Vector distance{};
 	double r2 = box->computeDistanceSquaredPBC(part1->position, part2->position, distance);
@@ -14,9 +14,9 @@ void LJForce::updateForce(Part* part1, const Part* part2, const Box* box) const
 
 		double force = 48.0 * eps * one_over_r2 * sigma6_over_r6 * (sigma6_over_r6 - 0.5);
 
-		Vector addedForce = distance * force;
+		forceVector = distance * force;
 
-		part1->velocity += addedForce * (1.0 / (1.0)); // TODO URGENT: change to 1.0 / FRICTION
+		part1->velocity += forceVector;
 	}
 
 }

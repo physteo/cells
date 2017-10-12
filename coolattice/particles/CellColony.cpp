@@ -60,15 +60,10 @@ void CellColony::populate(double numPerLineX, double numPerLineY, double boxLeng
 
 bool CellColony::save(Hdf5* file, const char* name) const
 {
-	// Hdf5 was just created outside
-	// create a group for cells
+
 	file->createNewGroup(name);
 	H5::Group groupCells = file->openGroup(name);
 
-	// TODO: URGENT remove simon's unit
-	//double unit = 1.0;
-
-	// from here new
 	const H5::CompType& partType = Hdf5types::getPartTypewCell();
 	int LENGTH = this->totalNumberOfParts();
 	int RANK = 1;
@@ -81,8 +76,6 @@ bool CellColony::save(Hdf5* file, const char* name) const
 	for (int i = 0; i < m_cells.size(); i++) {
 		for (size_t j = 0; j < m_cells.at(i).getNumOfParts(); j++) {
 			const Part* part = &m_cells.at(i).getPart(j);
-			// TODO URGENT: remove simon's units !!
-			//parts.at(partCounter) = LightPartwCell{ part->position.x * unit, part->position.y * unit, part->velocity.x * unit, part->velocity.y * unit, part->cell};
 			parts.at(partCounter) = LightPartwCell{ part->position.x, part->position.y, part->velocity.x, part->velocity.y, part->cell };
 			partCounter++;
 		}

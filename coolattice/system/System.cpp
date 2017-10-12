@@ -3,11 +3,67 @@
 #define DEBUG1
 
 
+MeasureTwoBodyForce::MeasureTwoBodyForce(PartSpecs* partSpecsIn, size_t partID1in, size_t partID2in,
+	bool intraIn, size_t forceIDin)
+{
+
+	partSpecsMeasure = partSpecsIn;
+	partID1 = partID1in;
+	partID2 = partID2in;
+	intra = intraIn;
+	forceID = forceIDin;
+
+	Part part1;
+	Part part2;
+	part1.cell = 0;
+	part1.type = partID1;
+	part2.cell = intra ? 0 : 1;
+	part2.type = partID2;
+
+	twoBodyForce = partSpecsIn->getTwoBodyForce(&part1, &part2, forceID);
+	//twoBodyForce = partSpecsIn->oneBodyForces.at(0).at(0);
+}
+
+bool MeasureTwoBodyForce::load(Hdf5* file, const char* name)
+{
+	std::cerr << "Not possible to load force measurements in this version of the code." << std::endl;
+	assert(false);
+	return false;
+}
+
+bool MeasureTwoBodyForce::save(Hdf5* file, const char* name) const
+{
+	file->createNewGroup(name);
+	H5::Group groupCells = file->openGroup(name);
+	const H5::CompType& h5type = Hdf5types::getSimonType();
+
+	for (size_t i = 0; i < data.size(); i++)
+	{
+		char stringName[1024];
+		sprintf(stringName, "%s_%u", "t", (unsigned int)i);
+
+		int LENGTH = this->data.at(i).size();
+		int RANK = 1;
+		hsize_t dim[] = { LENGTH };   /* Dataspace dimensions */
+		H5::DataSpace space(RANK, dim);
+		H5::DataSet* dataset = new H5::DataSet(groupCells.createDataSet(stringName, h5type, space));
+		dataset->write(&data.at(i).at(0), h5type);
+		delete dataset;
+	}
+	return true;
+}
+
+
+
+
+
+
 System::System()
 {
 	cells.resize(0);
 	parts.resize(0);
 	box = nullptr;
+	measureTwoBodyForce = nullptr;
 }
 
 System::System(size_t n)
@@ -15,6 +71,7 @@ System::System(size_t n)
 	cells.resize(n);
 	parts.resize(0);
 	box = nullptr;
+	measureTwoBodyForce = nullptr;
 }
 
 System::System(CellColony* cellsIn)
@@ -25,6 +82,7 @@ System::System(CellColony* cellsIn)
 		cells.push_back(cellsIn->at(i));
 	}
 	box = nullptr;
+	measureTwoBodyForce = nullptr;
 }
 
 
@@ -32,6 +90,7 @@ System::System(CellColony* cellsIn, Box* boxIn) : System{ cellsIn }
 {
 	constructPartsVector();
 	box = boxIn;
+	measureTwoBodyForce = nullptr;
 }
 
 
@@ -40,16 +99,29 @@ System::System(CellColony* cellsIn, PartSpecs* partSpecsIn, Box* boxIn) : System
 	partSpecs = partSpecsIn;
 	clearSubBoxes();
 	setSubBoxes();
-	
+
 	//resolveOverlaps();
 	
 	//clearSubBoxes();
 	//setSubBoxes();
 
-
+	measureTwoBodyForce = nullptr;
 }
 
 
+void System::registerTwoBodyForceMeasurement(MeasureTwoBodyForce* m)
+{
+	this->measureTwoBodyForce = m;
+}
+
+
+void System::resizePartsDataSlots(size_t slots)
+{
+	for (size_t n = 0; n < parts.size(); n++)
+	{
+		parts.at(n)->data.resize(slots);
+	}
+}
 
 void System::constructPartsVector()
 {
@@ -125,9 +197,9 @@ void System::clearSubBoxes()
 
 #define DEBUG
 
-void System::computeForces(double dt)
-{
 
+void System::resetVelocities()
+{
 #ifdef OMP
 #pragma omp parallel for
 #endif
@@ -136,6 +208,40 @@ void System::computeForces(double dt)
 		part1->velocity = Vector{ 0.0, 0.0 };
 	}
 
+}
+
+
+
+void System::computeOneBodyForces(Part* part1, const PartSpecs* specs)
+{
+	for (size_t f = 0; f < specs->oneBodyForces.at(part1->type).size(); f++)
+	{
+		//x/OneBodyForce* force = partSpecs->oneBodyForces.at(part1->type).at(f).get();
+		OneBodyForce* force = specs->oneBodyForces.at(part1->type).at(f); // .get() <- not here anymore cause i swtiched to raw pointers in order to make python interface
+
+		Vector addedForce;
+		force->updateForce(part1, addedForce);
+		//measureOneBodyForce.measure(part1->type, f, addedForce);
+	}
+}
+
+
+void System::computeTwoBodyForces(Part* part1, const Part* part2, const PartSpecs* specs)
+{
+	for (size_t f = 0; f < specs->numberOfTwoBodyForces(part1, part2); f++)
+	{
+		const TwoBodyForce* force = specs->getTwoBodyForce(part1, part2, f);
+
+		Vector addedForce;
+		force->updateForce(part1, part2, box, addedForce);
+		//measureTwoBodyForce.measure(part1->type, f, addedForce);
+	}
+}
+
+
+void System::computeForces(double dt)
+{
+	resetVelocities();
 	//test//double sigAA = 1.1;
 	//test//double sigBB = 0.88;
 	//test//double motility = 1.0;
@@ -152,7 +258,6 @@ void System::computeForces(double dt)
 	//test//CilForce  cil1   = CilForce { motility };
 	//test//FeneForce fene21 = FeneForce{ rMaxSquared, kappa };
 	
-
 	// loop over all parts
 #ifdef OMP
 #pragma omp parallel for schedule(guided)
@@ -163,13 +268,7 @@ void System::computeForces(double dt)
 		Part* part1 = parts.at(n);
 		
 		// apply one body forces
-		for (size_t f = 0; f < partSpecs->oneBodyForces.at(part1->type).size(); f++)
-		{
-			//x/OneBodyForce* force = partSpecs->oneBodyForces.at(part1->type).at(f).get();
-			OneBodyForce* force = partSpecs->oneBodyForces.at(part1->type).at(f); // .get() <- not here anymore cause i swtiched to raw pointers in order to make python interface
-		
-			force->updateForce(part1);
-		}
+		computeOneBodyForces(part1, partSpecs);
 
 #ifdef LIST
 		// get the cell of this part
@@ -190,11 +289,8 @@ void System::computeForces(double dt)
 #endif
 
 				if (part2 != part1) {
-					for (size_t f = 0; f < partSpecs->numberOfTwoBodyForces(part1, part2); f++)
-					{
-						const TwoBodyForce* force = partSpecs->getTwoBodyForce(part1, part2, f);
-						force->updateForce(part1, part2, box);
-					}
+
+					computeTwoBodyForces(part1, part2, partSpecs);
 
 					//test//size_t type1 = part1->type;
 					//test//size_t type2 = part2->type;
@@ -229,14 +325,14 @@ void System::computeForces(double dt)
 					//test//	{
 					//test//		BB.updateForce(part1, part2, box);
 					//test//	}
-					//test//}
-					
-
+					//test//}					
 
 #ifdef LIST
 				}
 				part2 = part2->next;
 #endif
+
+
 			}
 
 		}
@@ -249,6 +345,115 @@ void System::computeForces(double dt)
 	}
 
 }
+
+
+
+void System::collect()
+{
+	if (measureTwoBodyForce == nullptr)
+	{
+		std::cerr << "No force to be measured has been registered." << std::endl;
+	}
+
+
+	//measureOneBodyForce->data.push_back(std::vector<Vector>{});
+	measureTwoBodyForce->data.push_back(std::vector<Vector>{});
+	//measureOneBodyForce->data.back().resize(this->parts.size());
+	measureTwoBodyForce->data.back().resize(this->parts.size());
+
+
+	// store the velocities. They will be restored into the particles velocity vector
+	std::vector<Vector> velocities;
+	velocities.resize(parts.size());
+#ifdef OMP
+#pragma omp parallel for schedule(guided)
+#endif
+	for (int i = 0; i < parts.size(); i++)
+	{
+		velocities.at(i) = parts.at(i)->velocity;
+		measureTwoBodyForce->data.back().at(i) = Vector{ 0.0, 0.0 };
+	}
+
+	// reset to zero so we can extract the forces
+	resetVelocities();
+
+	// measure the forces I want and store them into a vector
+#ifdef OMP
+#pragma omp parallel for schedule(guided)
+#endif
+	for (int n = 0; n < parts.size(); n++)
+	{
+		Part* part1 = parts.at(n);
+		// look at measureOneBodyForce
+		//if (part1->type == measureOneBodyForce->partID)
+		//{
+		//	// apply force
+		//	Vector addedVector{};
+		//	measureOneBodyForce->oneBodyForce->updateForce(part1, addedVector);
+		//}
+		//measureOneBodyForce->data.back().push_back(part1->velocity);
+		//part1->velocity = Vector{ 0.0,0.0 }; // necessary for the next measure (twoBodyForces) !
+		
+#ifdef LIST
+		BoxCell* subBox1 = part1->myBoxCell;
+		for (int J = 0; J < 9; J++)
+		{
+			BoxCell* subBox2 = subBox1->neighbour[J];
+			Part* part2 = subBox2->head.next;
+			while (part2 != nullptr)
+			{
+#else
+		for (size_t m = 0; m < parts.size(); m++)
+		{
+			Part* part2 = parts.at(m);
+#endif
+			if (part2 != part1) {
+				// measureTwoBodyForce
+				if  (part1->type == measureTwoBodyForce->partID1 && part2->type == measureTwoBodyForce->partID2 && ((part1->cell == part2->cell) == (measureTwoBodyForce->intra)) )
+				{
+					Vector addedVector{};
+					measureTwoBodyForce->twoBodyForce->updateForce(part1, part2, box, addedVector);
+				}
+#ifdef LIST
+			}
+			part2 = part2->next;
+#endif
+			}
+		}
+		measureTwoBodyForce->data.back().at(n) = part1->velocity;
+		part1->velocity = Vector{ 0.0, 0.0 };
+	}
+
+
+
+	// restore velocities
+#ifdef OMP
+#pragma omp parallel for schedule(guided)
+#endif
+	for (int i = 0; i < parts.size(); i++)
+	{
+		parts.at(i)->velocity = velocities.at(i);
+	}
+
+}
+
+
+
+#include<limits>
+void System::setTypeFriction(size_t i, double friction)
+{
+	if (friction < 0)
+		friction = std::numeric_limits<double>::infinity();
+	this->partSpecs->setFriction(i, friction);
+}
+
+double System::getTypeFriction(size_t i)
+{
+	return this->partSpecs->getFriction(i);
+}
+
+
+
 #define NEWDEBUG
 void System::updatePositions(double dt, bool update)
 {
@@ -257,10 +462,20 @@ void System::updatePositions(double dt, bool update)
 #endif
 	for (int n = 0; n < parts.size(); n++)
 	{
+		size_t pt = parts.at(n)->type;
+		double friction = this->partSpecs->getFriction(pt);
+		double mass = this->partSpecs->partTypes.getPartTypes().at(pt).mass;
+
 #ifdef NEWDEBUG
 		Vector oldPosition = parts.at(n)->position;
 #endif
-		parts.at(n)->position += parts.at(n)->velocity * (dt/(FRICTION * MASS));
+		
+		
+		//std::cout << "part" << parts.at(n)->type << " has f = " << friction << std::endl;
+		
+
+
+		parts.at(n)->position += parts.at(n)->velocity * (dt/(friction * mass));
 
 #ifdef NEWDEBUG
 		Vector difference = parts.at(n)->position + (oldPosition * (-1) );

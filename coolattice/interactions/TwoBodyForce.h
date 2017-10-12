@@ -5,7 +5,7 @@ class TwoBodyForce
 {
 public:
 	~TwoBodyForce() {}
-	virtual void updateForce(Part* part1, const Part* part2, const Box* box) const = 0;
+	virtual void updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const = 0;
 };
 
 
@@ -16,6 +16,6 @@ public:
 public:
 	TwoBodyNoForce() {}
 	~TwoBodyNoForce() {}
-	virtual void updateForce(Part* part1, const Part* part2, const Box* box) const override {}
+	virtual void updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const override {}
 
 };

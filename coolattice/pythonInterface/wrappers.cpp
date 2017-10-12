@@ -45,31 +45,40 @@ namespace pywrapper {
 		//	;
 
 		class_<PartSpecsWrap, boost::noncopyable>("PartSpecs")
+			.def("setFriction",  &PartSpecs::setFriction)
 			.def("load", pure_virtual(&PartSpecs::load))
 			.def("save", pure_virtual(&PartSpecs::save))
 			.def("cellIsBroken", pure_virtual(&PartSpecs::cellIsBroken))
 			;
 
 		class_<SMTYSpecs, bases<PartSpecs> >("SMTYSpecs", init<>())
-			.def(init<double, double, double, double, double, double, double, double>())
+			.def(init<double, double, double, double, double, double, double, double, double, double, double>())
 			.def("save", &SMTYSpecs::save)
 			.def("load", &SMTYSpecs::load)
 			.def("cellIsBroken", &SMTYSpecs::cellIsBroken)
 			;
 
 		class_<SMTYSpecsNOCIL, bases<PartSpecs> >("SMTYSpecsNOCIL", init<>())
-			.def(init<double, double, double, double, double, double, double, double>())
+			.def(init<double, double, double, double, double, double, double, double, double, double, double>())
 			.def("save", &SMTYSpecsNOCIL::save)
 			.def("load", &SMTYSpecsNOCIL::load)
 			.def("cellIsBroken", &SMTYSpecs::cellIsBroken)
 			;
 
+		class_<MeasureTwoBodyForce>("MeasureTwoBodyForce", init<PartSpecs*, size_t, size_t, bool, size_t>())
+			.def("save", &MeasureTwoBodyForce::save)
+			.def("load", &MeasureTwoBodyForce::load)
+			;
 
 		class_<System>("System", init<CellColony*, PartSpecs*, Box*>())
 			.def("updatePositions", &System::updatePositions)
 			.def("computeForces", &System::computeForces)
+			.def("collectForces",  &System::collect)
 			.def("getColony", &System::getColony)
 			.def("cellsAreBroken", &System::cellsAreBroken)
+			.def("setTypeFriction", &System::setTypeFriction)
+			.def("getTypeFriction", &System::getTypeFriction)
+			.def("registerTwoBodyForceMeasurement", &System::registerTwoBodyForceMeasurement)
 			;
 
 
@@ -79,7 +88,9 @@ namespace pywrapper {
 			.def("size", &SystemTrajectory::size)
 			.def("push_back", &SystemTrajectory::push_back)
 			.def("copyColony", &SystemTrajectory::copyColony)
-		;
+			;
+
+
 
 #ifdef VISUALS
 		class_<visuals::Display, boost::noncopyable>("Display", init<int, int, Box*, PartSpecs*, SystemTrajectory*, bool>())

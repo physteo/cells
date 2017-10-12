@@ -11,7 +11,7 @@ public:
 public:
 	CilForce(double motilityIn = 0.0) : motility(motilityIn) {}
 
-	void updateForce(Part* part1, const Part* part2, const Box* box) const override;
+	void updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const override;
 };
 
 
@@ -24,5 +24,5 @@ public:
 public:
 	ConstantPropulsionForce(double intensityIn = 0.0) : intensity(intensityIn) {}
 
-	void updateForce(Part* part1, const Part* part2, const Box* box) const override;
+	void updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const override;
 };

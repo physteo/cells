@@ -9,10 +9,11 @@ GaussianRandomForce::GaussianRandomForce(double varianceIn, double deltatIn,
 
 
 
-void GaussianRandomForce::updateForce(Part* part) const
+void GaussianRandomForce::updateForce(Part* part, Vector& forceVector) const
 {
 	double dx = gsl_ran_gaussian_ziggurat(g_rng, variance);
 	double dy = gsl_ran_gaussian_ziggurat(g_rng, variance);
 
-	part->velocity += Vector{dx, dy} * prefactor;
+	forceVector = Vector{ dx, dy } * prefactor;
+	part->velocity += forceVector;
 }

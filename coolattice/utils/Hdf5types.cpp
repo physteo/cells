@@ -62,3 +62,5 @@ const H5::CompType& Hdf5types::getSimonType()
 	static Initializer ListInitializationGuard;
 	return *m_simonType;
 }
+
+

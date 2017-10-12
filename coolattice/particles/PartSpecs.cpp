@@ -27,9 +27,10 @@ const std::vector< TwoBodyForce* >& TwoBodyForceVectors::operator()(const Part* 
 PartSpecs::PartSpecs(size_t n)
 {
 	numberOfTypes = n;
-	partTypes.resize(n);
+	partTypes.getPartTypes().resize(n);
 	twoBodyForces = TwoBodyForceVectors{ n };
 	oneBodyForces.resize(n);
+	name = "";
 }
 
 TwoBodyForce* PartSpecs::getTwoBodyForce(const Part* part1, const Part* part2, size_t index) const

@@ -19,11 +19,14 @@
 #include "Cell.h"
 #include <omp.h>
 
+typedef  std::vector< std::vector<OneBodyForce* > > OneBodyForceVector;
+
 class TwoBodyForceVectors
 {
 private:
 	std::vector< std::vector<TwoBodyForce* > > intraForces;
 	std::vector< std::vector<TwoBodyForce* > > interForces;
+
 public:
 	TwoBodyForceVectors() {}
 	TwoBodyForceVectors(size_t numberOfTypes);
@@ -38,25 +41,30 @@ public:
 
 class PartSpecs : public BinarySavable
 {
-private:
-	typedef  std::vector< std::vector<OneBodyForce* > > OneBodyForceVector;
-
+protected:
+	std::string name;
 public:
 	size_t					numberOfTypes;
-	std::vector<PartType>	partTypes;
+	PartTypeVector          partTypes;
 	OneBodyForceVector		oneBodyForces;
 	TwoBodyForceVectors		twoBodyForces;
-	
 public:
-	PartSpecs() : numberOfTypes(0) {}
+	PartSpecs() : numberOfTypes(0), name("") {}
 
 	PartSpecs(size_t n);
 
 	TwoBodyForce*		getTwoBodyForce(const Part* part1, const Part* part2, size_t index) const;
 	size_t				numberOfTwoBodyForces(const Part* part1, const Part* part2) const;
 
-	std::string& getName(size_t i) { return partTypes.at(i).name; };
-	double getDiameter(size_t i) { return partTypes.at(i).sig; };
+	const std::string& getName(size_t i) const { return partTypes.getPartTypes().at(i).name; };
+	double getDiameter(size_t i)   const { return partTypes.getPartTypes().at(i).sig; };
+	double getMass(size_t i)       const { return partTypes.getPartTypes().at(i).mass; }
+	double getFriction(size_t i)   const { return partTypes.getPartTypes().at(i).friction; }
+
+	void setDiameter(size_t i, double sig) { partTypes.getPartTypes().at(i).sig = sig; };
+	void setMass(size_t i, double mass) {  partTypes.getPartTypes().at(i).mass = mass; }
+	void setFriction(size_t i, double friction) {  partTypes.getPartTypes().at(i).friction = friction; }
+
 
 	bool load(Hdf5* file, const char* groupName)		  = 0;
 	bool save(Hdf5* file, const char* groupName) const    = 0;

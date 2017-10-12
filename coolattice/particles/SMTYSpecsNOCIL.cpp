@@ -3,23 +3,29 @@
 
 SMTYSpecsNOCIL::SMTYSpecsNOCIL() : PartSpecs(2)
 {
-
+	name = "SMTY_NOCIL";
 }
 
 void SMTYSpecsNOCIL::build()
 {
-	double sigAB = .5*(m_sigAA + m_sigBB);
+	const double& sigAA = this->partTypes.getPartTypes().at(0).sig;
+	const double& sigBB = this->partTypes.getPartTypes().at(1).sig;
+	const double& frictionF = this->partTypes.getPartTypes().at(0).friction;
+	const double& frictionB = this->partTypes.getPartTypes().at(1).friction;
+
+	double sigAB = .5*(sigAA + sigBB);
 
 	// characteristics
-	double ssCellLength = sqrt(m_rMaxSquared) * sqrt(1.0 - 2.0 * m_kappa / m_motility);
-	double ssSpeed = ssCellLength * m_motility / (2 * m_friction);
+	double ssCellLength = sqrt(m_rMaxSquared) * sqrt(1.0 - m_kappa * (1.0 / frictionF + 1.0 / frictionB) / (m_motility / frictionF));
+	double ssSpeed = ssCellLength * m_motility / (frictionF + frictionB);
 	double migrationTime = sqrt(m_rMaxSquared) / ssSpeed;
 
 
-	LJForce* lja(new LJForce{ m_sigAA, m_epsilon, (m_sigAA * m_sigAA * m_cut * m_cut) });
-	LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
-	LJForce* ljc(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
-	LJForce* ljd(new LJForce{ m_sigBB, m_epsilon, (m_sigBB * m_sigBB * m_cut * m_cut) });
+
+	LJForce* lja(new LJForce{ sigAA, m_epsilon, (sigAA * sigAA * m_cut * m_cut) });
+	LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB * sigAB * m_cut * m_cut) });
+	LJForce* ljc(new LJForce{ sigAB, m_epsilon, (sigAB * sigAB * m_cut * m_cut) });
+	LJForce* ljd(new LJForce{ sigBB, m_epsilon, (sigBB * sigBB * m_cut * m_cut) });
 
 	std::vector< std::vector< TwoBodyForce* > >& interForces = this->twoBodyForces.getInterForces();
 	interForces.at(0).push_back(lja);
@@ -39,7 +45,7 @@ void SMTYSpecsNOCIL::build()
 	intraForces.at(0).push_back(noforce); // this is not necessary
 	intraForces.at(3).push_back(noforce); // this is not necessary
 
-										 // interaction where part1 is the front, and part2 is the back: both Fene force and CIL force to part1
+	// interaction where part1 is the front, and part2 is the back: both Fene force and CIL force to part1
 	intraForces.at(1).push_back(feneAB);
 	intraForces.at(1).push_back(propForce);
 	//intraForces.at(1).push_back(std::make_unique<ConstantPropulsionForce>(std::move(ConstantPropulsionForce{ motility * ssSpeed})));
@@ -50,12 +56,9 @@ void SMTYSpecsNOCIL::build()
 	//partSpecs.oneBodyForces.at(0).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7})))); // TODO URGENT: pass dt etc
 	//partSpecs.oneBodyForces.at(1).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7 })))); // TODO URGENT: pass dt etc
 
-	this->partTypes.at(0).name = "F";
-	this->partTypes.at(1).name = "B";
-	this->partTypes.at(0).mass = 1.0;
-	this->partTypes.at(1).mass = 1.0;
-	this->partTypes.at(0).sig = m_sigAA;
-	this->partTypes.at(1).sig = m_sigBB;
+
+
+
 
 	std::cout << " *** System's steady-state(ss) characteristics *** " << std::endl;
 	std::cout << " - Cell Length = " << ssCellLength << std::endl;
@@ -64,10 +67,23 @@ void SMTYSpecsNOCIL::build()
 }
 
 SMTYSpecsNOCIL::SMTYSpecsNOCIL(double sigAA, double sigBB, double motility,
-	double epsilon, double cut, double rMaxSquared, double kappa, double friction) : PartSpecs(2),
-	m_sigAA(sigAA), m_sigBB(sigBB), m_motility(motility), m_epsilon(epsilon),
-	m_cut(cut), m_rMaxSquared(rMaxSquared), m_kappa(kappa), m_friction(friction)
+	double epsilon, double cut, double rMaxSquared, double kappa, double frictionF, double frictionB, double massF, double massB) : SMTYSpecsNOCIL()
 {
+	m_motility = motility;
+	m_epsilon = epsilon;
+	m_cut = cut;
+	m_rMaxSquared = rMaxSquared;
+	m_kappa = kappa;
+
+	// particle types
+	this->partTypes.getPartTypes().at(0).name = "F";
+	this->partTypes.getPartTypes().at(1).name = "B";
+	this->partTypes.getPartTypes().at(0).mass = massF;
+	this->partTypes.getPartTypes().at(1).mass = massB;
+	this->partTypes.getPartTypes().at(0).sig = sigAA;
+	this->partTypes.getPartTypes().at(1).sig = sigBB;
+	this->partTypes.getPartTypes().at(0).friction = frictionF;
+	this->partTypes.getPartTypes().at(1).friction = frictionB;
 	build();
 }
 
@@ -76,14 +92,19 @@ bool SMTYSpecsNOCIL::load(Hdf5* file, const char* groupName)
 {
 	try {
 		H5::Group group = file->openGroup(groupName);
-		m_sigAA = file->readAttributeDouble(groupName, "sigAA");
-		m_sigBB = file->readAttributeDouble(groupName, "sigBB");
+
+		name = file->readAttributeString(groupName, "name");
 		m_motility = file->readAttributeDouble(groupName, "motility");
 		m_epsilon = file->readAttributeDouble(groupName, "eps");
 		m_cut = file->readAttributeDouble(groupName, "cut");
 		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
 		m_kappa = file->readAttributeDouble(groupName, "k");
-		m_friction = file->readAttributeDouble(groupName, "friction");
+
+		// save partType
+		char partTypesGroupName[64];
+		strcpy(partTypesGroupName, groupName);
+		strcat(partTypesGroupName, "/Types");
+		this->partTypes.load(file, partTypesGroupName);
 
 		build();
 		return true;
@@ -106,14 +127,19 @@ bool SMTYSpecsNOCIL::save(Hdf5* file, const char* groupName) const
 	try {
 		file->createNewGroup(groupName);
 		H5::Group group = file->openGroup(groupName);
-		file->writeAttributeDouble(groupName, "sigAA", m_sigAA);
-		file->writeAttributeDouble(groupName, "sigBB", m_sigBB);
-		file->writeAttributeDouble(groupName, "eps", m_epsilon);
+
+		file->writeAttributeString(groupName, "name", name.c_str());
 		file->writeAttributeDouble(groupName, "motility", m_motility);
+		file->writeAttributeDouble(groupName, "eps", m_epsilon);
 		file->writeAttributeDouble(groupName, "cut", m_cut);
 		file->writeAttributeDouble(groupName, "rMax2", m_rMaxSquared);
 		file->writeAttributeDouble(groupName, "k", m_kappa);
-		file->writeAttributeDouble(groupName, "friction", m_friction);
+
+		// save partType
+		char partTypesGroupName[64];
+		strcpy(partTypesGroupName, groupName);
+		strcat(partTypesGroupName, "/Types");
+		this->partTypes.save(file, partTypesGroupName);
 
 		return true;
 	}

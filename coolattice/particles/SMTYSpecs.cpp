@@ -59,23 +59,30 @@
 
 SMTYSpecs::SMTYSpecs() : PartSpecs(2)
 {
-
+	name = "SMTY";
 }
 
 void SMTYSpecs::build()
 {
-	double sigAB = .5*(m_sigAA + m_sigBB);
+
+	const double& sigAA = this->partTypes.getPartTypes().at(0).sig;
+	const double& sigBB = this->partTypes.getPartTypes().at(1).sig;
+	const double& frictionF = this->partTypes.getPartTypes().at(0).friction;
+	const double& frictionB = this->partTypes.getPartTypes().at(1).friction;
+
+
+	double sigAB = .5*(sigAA + sigBB);
 
 	// characteristics
-	double ssCellLength = sqrt(m_rMaxSquared) * sqrt(1.0 - 2.0 * m_kappa / m_motility);
-	double ssSpeed = ssCellLength * m_motility / (2 * m_friction);
+	double ssCellLength = sqrt(m_rMaxSquared) * sqrt(1.0 - m_kappa * (1.0/frictionF + 1.0/frictionB)/(m_motility/frictionF)  );
+	double ssSpeed		= ssCellLength * m_motility / (frictionF + frictionB);
 	double migrationTime = sqrt(m_rMaxSquared) / ssSpeed;
 
 
-	LJForce* lja(new LJForce{ m_sigAA, m_epsilon, (m_sigAA * m_sigAA * m_cut * m_cut) });
+	LJForce* lja(new LJForce{ sigAA, m_epsilon, (sigAA *   sigAA * m_cut * m_cut) });
 	LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
 	LJForce* ljc(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
-	LJForce* ljd(new LJForce{ m_sigBB, m_epsilon, (m_sigBB * m_sigBB * m_cut * m_cut) });
+	LJForce* ljd(new LJForce{ sigBB, m_epsilon, (sigBB *   sigBB * m_cut * m_cut) });
 
 	std::vector< std::vector< TwoBodyForce* > >& interForces = this->twoBodyForces.getInterForces();
 	interForces.at(0).push_back(lja);
@@ -83,12 +90,10 @@ void SMTYSpecs::build()
 	interForces.at(2).push_back(ljc);
 	interForces.at(3).push_back(ljd);
 
-
 	FeneForce* feneAA(new FeneForce{ m_rMaxSquared, m_kappa });
 	FeneForce* feneAB(new FeneForce{ m_rMaxSquared, m_kappa });
 	FeneForce* feneBA(new FeneForce{ m_rMaxSquared, m_kappa });
 	FeneForce* feneBB(new FeneForce{ m_rMaxSquared, m_kappa });
-
 
 	CilForce*  cil(new CilForce{ m_motility });
 
@@ -97,8 +102,8 @@ void SMTYSpecs::build()
 	intraForces.at(3).push_back(feneBB); // this is not necessary
 
 										 // interaction where part1 is the front, and part2 is the back: both Fene force and CIL force to part1
-	intraForces.at(1).push_back(feneAB);
-	intraForces.at(1).push_back(cil);
+	intraForces.at(1).push_back(feneAB); // fene is in the slot 0 ! (keep in mind when measuring forces
+	intraForces.at(1).push_back(cil);	 // CIL  is in the slot 1 ! ( //	 //    //   //    //  )
 	//intraForces.at(1).push_back(std::make_unique<ConstantPropulsionForce>(std::move(ConstantPropulsionForce{ motility * ssSpeed})));
 
 	// interaction where part2 is the front and part1 is the back: no CIL given to part1 
@@ -107,12 +112,7 @@ void SMTYSpecs::build()
 	//partSpecs.oneBodyForces.at(0).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7})))); // TODO URGENT: pass dt etc
 	//partSpecs.oneBodyForces.at(1).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7 })))); // TODO URGENT: pass dt etc
 
-	this->partTypes.at(0).name = "F";
-	this->partTypes.at(1).name = "B";
-	this->partTypes.at(0).mass = 1.0;
-	this->partTypes.at(1).mass = 1.0;
-	this->partTypes.at(0).sig = m_sigAA;
-	this->partTypes.at(1).sig = m_sigBB;
+
 
 	std::cout << " *** System's steady-state(ss) characteristics *** " << std::endl;
 	std::cout << " - Cell Length = " << ssCellLength << std::endl;
@@ -121,29 +121,24 @@ void SMTYSpecs::build()
 }
 
 SMTYSpecs::SMTYSpecs(double sigAA, double sigBB, double motility,
-	double epsilon, double cut, double rMaxSquared, double kappa, double friction) : PartSpecs(2)
-	, m_sigAA(sigAA), m_sigBB(sigBB), m_motility(motility), m_epsilon(epsilon),
-	m_cut(cut), m_rMaxSquared(rMaxSquared), m_kappa(kappa), m_friction(friction)
+	double epsilon, double cut, double rMaxSquared, double kappa, double frictionF, double frictionB, double massF, double massB) : SMTYSpecs()
 {
-	//m_sigAA = 1.1  * 0.04;
-	//m_sigBB = 0.88 * 0.04;
-	//m_motility = 1.0;
-	//m_epsilon = 9.64832e-5;
-	//m_cut = pow(2., 1. / 6.);
-	//m_rMaxSquared = 4.0;
-	//m_kappa = 0.482416;
-	//m_friction = 1.0;
 
+	m_motility = motility;
+	m_epsilon = epsilon;
+	m_cut = cut;
+	m_rMaxSquared = rMaxSquared;
+	m_kappa = kappa;
 
-	//TODO: URGENT. REMOVE THE HARD CODED NUMBERS
-	//m_sigAA = 1.1;
-	//m_sigBB = 0.88;
-	//m_motility = 1.0;
-	//m_epsilon = 9.64832e-5;
-	//m_cut = pow(2., 1. / 6.);
-	//m_rMaxSquared = 4.0;
-	//m_kappa = 0.482416;
-	//m_friction = 1.0;
+	// particle types
+	this->partTypes.getPartTypes().at(0).name = "F";
+	this->partTypes.getPartTypes().at(1).name = "B";
+	this->partTypes.getPartTypes().at(0).mass = massF;
+	this->partTypes.getPartTypes().at(1).mass = massB;
+	this->partTypes.getPartTypes().at(0).sig = sigAA;
+	this->partTypes.getPartTypes().at(1).sig = sigBB;
+	this->partTypes.getPartTypes().at(0).friction = frictionF;
+	this->partTypes.getPartTypes().at(1).friction = frictionB;
 
 	build();
 }
@@ -153,14 +148,26 @@ bool SMTYSpecs::load(Hdf5* file, const char* groupName)
 {
 	try {
 		H5::Group group = file->openGroup(groupName);
-		m_sigAA       = file->readAttributeDouble(groupName, "sigAA");
-		m_sigBB       = file->readAttributeDouble(groupName, "sigBB");
+
+		std::string readName = file->readAttributeString(groupName, "name");
+		// TODO: check if name is the same
+		if (readName == name)
+		{
+
+		}
+
 		m_motility    = file->readAttributeDouble(groupName, "motility");
 		m_epsilon     = file->readAttributeDouble(groupName, "eps");
 		m_cut         = file->readAttributeDouble(groupName, "cut");
 		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
 		m_kappa       = file->readAttributeDouble(groupName, "k");
-		m_friction    = file->readAttributeDouble(groupName, "friction");
+
+		// save partType
+		char partTypesGroupName[64];
+		strcpy(partTypesGroupName, groupName);
+		strcat(partTypesGroupName, "/Types");
+		this->partTypes.load(file, partTypesGroupName);
+
 
 		build();
 		return true;
@@ -183,14 +190,19 @@ bool SMTYSpecs::save(Hdf5* file, const char* groupName) const
 	try {
 		file->createNewGroup(groupName);
 		H5::Group group = file->openGroup(groupName);
-		file->writeAttributeDouble(groupName, "sigAA",    m_sigAA);
-		file->writeAttributeDouble(groupName, "sigBB",	  m_sigBB);
+
+		file->writeAttributeString(groupName, "name",     name.c_str());
 		file->writeAttributeDouble(groupName, "motility", m_motility);
 		file->writeAttributeDouble(groupName, "eps",	  m_epsilon);
 		file->writeAttributeDouble(groupName, "cut",      m_cut);
 		file->writeAttributeDouble(groupName, "rMax2",    m_rMaxSquared);
 		file->writeAttributeDouble(groupName, "k",        m_kappa);
-		file->writeAttributeDouble(groupName, "friction", m_friction);
+		
+		// save partType
+		char partTypesGroupName[64];
+		strcpy(partTypesGroupName, groupName);
+		strcat(partTypesGroupName, "/Types");
+		this->partTypes.save(file, partTypesGroupName);
 
 		return true;
 	}

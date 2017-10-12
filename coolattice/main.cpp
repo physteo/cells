@@ -103,7 +103,6 @@ int main2()
 		std::cout << pos.at(i) << ", " << pos.at(i+1) << std::endl;
 	}
 
-	std::cin.get();
 	return 0;
 }
 
@@ -121,6 +120,7 @@ int main(int argc, char* argv[])
 #else
 	unsigned long int seed = (seedStr == "") ? mix(clock(), time(NULL), 1) : std::stoul(seedStr);
 #endif
+
 	g_rng = gsl_rng_alloc(gsl_rng_mt19937);
 	gsl_rng_set(g_rng, seed);
 	// ***************************************************************************
@@ -135,6 +135,7 @@ int main(int argc, char* argv[])
 		inputFilePath = argv[1];
 	}
 	else if (argc == 1) {
+		//inputFilePath = "C:/Users/matte/Desktop/script_load_cycle.py";
 		inputFilePath = "C:/Users/matte/Desktop/script_load.py";
 	}
 	else if (argc > 2) {
@@ -164,6 +165,10 @@ int main(int argc, char* argv[])
 		PyErr_Print();
 	}
 
+#ifdef NOLINUX
+	std::cin.get();
+#endif
+	return 0;
 }
 
 

@@ -73,6 +73,35 @@ double Hdf5::readAttributeDouble(const char* name, const char* attribute)
 }
 
 
+void   Hdf5::writeAttributeString(const char* name, const char* attribute, const std::string& value)
+{
+	H5::Group grp = openGroup(name);
+	
+	H5::StrType strdatatype(H5::PredType::C_S1, 64);
+	H5::DataSpace attr_dataspace = H5::DataSpace(H5S_SCALAR);
+	const H5std_string strwritebuf(value.c_str());
+	H5::Attribute a = grp.createAttribute(attribute, strdatatype, attr_dataspace);
+	a.write(strdatatype, strwritebuf);
+
+}
+
+std::string Hdf5::readAttributeString(const char* name, const char* attribute)
+{
+	H5::Group grp = openGroup(name);
+	H5::Attribute a = grp.openAttribute(attribute);
+
+	H5::StrType strdatatype(H5::PredType::C_S1, 64);
+	H5::DataSpace attr_dataspace = H5::DataSpace(H5S_SCALAR);
+	
+	H5std_string strreadbuf("");
+	a.read(strdatatype, strreadbuf);
+
+	return strreadbuf;
+}
+
+
+
+
 H5::Group Hdf5::createGroupNoThrow(const char* name)
 {
 	try

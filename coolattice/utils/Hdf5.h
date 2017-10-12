@@ -34,6 +34,11 @@ public:
 	int    readAttributeInteger(const char* name, const char* attribute);
 	void   writeAttributeDouble(const char* name, const char* attribute, double value);
 	double readAttributeDouble(const char* name, const char* attribute);
+	void   writeAttributeString(const char* name, const char* attribute, const std::string& value);
+	std::string readAttributeString(const char* name, const char* attribute);
+	
+
+
 
 public:
 	H5::Group  createGroupNoThrow(const char*);

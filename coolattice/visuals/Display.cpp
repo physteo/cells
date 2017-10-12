@@ -9,15 +9,16 @@ namespace visuals {
 		m_renderer{ &m_camera },
 		m_shader{},
 		m_trajectory(trajectory),
-		m_activeSite{ (GLuint) width * 1.0 * partSpecs->partTypes.at(0).sig / m_box->getLx(), (GLuint) height * 1.0 * partSpecs->partTypes.at(0).sig / m_box->getLy(),
+		m_activeSite{ (GLuint) width * 1.0 * partSpecs->partTypes.getPartTypes().at(0).sig / m_box->getLx(), (GLuint) height * 1.0 * partSpecs->partTypes.getPartTypes().at(0).sig / m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/smile.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
-		m_inactiveSite{ (GLuint)width * 1.0 * partSpecs->partTypes.at(partSpecs->numberOfTypes - 1).sig / m_box->getLx(), (GLuint)height * 1.0 * partSpecs->partTypes.at(partSpecs->numberOfTypes - 1).sig / m_box->getLy(),
+		m_inactiveSite{ (GLuint)width * 1.0 * partSpecs->partTypes.getPartTypes().at(partSpecs->numberOfTypes - 1).sig / m_box->getLx(), (GLuint)height * 1.0 * partSpecs->partTypes.getPartTypes().at(partSpecs->numberOfTypes - 1).sig / m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/redsiteCool.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
 		m_subBox{ (GLuint)width * 0.9 * m_box->getBoxCellLengthX() / m_box->getLx(), (GLuint)height * 0.9 * m_box->getBoxCellLengthY()/ m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/subBox.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
 		m_renderablesPool{ lightRendering ? trajectory->at(0).size() : (trajectory->at(0).totalNumberOfParts() + m_box->getBoxCells().size()) },
 		m_lightRendering(lightRendering)
 	{
+
 
 
 		//GLfloat skyR = 210 / 255.;
