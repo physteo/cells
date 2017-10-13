@@ -20,12 +20,52 @@ void CellColony::addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 	this->m_cells.push_back(newCell);
 }
 
+// N is the total number of particles we want. The resulting number of particles will be close to that number.
+// f is the slab dimension, as a submultiple of the boxLengthX 
+void CellColony::populateSlab(double N, double f, double boxLengthX, double boxLengthY, double sigMin)
+{
+	double numPerLineX = static_cast<int>(sqrt(f * N));
+	double numPerLineY = static_cast<int>(sqrt(N / f));
+
+	double lx = f * boxLengthX / numPerLineX;
+	double ly =     boxLengthY / numPerLineY; // they're the same if boxLengthX == boxLengthY
+
+	double startX = 0.5 * (1.0 - f) * boxLengthX;
+	double startY = 0.0;
+
+	size_t numberOfCells = 0;
+	for (int x = 0; x < numPerLineX; x++)
+	{
+		for (int y = 0; y < numPerLineY; y++)
+		{
+			std::vector<Part> cell;
+			Vector positionF{ startX + (x + 0.5) * lx, startY + (y + 0.5) * ly };
+			
+			Vector positionB = positionF +
+				Vector{ (lx - sigMin) * (2.0 * gsl_rng_uniform(g_rng) - 1.0),
+				(ly - sigMin) * (2.0 * gsl_rng_uniform(g_rng) - 1.0) } *0.5;
+			// check if the distance is bigger than rmax.. or better sigMin so i dont have to pass more stuff inside
+			Vector distanceVector = positionB - positionF;
+			double distance2 = Vector::dotProduct(distanceVector, distanceVector);
+
+			if (distance2 > sigMin*sigMin)
+			{
+				positionB = positionF;
+			}
+
+			cell.push_back(Part{ positionF, Vector{ 0.0, 0.0 },0,numberOfCells });
+			cell.push_back(Part{ positionB, Vector{ 0.0, 0.0 },1,numberOfCells });
+			this->push_back(cell);
+			numberOfCells++;
+		}
+	}
+	std::cout << "Number of cells: " << this->size() << std::endl;
+}
 
 void CellColony::populate(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigMin)
 {
 	double lx = boxLengthX / numPerLineX;
 	double ly = boxLengthY / numPerLineY;
-	//double sigBB = inputJson["SYSTEM"]["Type"]["sigBB"];
 
 	size_t numberOfCells = 0;
 	for (int x = 0; x < numPerLineX; x++)
@@ -53,7 +93,6 @@ void CellColony::populate(double numPerLineX, double numPerLineY, double boxLeng
 		}
 	}
 	std::cout << "Number of cells: " << this->size() << std::endl;
-	//trajectory.push_back(colony);
 }
 
 

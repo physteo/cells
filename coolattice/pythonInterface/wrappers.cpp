@@ -27,6 +27,7 @@ namespace pywrapper {
 			.def("save", &CellColony::save)
 			.def("load", &CellColony::load)
 			.def("populate", &CellColony::populate)
+			.def("populateSlab", &CellColony::populateSlab)
 			.def("addTwoPartsCell", &CellColony::addTwoPartsCell )
 			.def("size", &CellColony::size)
 			.def("totalNumberOfParts", &CellColony::totalNumberOfParts)

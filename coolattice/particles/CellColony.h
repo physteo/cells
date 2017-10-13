@@ -23,6 +23,8 @@ private:
 public:
 	CellColony() : m_cells(0) {}
 	void populate(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigMax);
+	void populateSlab(double N, double f, double boxLengthX, double boxLengthY, double sigMin);
+
 	void addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 		double x2, double y2, double vx2, double vy2);
 
