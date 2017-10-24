@@ -15,5 +15,6 @@ public:
 	PlanarWall(double sigma, double epsilon, double cut, int axis, double position );
 
 	void updateForce(Part* part, const Box* box, Vector& forceVector) const  override;
+	void setEpsilon(double newEpsilon);
 
 };

@@ -50,6 +50,7 @@ namespace pywrapper {
 
 		class_<PlanarWall, bases<OneBodyForce> >("PlanarWall")
 			.def(init<double, double, double, int, double>())
+			.def("setEpsilon", &PlanarWall::setEpsilon)
 			;
 
 		class_<PartSpecsWrap, boost::noncopyable>("PartSpecs")

@@ -45,3 +45,10 @@ void PlanarWall::updateForce(Part* part, const Box* box, Vector& forceVector) co
 
 	}
 }
+
+
+
+void PlanarWall::setEpsilon(double newEpsilon)
+{
+	m_epsilon = newEpsilon;
+}
