@@ -104,6 +104,12 @@ public:
 
 	size_t getTotalNumOfParts();
 	
+	inline const std::vector<Part*>&	getParts() const { return parts; }
+	inline const CellColony& getConstCellColony() const { return cells; }
+	inline const Box&  getBox() const { return *box; }
+	inline const PartSpecs& getPartSpecs() const { return *partSpecs; }
+	inline const MeasureTwoBodyForce& getMeasureTwoBodyForce() const { return *measureTwoBodyForce; }
+
 
 	void   setTypeFriction(size_t i, double friction);
 	double getTypeFriction(size_t i);

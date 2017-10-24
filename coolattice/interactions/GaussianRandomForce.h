@@ -27,6 +27,6 @@ private:
 	double prefactor;
 
 public:
-	void updateForce(Part* part, Vector& forceVector) const  override;
+	void updateForce(Part* part, const Box* box, Vector& forceVector) const  override;
 
 };

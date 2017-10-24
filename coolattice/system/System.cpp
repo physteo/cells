@@ -42,7 +42,7 @@ bool MeasureTwoBodyForce::save(Hdf5* file, const char* name) const
 		char stringName[1024];
 		sprintf(stringName, "%s_%u", "t", (unsigned int)i);
 
-		int LENGTH = this->data.at(i).size();
+		size_t LENGTH = this->data.at(i).size();
 		int RANK = 1;
 		hsize_t dim[] = { LENGTH };   /* Dataspace dimensions */
 		H5::DataSpace space(RANK, dim);
@@ -181,7 +181,7 @@ void System::setSubBoxes()
 //#ifdef OMP
 //#pragma omp parallel for
 //#endif
-	for (int n = 0; n < parts.size(); n++) {
+	for (size_t n = 0; n < parts.size(); n++) {
 		Part* particle = parts.at(n);
 		box->putPartInSubBox(particle, n);
 	}
@@ -220,7 +220,7 @@ void System::computeOneBodyForces(Part* part1, const PartSpecs* specs)
 		OneBodyForce* force = specs->oneBodyForces.at(part1->type).at(f); // .get() <- not here anymore cause i swtiched to raw pointers in order to make python interface
 
 		Vector addedForce;
-		force->updateForce(part1, addedForce);
+		force->updateForce(part1, box, addedForce);
 		//measureOneBodyForce.measure(part1->type, f, addedForce);
 	}
 }
@@ -517,7 +517,7 @@ void System::resolveOverlaps()
 	while (overlaps)
 	{
 		overlaps = false;
-		for (int n = 0; n < parts.size(); n++)
+		for (size_t n = 0; n < parts.size(); n++)
 		{
 			// get the part
 			Part* part1 = parts.at(n);

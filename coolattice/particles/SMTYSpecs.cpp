@@ -150,10 +150,11 @@ bool SMTYSpecs::load(Hdf5* file, const char* groupName)
 		H5::Group group = file->openGroup(groupName);
 
 		std::string readName = file->readAttributeString(groupName, "name");
-		// TODO: check if name is the same
-		if (readName == name)
+		// check if name is the same
+		if (readName != name)
 		{
-
+			std::cerr << "Error: Trying to load a '" << readName << "' SystemSpecs into a '"<< name <<"' SystemSpecs." << std::endl;
+			exit(EXIT_FAILURE);
 		}
 
 		m_motility    = file->readAttributeDouble(groupName, "motility");

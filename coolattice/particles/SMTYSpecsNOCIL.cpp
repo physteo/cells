@@ -93,18 +93,26 @@ bool SMTYSpecsNOCIL::load(Hdf5* file, const char* groupName)
 	try {
 		H5::Group group = file->openGroup(groupName);
 
-		name = file->readAttributeString(groupName, "name");
-		m_motility = file->readAttributeDouble(groupName, "motility");
-		m_epsilon = file->readAttributeDouble(groupName, "eps");
-		m_cut = file->readAttributeDouble(groupName, "cut");
-		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
-		m_kappa = file->readAttributeDouble(groupName, "k");
+		std::string readName = file->readAttributeString(groupName, "name");
+		// check if name is the same
+		if (readName != name)
+		{
+			std::cerr << "Error: Trying to load a '" << readName << "' SystemSpecs into a '" << name << "' SystemSpecs." << std::endl;
+			exit(EXIT_FAILURE);
+		}
+
+		m_motility		= file->readAttributeDouble(groupName, "motility");
+		m_epsilon		= file->readAttributeDouble(groupName, "eps");
+		m_cut			= file->readAttributeDouble(groupName, "cut");
+		m_rMaxSquared	= file->readAttributeDouble(groupName, "rMax2");
+		m_kappa			= file->readAttributeDouble(groupName, "k");
 
 		// save partType
 		char partTypesGroupName[64];
 		strcpy(partTypesGroupName, groupName);
 		strcat(partTypesGroupName, "/Types");
 		this->partTypes.load(file, partTypesGroupName);
+
 
 		build();
 		return true;

@@ -14,6 +14,8 @@
 #include "../particles/CellColony.h"
 #include "../particles/SMTYSpecs.h"
 #include "../particles/SMTYSpecsNOCIL.h"
+#include "../particles/SMTYSpecsAdhesion.h"
+
 
 #include "../system/System.h"
 #include "../system/SystemTrajectory.h"
@@ -23,6 +25,16 @@
 #endif
 
 namespace pywrapper {
+
+	class OneBodyForceWrap : public OneBodyForce, public boost::python::wrapper<OneBodyForce>
+	{
+		void updateForce(Part* part, const Box* box, Vector& forceVector) const override
+		{
+			this->get_override("updateForce")();
+		}
+
+	};
+
 
 	class PartSpecsWrap : public PartSpecs, public boost::python::wrapper<PartSpecs>
 	{

@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-struct BoxCell
+class BoxCell
 {
 public:
 	Vector downLeftCorner;
@@ -21,6 +21,8 @@ public:
 
 	void printSubCellList(int) const;
 	int  getSubCellListLength() const;
+
+	inline const BoxCell* getNeighbour(int n) const { return neighbour.at(n); }
 
 };
 

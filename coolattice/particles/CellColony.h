@@ -60,6 +60,7 @@ private:
 		double vx;
 		double vy;
 		size_t cell;
+		size_t type;
 	};
 
 

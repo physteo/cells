@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
 	}
 	else if (argc == 1) {
 		//inputFilePath = "C:/Users/matte/Desktop/script_load_cycle.py";
-		inputFilePath = "C:/Users/matte/Desktop/script_load.py";
+		inputFilePath = "C:/Users/matte/Desktop/script_load_forces_cycle.py";
 	}
 	else if (argc > 2) {
 		std::cerr << "maximum one input file." << std::endl;
@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
 	}
 
 	std::string script = Miscellaneous::read_file(inputFilePath.c_str());
-
+	
 	try {
 		PyImport_AppendInittab("Cellulae", &initCellulae);
 		Py_Initialize();

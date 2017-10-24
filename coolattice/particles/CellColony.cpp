@@ -104,7 +104,7 @@ bool CellColony::save(Hdf5* file, const char* name) const
 	H5::Group groupCells = file->openGroup(name);
 
 	const H5::CompType& partType = Hdf5types::getPartTypewCell();
-	int LENGTH = this->totalNumberOfParts();
+	size_t LENGTH = this->totalNumberOfParts();
 	int RANK = 1;
 	hsize_t dim[] = { LENGTH };   /* Dataspace dimensions */
 	H5::DataSpace space(RANK, dim);
@@ -112,10 +112,10 @@ bool CellColony::save(Hdf5* file, const char* name) const
 	std::vector<LightPartwCell> parts;
 	parts.resize(LENGTH);
 	size_t partCounter = 0;
-	for (int i = 0; i < m_cells.size(); i++) {
+	for (size_t i = 0; i < m_cells.size(); i++) {
 		for (size_t j = 0; j < m_cells.at(i).getNumOfParts(); j++) {
 			const Part* part = &m_cells.at(i).getPart(j);
-			parts.at(partCounter) = LightPartwCell{ part->position.x, part->position.y, part->velocity.x, part->velocity.y, part->cell };
+			parts.at(partCounter) = LightPartwCell{ part->position.x, part->position.y, part->velocity.x, part->velocity.y, part->cell, part->type };
 			partCounter++;
 		}
 	}
@@ -213,28 +213,25 @@ bool CellColony::load(Hdf5* file, const char* name)
 	H5::Group groupCells = file->openGroup(name);
 	H5::DataSet dataset = groupCells.openDataSet("c");
 	H5::DataSpace dataspace = dataset.getSpace();
-	hsize_t LENGTH = dataspace.getSimpleExtentNpoints();
+	size_t LENGTH = dataspace.getSimpleExtentNpoints();
 	std::vector<LightPartwCell> lightParts;
 	lightParts.resize(LENGTH);
 	dataset.read(&lightParts.at(0), partType);
-
+	
 	size_t currentCell = 0;
-	size_t type = 0;
 	std::vector<Part> partsInCell;
-	for (int i = 0; i < LENGTH; i++) {
+	for (size_t i = 0; i < LENGTH; i++) {
 		if (!(lightParts.at(i).cell == currentCell))
 		{
 			currentCell++;
-			type = 0;
-
 			m_cells.push_back(partsInCell);
 			partsInCell.resize(0);
 		}
-		Part part{ Vector{lightParts.at(i).x, lightParts.at(i).y}, Vector{ lightParts.at(i).vx , lightParts.at(i).vy }, type, lightParts.at(i).cell };
+		Part part{ Vector{lightParts.at(i).x, lightParts.at(i).y}, Vector{ lightParts.at(i).vx , lightParts.at(i).vy },
+			lightParts.at(i).type , lightParts.at(i).cell };
 		partsInCell.push_back(part);
-		
-		type++;
 	}
+		
 	m_cells.push_back(partsInCell);
 
 	return true;

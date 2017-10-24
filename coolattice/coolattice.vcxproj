@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="analysis\TractionAnalysis.cpp" />
     <ClCompile Include="box\Box.cpp" />
     <ClCompile Include="box\BoxCell.cpp" />
     <ClCompile Include="graphical\graphics\batchrenderer2d.cpp" />
@@ -168,6 +169,8 @@
     <ClCompile Include="interactions\FeneForce.cpp" />
     <ClCompile Include="interactions\GaussianRandomForce.cpp" />
     <ClCompile Include="interactions\LJForce.cpp" />
+    <ClCompile Include="interactions\PlanarWall.cpp" />
+    <ClCompile Include="interactions\RepulsionAdhesion.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Vector.cpp" />
     <ClCompile Include="particles\Cell.cpp" />
@@ -175,6 +178,7 @@
     <ClCompile Include="particles\Part.cpp" />
     <ClCompile Include="particles\PartSpecs.cpp" />
     <ClCompile Include="particles\SMTYSpecs.cpp" />
+    <ClCompile Include="particles\SMTYSpecsAdhesion.cpp" />
     <ClCompile Include="particles\SMTYSpecsNOCIL.cpp" />
     <ClCompile Include="system\System.cpp" />
     <ClCompile Include="system\SystemTrajectory.cpp" />
@@ -185,6 +189,7 @@
     <ClCompile Include="visuals\shader\LatticeShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="analysis\TractionAnalysis.h" />
     <ClInclude Include="box\Box.h" />
     <ClInclude Include="box\BoxCell.h" />
     <ClInclude Include="graphical\graphics\batchrenderer2d.h" />
@@ -239,6 +244,8 @@
     <ClInclude Include="interactions\Force.h" />
     <ClInclude Include="interactions\GaussianRandomForce.h" />
     <ClInclude Include="interactions\LJForce.h" />
+    <ClInclude Include="interactions\PlanarWall.h" />
+    <ClInclude Include="interactions\RepulsionAdhesion.h" />
     <ClInclude Include="interactions\TwoBodyForce.h" />
     <ClInclude Include="math\Vector.h" />
     <ClInclude Include="definitions.h" />
@@ -249,6 +256,7 @@
     <ClInclude Include="particles\PartSpecs.h" />
     <ClInclude Include="particles\SMTYSpecs.h" />
     <ClInclude Include="particles\PartType.h" />
+    <ClInclude Include="particles\SMTYSpecsAdhesion.h" />
     <ClInclude Include="particles\SMTYSpecsNOCIL.h" />
     <ClInclude Include="pythonInterface\wrappers.h" />
     <ClInclude Include="system\System.h" />

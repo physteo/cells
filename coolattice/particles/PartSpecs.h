@@ -66,9 +66,20 @@ public:
 	void setFriction(size_t i, double friction) {  partTypes.getPartTypes().at(i).friction = friction; }
 
 
+
+
+	void addOneBodyForce(size_t slot, OneBodyForce* force);
+	void addIntraForce(size_t slot, TwoBodyForce* force);
+	void addInterForce(size_t slot, TwoBodyForce* force);
+
+
 	bool load(Hdf5* file, const char* groupName)		  = 0;
 	bool save(Hdf5* file, const char* groupName) const    = 0;
 
 	virtual bool cellIsBroken(const Cell* cell, const Box* box) const = 0;
+
+
+private:
+	void addTwoBodyForce(size_t slot, int intra, TwoBodyForce* force);
 };
 

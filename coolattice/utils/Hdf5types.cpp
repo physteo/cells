@@ -43,7 +43,8 @@ const H5::CompType& Hdf5types::getPartTypewCell()
 			m_partTypewCell->insertMember("y" , HOFFSET(LightPartwCell, y),    H5::PredType::NATIVE_DOUBLE);
 			m_partTypewCell->insertMember("vx", HOFFSET(LightPartwCell, vx),   H5::PredType::NATIVE_DOUBLE);
 			m_partTypewCell->insertMember("vy", HOFFSET(LightPartwCell, vy),   H5::PredType::NATIVE_DOUBLE);
-			m_partTypewCell->insertMember( "c", HOFFSET(LightPartwCell, cell), H5::PredType::NATIVE_HSIZE);
+			m_partTypewCell->insertMember("c",  HOFFSET(LightPartwCell, cell), H5::PredType::NATIVE_INT);
+			m_partTypewCell->insertMember("t",  HOFFSET(LightPartwCell, type), H5::PredType::NATIVE_INT);
 		}
 	};
 	static Initializer ListInitializationGuard;

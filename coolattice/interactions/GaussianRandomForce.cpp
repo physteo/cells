@@ -9,7 +9,7 @@ GaussianRandomForce::GaussianRandomForce(double varianceIn, double deltatIn,
 
 
 
-void GaussianRandomForce::updateForce(Part* part, Vector& forceVector) const
+void GaussianRandomForce::updateForce(Part* part, const Box* box, Vector& forceVector) const
 {
 	double dx = gsl_ran_gaussian_ziggurat(g_rng, variance);
 	double dy = gsl_ran_gaussian_ziggurat(g_rng, variance);

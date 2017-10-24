@@ -45,8 +45,16 @@ namespace pywrapper {
 		//class_<PartSpecs>("PartSpecs", no_init)
 		//	;
 
+		class_<OneBodyForceWrap, boost::noncopyable>("OneBodyForce")
+			;
+
+		class_<PlanarWall, bases<OneBodyForce> >("PlanarWall")
+			.def(init<double, double, double, int, double>())
+			;
+
 		class_<PartSpecsWrap, boost::noncopyable>("PartSpecs")
 			.def("setFriction",  &PartSpecs::setFriction)
+			.def("addOneBodyForce", &PartSpecs::addOneBodyForce)
 			.def("load", pure_virtual(&PartSpecs::load))
 			.def("save", pure_virtual(&PartSpecs::save))
 			.def("cellIsBroken", pure_virtual(&PartSpecs::cellIsBroken))
@@ -57,6 +65,13 @@ namespace pywrapper {
 			.def("save", &SMTYSpecs::save)
 			.def("load", &SMTYSpecs::load)
 			.def("cellIsBroken", &SMTYSpecs::cellIsBroken)
+			;
+
+		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
+			.def(init<double, double, double, double, double, double, double, double, double, double>())
+			.def("save", &SMTYSpecsAdhesion::save)
+			.def("load", &SMTYSpecsAdhesion::load)
+			.def("cellIsBroken", &SMTYSpecsAdhesion::cellIsBroken)
 			;
 
 		class_<SMTYSpecsNOCIL, bases<PartSpecs> >("SMTYSpecsNOCIL", init<>())

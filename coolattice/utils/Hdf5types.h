@@ -23,6 +23,7 @@ class Hdf5types
 		double vx;
 		double vy;
 		size_t cell;
+		size_t type;
 	};
 
 private:

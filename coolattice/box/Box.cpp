@@ -57,8 +57,8 @@ void Box::createCubic()
 
 void Box::putPartInSubBox(Part* part, int n)
 {
-	int tempX = part->position.x / m_subBoxesLengthX;
-	int tempY = part->position.y / m_subBoxesLengthY;
+	int tempX = static_cast<int> (part->position.x / m_subBoxesLengthX);
+	int tempY = static_cast<int> (part->position.y / m_subBoxesLengthY);
 
 #ifdef DEBUG
 	std::cout << "particle " << part->cell << "/" << part->type << " has temp box indices " << tempX << "," << tempY << std::endl;
@@ -144,7 +144,7 @@ double Box::computeDistanceSquaredPBC(const Vector& v1, const Vector& v2, Vector
 	double& deltay = output.y;
 
 	// periodic boundary conditions
-
+	
 	
 	while (deltax > 0.5 * m_lx)
 	{
@@ -236,8 +236,8 @@ bool Box::load(Hdf5* file, const char* groupName)
 		m_subBoxesLengthX = file->readAttributeDouble(groupName, "lcx");
 		m_subBoxesLengthY = file->readAttributeDouble(groupName, "lcy");
 		m_periodicBoundaries = file->readAttributeBool(groupName, "pbc");
-		m_numberOfBoxCellsX = file->readAttributeDouble(groupName, "subBoxesX");
-		m_numberOfBoxCellsY = file->readAttributeDouble(groupName, "subBoxesY");
+		m_numberOfBoxCellsX = file->readAttributeInteger(groupName, "subBoxesX");
+		m_numberOfBoxCellsY = file->readAttributeInteger(groupName, "subBoxesY");
 
 		createCubic();
 		return true;
