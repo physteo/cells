@@ -2,15 +2,15 @@
 
 SMTYSpecsAdhesion::SMTYSpecsAdhesion() : PartSpecs(2)
 {
-	name = "SMTY_Adhesion";
+	name = "SMTY_ZimmermannRepAdh";
 }
 
-SMTYSpecsAdhesion::SMTYSpecsAdhesion(double f0, double f1, double motility,
-	double cut, double rMaxSquared, double kappa, double frictionF, double frictionB, double massF, double massB) : SMTYSpecsAdhesion()
+SMTYSpecsAdhesion::SMTYSpecsAdhesion(double sigAA, double sigBB, double A, double C, double motility,
+	double rMaxSquared, double kappa, double frictionF, double frictionB, double massF, double massB) : SMTYSpecsAdhesion()
 {
-	m_f1 = f1;
+	m_A = A;
+	m_C = C;
 	m_motility = motility;
-	m_cut = cut;
 	m_rMaxSquared = rMaxSquared;
 	m_kappa = kappa;
 
@@ -19,8 +19,8 @@ SMTYSpecsAdhesion::SMTYSpecsAdhesion(double f0, double f1, double motility,
 	this->partTypes.getPartTypes().at(1).name = "B";
 	this->partTypes.getPartTypes().at(0).mass = massF;
 	this->partTypes.getPartTypes().at(1).mass = massB;
-	this->partTypes.getPartTypes().at(0).sig = f0;
-	this->partTypes.getPartTypes().at(1).sig = f0;
+	this->partTypes.getPartTypes().at(0).sig = sigAA;
+	this->partTypes.getPartTypes().at(1).sig = sigBB;
 	this->partTypes.getPartTypes().at(0).friction = frictionF;
 	this->partTypes.getPartTypes().at(1).friction = frictionB;
 
@@ -44,11 +44,14 @@ void SMTYSpecsAdhesion::build()
 
 
     // inter particle forces
-	RepulsionAdhesion* repAd(new RepulsionAdhesion{ sigAA, this->m_f1, sigAA * sigAA * this->m_cut * this->m_cut });
-	addInterForce(0, repAd);
-	addInterForce(1, repAd);
-	addInterForce(2, repAd);
-	addInterForce(3, repAd);
+	ZimmermannRepAdh* repAd_AA(new ZimmermannRepAdh{ m_A, sigAA, m_C });
+	ZimmermannRepAdh* repAd_AB(new ZimmermannRepAdh{ m_A, sigAB, m_C });
+	ZimmermannRepAdh* repAd_BB(new ZimmermannRepAdh{ m_A, sigBB, m_C });
+	
+	addInterForce(0, repAd_AA);
+	addInterForce(1, repAd_AB);
+	addInterForce(2, repAd_AB);
+	addInterForce(3, repAd_BB);
 
 	// intra particle forces
 	FeneForce* feneAA(new FeneForce{ m_rMaxSquared, m_kappa });
@@ -96,9 +99,10 @@ bool SMTYSpecsAdhesion::load(Hdf5* file, const char* groupName)
 			exit(EXIT_FAILURE);
 		}
 
+		m_A = file->readAttributeDouble(groupName, "A");
+		m_C = file->readAttributeDouble(groupName, "C");
+
 		m_motility = file->readAttributeDouble(groupName, "motility");
-		m_f1 = file->readAttributeDouble(groupName, "f1");
-		m_cut = file->readAttributeDouble(groupName, "cut");
 		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
 		m_kappa = file->readAttributeDouble(groupName, "k");
 
@@ -131,9 +135,9 @@ bool SMTYSpecsAdhesion::save(Hdf5* file, const char* groupName) const
 		H5::Group group = file->openGroup(groupName);
 
 		file->writeAttributeString(groupName, "name", name.c_str());
+		file->writeAttributeDouble(groupName, "A", m_A);
+		file->writeAttributeDouble(groupName, "C", m_C);
 		file->writeAttributeDouble(groupName, "motility", m_motility);
-		file->writeAttributeDouble(groupName, "f1", m_f1);
-		file->writeAttributeDouble(groupName, "cut", m_cut);
 		file->writeAttributeDouble(groupName, "rMax2", m_rMaxSquared);
 		file->writeAttributeDouble(groupName, "k", m_kappa);
 

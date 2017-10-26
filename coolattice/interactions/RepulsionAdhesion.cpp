@@ -8,8 +8,8 @@ void RepulsionAdhesion::updateForce(Part* part1, const Part* part2, const Box* b
 	if (r2 < rcut2)
 	{
 		double inverse_r = 1.0 / sqrt(r2);		
-		double force = -(f0 * (inverse_r - 1.0) + f1);
-		forceVector = distance * (-force * inverse_r);	
+		double force = (f0 * (inverse_r - 1.0) - f1);
+		forceVector = distance * (force * inverse_r);	
 		part1->velocity += forceVector;
 	}
 }

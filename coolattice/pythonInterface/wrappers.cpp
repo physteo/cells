@@ -69,7 +69,7 @@ namespace pywrapper {
 			;
 
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
-			.def(init<double, double, double, double, double, double, double, double, double, double>())
+			.def(init<double, double, double, double, double, double, double, double, double, double, double>())
 			.def("save", &SMTYSpecsAdhesion::save)
 			.def("load", &SMTYSpecsAdhesion::load)
 			.def("cellIsBroken", &SMTYSpecsAdhesion::cellIsBroken)
