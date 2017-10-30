@@ -11,3 +11,5 @@
 #define VISUALS
 
 #define NOLINUX
+
+#define OBJECTPOOL

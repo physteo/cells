@@ -43,6 +43,20 @@ void SystemTrajectory::reserve(size_t i)
 	m_trajectory.reserve(i);
 }
 
+size_t SystemTrajectory::maxCells() const
+{
+	size_t maxCellsSize = 0;
+	for (size_t i = 0; i < m_trajectory.size(); i++)
+	{
+		size_t snapshotSize = m_trajectory.at(i).totalNumberOfParts();
+		if ( snapshotSize > maxCellsSize)
+		{
+			maxCellsSize = snapshotSize;
+		}
+	}
+	return maxCellsSize;
+}
+
 
 bool SystemTrajectory::load(Hdf5* file, const char* name)
 {	

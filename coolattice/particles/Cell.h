@@ -14,6 +14,8 @@ public:
 	Cell(size_t numberOfParts);
 	Cell(const std::vector<Part>& partsIn);
 
+	void init(const std::vector<Part>& partsIn);
+
 	inline size_t getNumOfParts() const { return m_parts.size(); }
 
 	inline const Part& getPart(size_t n) const  { return m_parts.at(n); }

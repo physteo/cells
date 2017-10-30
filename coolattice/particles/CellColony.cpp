@@ -8,6 +8,25 @@ size_t CellColony::totalNumberOfParts() const
 	return tot;
 }
 
+void CellColony::addVelocity(double vx, double vy, size_t cell, size_t  type)
+{
+	this->m_cells.at(cell).getPart(type).velocity += Vector{vx, vy};
+}
+
+void CellColony::addOnePartCell(double x, double y, double vx, double vy)
+{
+	size_t cell = m_cells.size();
+	Part p{ Vector{ x, y }, Vector{ vx, vy }, 0, cell };
+	std::vector<Part> parts = { p };
+#ifdef OBJECTPOOL
+	this->m_cells.addBackElement();
+	m_cells.back().init(parts);
+#else
+	Cell newCell{ parts };
+	this->m_cells.push_back(newCell);
+#endif
+}
+
 void CellColony::addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 	double x2, double y2, double vx2, double vy2)
 {
@@ -16,8 +35,14 @@ void CellColony::addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 	Part p2{ Vector{ x2, y2 }, Vector{ vx2, vy2 }, 1, cell };
 
 	std::vector<Part> parts = { p1, p2 };
+
+#ifdef OBJECTPOOL
+	this->m_cells.addBackElement();
+	m_cells.back().init(parts);
+#else
 	Cell newCell{ parts };
 	this->m_cells.push_back(newCell);
+#endif
 }
 
 // N is the total number of particles we want. The resulting number of particles will be close to that number.
@@ -209,7 +234,11 @@ bool CellColony::load(Hdf5* file, const char* name)
 	// TODO: check that the file exists: why it does not work???
 	//if (!file->exists(fileName))
 	//	return false;
+#ifdef OBJECTPOOL
+#else
 	m_cells.resize(0);
+#endif
+	
 	H5::Group groupCells = file->openGroup(name);
 	H5::DataSet dataset = groupCells.openDataSet("c");
 	H5::DataSpace dataspace = dataset.getSpace();
@@ -224,7 +253,12 @@ bool CellColony::load(Hdf5* file, const char* name)
 		if (!(lightParts.at(i).cell == currentCell))
 		{
 			currentCell++;
+#ifdef OBJECTPOOL
+			this->m_cells.addBackElement();
+			m_cells.back().init(partsInCell);
+#else
 			m_cells.push_back(partsInCell);
+#endif
 			partsInCell.resize(0);
 		}
 		Part part{ Vector{lightParts.at(i).x, lightParts.at(i).y}, Vector{ lightParts.at(i).vx , lightParts.at(i).vy },
@@ -232,7 +266,13 @@ bool CellColony::load(Hdf5* file, const char* name)
 		partsInCell.push_back(part);
 	}
 		
+#ifdef OBJECTPOOL
+	this->m_cells.addBackElement();
+	m_cells.back().init(partsInCell);
+#else
 	m_cells.push_back(partsInCell);
+#endif
+
 
 	return true;
 }
@@ -242,7 +282,12 @@ bool CellColony::load(Hdf5* file, const char* name)
 
 void CellColony::push_back(const Cell& cc)
 {
+#ifdef OBJECTPOOL
+	this->m_cells.addBackElement();
+	m_cells.back() = cc;
+#else
 	m_cells.push_back(cc);
+#endif
 }
 
 Cell& CellColony::at(size_t i)
@@ -255,12 +300,44 @@ const Cell& CellColony::at(size_t i) const
 	return m_cells.at(i);
 }
 
+Cell&	CellColony::back()
+{
+	return m_cells.back();
+}
+
+const Cell	CellColony::back() const
+{
+	return m_cells.back();
+}
+
 void CellColony::resize(size_t i)
 {
+#ifdef OBJECTPOOL
+	//std::cout << "trying to resize cellColony" << std::endl;
+	//std::cin.get();
 	m_cells.resize(i);
+#else
+	m_cells.resize(i);
+#endif
 }
 
 void CellColony::reserve(size_t i)
 {
+#ifdef OBJECTPOOL
+	m_cells.resize(i); // TODO URGENT: see if i can define a suitable reserve function
+#else
 	m_cells.reserve(i);
+#endif
+}
+
+
+void CellColony::erase(size_t i)
+{
+#ifdef OBJECTPOOL
+	m_cells.deleteElement(i);
+#else
+	std::cout << "erase feature for vector of cells is not implemented yet." << std::endl;
+	std::cin.get();
+	//m_cells.erase(i);
+#endif
 }

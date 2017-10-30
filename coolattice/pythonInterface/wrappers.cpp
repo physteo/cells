@@ -23,13 +23,20 @@ namespace pywrapper {
 			.def("activate", &myOpenmp::activate)
 			;
 
+		class_<Parameters>("Parameters", init<>())
+			.def("addParam", &Parameters::addParam)
+			;
+
 		class_<CellColony>("CellColony", init<>())
+			.def(init<int>())
 			.def("save", &CellColony::save)
 			.def("load", &CellColony::load)
 			.def("populate", &CellColony::populate)
 			.def("populateSlab", &CellColony::populateSlab)
+			.def("addOnePartCell", &CellColony::addOnePartCell)
 			.def("addTwoPartsCell", &CellColony::addTwoPartsCell )
 			.def("size", &CellColony::size)
+			.def("resize", &CellColony::resize)
 			.def("totalNumberOfParts", &CellColony::totalNumberOfParts)
 			.def("getPartX", &CellColony::getPartX)
 			.def("getPartY", &CellColony::getPartY)
@@ -82,17 +89,36 @@ namespace pywrapper {
 			.def("cellIsBroken", &SMTYSpecs::cellIsBroken)
 			;
 
+		class_<SMTYSpecsSticky, bases<PartSpecs> >("SMTYSpecsSticky", init<>())
+			.def(init<Parameters*>())
+			.def("save", &SMTYSpecsSticky::save)
+			.def("load", &SMTYSpecsSticky::load)
+			.def("cellIsBroken", &SMTYSpecsSticky::cellIsBroken)
+			;
+
+		class_<MonoZimm, bases<PartSpecs> >("MonoZimm", init<>())
+			.def(init<double, double, double, double, double>())
+			.def("save", &MonoZimm::save)
+			.def("load", &MonoZimm::load)
+			.def("cellIsBroken", &MonoZimm::cellIsBroken)
+			;
+
 		class_<MeasureTwoBodyForce>("MeasureTwoBodyForce", init<PartSpecs*, size_t, size_t, bool, size_t>())
 			.def("save", &MeasureTwoBodyForce::save)
 			.def("load", &MeasureTwoBodyForce::load)
 			;
 
 		class_<System>("System", init<CellColony*, PartSpecs*, Box*>())
+			.def("addVelocity", &System::addVelocity)
 			.def("updatePositions", &System::updatePositions)
 			.def("computeForces", &System::computeForces)
 			.def("collectForces",  &System::collect)
 			.def("getColony", &System::getColony)
+			.def("getNumberOfCells", &System::getNumberOfCells)
+			.def("resizeCellColony", &System::resizeCellColony)
 			.def("cellsAreBroken", &System::cellsAreBroken)
+			.def("eraseDeadCells", &System::eraseDeadCells)
+			.def("duplicateCells", &System::duplicateCells)
 			.def("setTypeFriction", &System::setTypeFriction)
 			.def("getTypeFriction", &System::getTypeFriction)
 			.def("registerTwoBodyForceMeasurement", &System::registerTwoBodyForceMeasurement)

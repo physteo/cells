@@ -77,7 +77,10 @@ public:
 	bool save(Hdf5* file, const char* groupName) const    = 0;
 
 	virtual bool cellIsBroken(const Cell* cell, const Box* box) const = 0;
+	virtual bool cellIsDead(const Cell* cell, const Box* box) const { return false; } // TODO: URGENT make pure virtual
+	virtual bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box) const { return false; } // TODO: URGENT make pure virtual
 
+	//virtual bool cellCanDuplicate(const Cell* cell, const Box* box) const = 0;
 
 private:
 	void addTwoBodyForce(size_t slot, int intra, TwoBodyForce* force);

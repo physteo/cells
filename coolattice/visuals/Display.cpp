@@ -15,7 +15,7 @@ namespace visuals {
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/redsiteCool.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
 		m_subBox{ (GLuint)width * 0.9 * m_box->getBoxCellLengthX() / m_box->getLx(), (GLuint)height * 0.9 * m_box->getBoxCellLengthY()/ m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/subBox.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
-		m_renderablesPool{ lightRendering ? trajectory->at(0).size() : (trajectory->at(0).totalNumberOfParts() + m_box->getBoxCells().size()) },
+		m_renderablesPool{ lightRendering ? trajectory->maxCells() / 2 : (trajectory->maxCells() + m_box->getBoxCells().size()) },
 		m_lightRendering(lightRendering)
 	{
 

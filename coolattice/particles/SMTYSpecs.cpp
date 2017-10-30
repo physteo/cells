@@ -236,3 +236,55 @@ bool SMTYSpecs::cellIsBroken(const Cell* cell, const Box* box) const
 	return false;
 
 }
+
+
+bool SMTYSpecs::cellIsDead(const Cell* cell, const Box* box) const
+{
+	// in this system, a cell cannot die
+
+
+	// a cell is dead when it's length is
+	// bigger than Rmax2 / 8.0
+	//Vector vectorDistance;
+	//double distance2 = box->computeDistanceSquaredPBC(cell->getPart(0).position, cell->getPart(1).position, vectorDistance);
+	//if (distance2 > m_rMaxSquared / 8.0)
+	//{
+	//	std::cout << "cell is dead" << std::endl;
+	//	return true;
+	//}
+	return false;
+}
+
+
+bool SMTYSpecs::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box) const
+{
+	// in this model, a cell can duplicate if its length is bigger than Rmax/2.0
+	Vector vectorDistance;
+	double distance2 = box->computeDistanceSquaredPBC(cell->getPart(0).position, cell->getPart(1).position, vectorDistance);
+	
+	if (distance2 > m_rMaxSquared / 8.0)
+	{
+		// bla
+		Cell newcell{ 2 };
+		newcell.getPart(0).type = 0;
+		newcell.getPart(0).cell = 373;
+
+		newcell.getPart(0).position = cell->getPart(1).position;
+
+		newcell.getPart(1).type = 1;
+		newcell.getPart(1).cell = 373;
+		newcell.getPart(1).position = cell->getPart(1).position;
+		
+		cell->getPart(1).position = cell->getPart(0).position;
+		
+		// set velocities to zero
+		newcell.getPart(0).velocity = Vector{ 0.0, 0.0 };
+		newcell.getPart(1).velocity = Vector{ 0.0, 0.0 };
+		cell->getPart(0).velocity   = Vector{ 0.0,0.0 };
+		cell->getPart(1).velocity   = Vector{ 0.0,0.0 };
+
+		newCells->push_back(newcell);
+		return true;
+	}
+	return false;
+}

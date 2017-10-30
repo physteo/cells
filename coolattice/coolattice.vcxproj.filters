@@ -174,9 +174,6 @@
     <ClCompile Include="particles\SMTYSpecsNOCIL.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="analysis\TractionAnalysis.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="interactions\RepulsionAdhesion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -187,6 +184,18 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="interactions\ZimmermannRepAdh.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="particles\MonoZimm.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="interactions\OneBodyPropulsion.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="interactions\Sigmoidal.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="particles\SMTYSpecsSticky.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -416,9 +425,6 @@
     <ClInclude Include="particles\SMTYSpecsNOCIL.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="analysis\TractionAnalysis.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="interactions\RepulsionAdhesion.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -429,6 +435,24 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="interactions\ZimmermannRepAdh.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\MonoZimm.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="interactions\OneBodyPropulsion.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ObjectPool.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="interactions\Sigmoidal.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\SMTYSpecsSticky.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="pythonInterface\Parameters.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

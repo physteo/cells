@@ -29,6 +29,6 @@ public:
 	bool cellIsBroken(const Cell* cell, const Box* box) const override;
 
 private:
-	void SMTYSpecsNOCIL::build();
+	void build();
 
 };

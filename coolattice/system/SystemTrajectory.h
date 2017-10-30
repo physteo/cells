@@ -26,7 +26,7 @@ public:
 	void				reserve(size_t i);
 
 	inline size_t       size() const { return m_trajectory.size(); };
-
+	size_t		maxCells() const;
 
 
 	bool load(Hdf5* file, const char* fileName)       override;

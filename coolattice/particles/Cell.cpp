@@ -19,3 +19,8 @@ Cell::Cell(const std::vector<Part>& partsIn)
 	}
 
 }
+
+void Cell::init(const std::vector<Part>& partsIn)
+{
+	this->m_parts = partsIn;
+}

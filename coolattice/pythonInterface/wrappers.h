@@ -15,6 +15,9 @@
 #include "../particles/SMTYSpecs.h"
 #include "../particles/SMTYSpecsNOCIL.h"
 #include "../particles/SMTYSpecsAdhesion.h"
+#include "../particles/SMTYSpecsSticky.h"
+
+#include "../particles/MonoZimm.h"
 
 
 #include "../system/System.h"
@@ -23,6 +26,9 @@
 #ifdef VISUALS
 #include "../visuals/Display.h"
 #endif
+
+// parameters
+#include "Parameters.h"
 
 namespace pywrapper {
 

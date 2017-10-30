@@ -101,9 +101,16 @@ public:
 	void registerTwoBodyForceMeasurement(MeasureTwoBodyForce* m);
 	void collect();
 	bool cellsAreBroken() const;
+	void eraseDeadCells();
+	void duplicateCells();
+	void resizeCellColony(size_t maxCells)
+	{
+		this->cells.resize(maxCells);
+	}
 
 	size_t getTotalNumOfParts();
-	
+	inline size_t getNumberOfCells() { return cells.size(); }
+
 	inline const std::vector<Part*>&	getParts() const { return parts; }
 	inline const CellColony& getConstCellColony() const { return cells; }
 	inline const Box&  getBox() const { return *box; }
@@ -114,6 +121,11 @@ public:
 	void   setTypeFriction(size_t i, double friction);
 	double getTypeFriction(size_t i);
 
+	// to eliminate:
+	void addVelocity(double vx, double vy, size_t cell, size_t type)
+	{
+		this->cells.addVelocity(vx, vy, cell, type);
+	}
 
 	// for debugging:
 	void printCoord();
@@ -127,7 +139,6 @@ private:
 	void computeTwoBodyForces(Part* part1, const Part* part2, const PartSpecs* specs);
 
 	void resetVelocities();
-
 
 	// TODO: make sense out of these constructors
 	System(size_t n);

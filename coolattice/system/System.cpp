@@ -76,7 +76,11 @@ System::System(size_t n)
 
 System::System(CellColony* cellsIn)
 {
+#ifdef OBJECTPOOL
 	cells.reserve(cellsIn->size());
+#else
+	cells.reserve(cellsIn->size());
+#endif
 	for (size_t i = 0; i < cellsIn->size(); i++)
 	{
 		cells.push_back(cellsIn->at(i));
@@ -101,7 +105,7 @@ System::System(CellColony* cellsIn, PartSpecs* partSpecsIn, Box* boxIn) : System
 	setSubBoxes();
 
 	//resolveOverlaps();
-	
+
 	//clearSubBoxes();
 	//setSubBoxes();
 
@@ -178,9 +182,9 @@ void System::printCoordDiff()
 void System::setSubBoxes()
 {
 	// put particles in the subBoxes
-//#ifdef OMP
-//#pragma omp parallel for
-//#endif
+	//#ifdef OMP
+	//#pragma omp parallel for
+	//#endif
 	for (size_t n = 0; n < parts.size(); n++) {
 		Part* particle = parts.at(n);
 		box->putPartInSubBox(particle, n);
@@ -242,22 +246,7 @@ void System::computeTwoBodyForces(Part* part1, const Part* part2, const PartSpec
 void System::computeForces(double dt)
 {
 	resetVelocities();
-	//test//double sigAA = 1.1;
-	//test//double sigBB = 0.88;
-	//test//double motility = 1.0;
-	//test//double epsilon = 9.64832e-5;
-	//test//double sigAB = .5*(sigAA + sigBB);
-	//test//double cut = pow(2., 1. / 6.);
-	//test//double rMaxSquared = 4.0;
-	//test//double kappa = 0.482416;
-	//test//LJForce    AA    = LJForce  { sigAA, epsilon, (sigAA * sigAA * cut * cut) };
-	//test//LJForce    AB    = LJForce  { sigAB, epsilon, (sigAB * sigAB * cut * cut) };
-	//test//LJForce    BA    = LJForce  { sigAB, epsilon, (sigAB * sigAB * cut * cut) };
-	//test//LJForce    BB    = LJForce  { sigBB, epsilon, (sigBB * sigBB * cut * cut) };
-	//test//FeneForce fene12 = FeneForce{ rMaxSquared, kappa };
-	//test//CilForce  cil1   = CilForce { motility };
-	//test//FeneForce fene21 = FeneForce{ rMaxSquared, kappa };
-	
+
 	// loop over all parts
 #ifdef OMP
 #pragma omp parallel for schedule(guided)
@@ -266,7 +255,7 @@ void System::computeForces(double dt)
 	{
 		// get the part
 		Part* part1 = parts.at(n);
-		
+
 		// apply one body forces
 		computeOneBodyForces(part1, partSpecs);
 
@@ -288,141 +277,103 @@ void System::computeForces(double dt)
 			Part* part2 = parts.at(m);
 #endif
 
-				if (part2 != part1) {
-
-					computeTwoBodyForces(part1, part2, partSpecs);
-
-					//test//size_t type1 = part1->type;
-					//test//size_t type2 = part2->type;
-					//test//size_t cell1 = part1->cell;
-					//test//size_t cell2 = part2->cell;
-					//test//
-					//test//if (cell1 == cell2)
-					//test//{
-					//test//	fene12.updateForce(part1, part2, box);
-					//test//	if (type1 == 0)
-					//test//	{
-					//test//		// cil and fene1
-					//test//		cil1.updateForce(part1, part2, box);
-					//test//	}
-					//test//}
-					//test//else
-					//test//{
-					//test//	// apply intermol LJ 
-					//test//	if (type1 == 0 && type2 == 0)
-					//test//	{
-					//test//		AA.updateForce(part1,part2,box);
-					//test//	}
-					//test//	else if (type1 == 0 && type2 == 1)
-					//test//	{
-					//test//		AB.updateForce(part1, part2, box);
-					//test//	}
-					//test//	else if (type1 == 1 && type2 == 0)
-					//test//	{
-					//test//		BA.updateForce(part1, part2, box);
-					//test//	}
-					//test//	else
-					//test//	{
-					//test//		BB.updateForce(part1, part2, box);
-					//test//	}
-					//test//}					
-
-#ifdef LIST
-				}
-				part2 = part2->next;
-#endif
-
-
-			}
-
-		}
-
-	box->remap(part1->position);
-//#ifdef LIST
-//	box->putPartInSubBox(part1, n);
-//#endif
-
-	}
-
-}
-
-
-
-void System::collect()
-{
-	if (measureTwoBodyForce == nullptr)
-	{
-		std::cerr << "No force to be measured has been registered." << std::endl;
-	}
-
-
-	//measureOneBodyForce->data.push_back(std::vector<Vector>{});
-	measureTwoBodyForce->data.push_back(std::vector<Vector>{});
-	//measureOneBodyForce->data.back().resize(this->parts.size());
-	measureTwoBodyForce->data.back().resize(this->parts.size());
-
-
-	// store the velocities. They will be restored into the particles velocity vector
-	std::vector<Vector> velocities;
-	velocities.resize(parts.size());
-#ifdef OMP
-#pragma omp parallel for schedule(guided)
-#endif
-	for (int i = 0; i < parts.size(); i++)
-	{
-		velocities.at(i) = parts.at(i)->velocity;
-		measureTwoBodyForce->data.back().at(i) = Vector{ 0.0, 0.0 };
-	}
-
-	// reset to zero so we can extract the forces
-	resetVelocities();
-
-	// measure the forces I want and store them into a vector
-#ifdef OMP
-#pragma omp parallel for schedule(guided)
-#endif
-	for (int n = 0; n < parts.size(); n++)
-	{
-		Part* part1 = parts.at(n);
-		// look at measureOneBodyForce
-		//if (part1->type == measureOneBodyForce->partID)
-		//{
-		//	// apply force
-		//	Vector addedVector{};
-		//	measureOneBodyForce->oneBodyForce->updateForce(part1, addedVector);
-		//}
-		//measureOneBodyForce->data.back().push_back(part1->velocity);
-		//part1->velocity = Vector{ 0.0,0.0 }; // necessary for the next measure (twoBodyForces) !
-		
-#ifdef LIST
-		BoxCell* subBox1 = part1->myBoxCell;
-		for (int J = 0; J < 9; J++)
-		{
-			BoxCell* subBox2 = subBox1->neighbour[J];
-			Part* part2 = subBox2->head.next;
-			while (part2 != nullptr)
-			{
-#else
-		for (size_t m = 0; m < parts.size(); m++)
-		{
-			Part* part2 = parts.at(m);
-#endif
 			if (part2 != part1) {
-				// measureTwoBodyForce
-				if  (part1->type == measureTwoBodyForce->partID1 && part2->type == measureTwoBodyForce->partID2 && ((part1->cell == part2->cell) == (measureTwoBodyForce->intra)) )
-				{
-					Vector addedVector{};
-					measureTwoBodyForce->twoBodyForce->updateForce(part1, part2, box, addedVector);
-				}
+
+				computeTwoBodyForces(part1, part2, partSpecs);			
+
 #ifdef LIST
 			}
 			part2 = part2->next;
 #endif
-			}
+
+
 		}
+
+			}
+
+	box->remap(part1->position);
+
+		}
+
+	}
+
+
+
+	void System::collect()
+	{
+		if (measureTwoBodyForce == nullptr)
+		{
+			std::cerr << "No force to be measured has been registered." << std::endl;
+		}
+
+
+		//measureOneBodyForce->data.push_back(std::vector<Vector>{});
+		measureTwoBodyForce->data.push_back(std::vector<Vector>{});
+		//measureOneBodyForce->data.back().resize(this->parts.size());
+		measureTwoBodyForce->data.back().resize(this->parts.size());
+
+
+		// store the velocities. They will be restored into the particles velocity vector
+		std::vector<Vector> velocities;
+		velocities.resize(parts.size());
+#ifdef OMP
+#pragma omp parallel for schedule(guided)
+#endif
+		for (int i = 0; i < parts.size(); i++)
+		{
+			velocities.at(i) = parts.at(i)->velocity;
+			measureTwoBodyForce->data.back().at(i) = Vector{ 0.0, 0.0 };
+		}
+
+		// reset to zero so we can extract the forces
+		resetVelocities();
+
+		// measure the forces I want and store them into a vector
+#ifdef OMP
+#pragma omp parallel for schedule(guided)
+#endif
+		for (int n = 0; n < parts.size(); n++)
+		{
+			Part* part1 = parts.at(n);
+			// look at measureOneBodyForce
+			//if (part1->type == measureOneBodyForce->partID)
+			//{
+			//	// apply force
+			//	Vector addedVector{};
+			//	measureOneBodyForce->oneBodyForce->updateForce(part1, addedVector);
+			//}
+			//measureOneBodyForce->data.back().push_back(part1->velocity);
+			//part1->velocity = Vector{ 0.0,0.0 }; // necessary for the next measure (twoBodyForces) !
+
+#ifdef LIST
+			BoxCell* subBox1 = part1->myBoxCell;
+			for (int J = 0; J < 9; J++)
+			{
+				BoxCell* subBox2 = subBox1->neighbour[J];
+				Part* part2 = subBox2->head.next;
+				while (part2 != nullptr)
+				{
+#else
+			for (size_t m = 0; m < parts.size(); m++)
+			{
+				Part* part2 = parts.at(m);
+#endif
+				if (part2 != part1) {
+					// measureTwoBodyForce
+					if (part1->type == measureTwoBodyForce->partID1 && part2->type == measureTwoBodyForce->partID2 && ((part1->cell == part2->cell) == (measureTwoBodyForce->intra)))
+					{
+						Vector addedVector{};
+						measureTwoBodyForce->twoBodyForce->updateForce(part1, part2, box, addedVector);
+					}
+#ifdef LIST
+				}
+				part2 = part2->next;
+#endif
+			}
+				}
 		measureTwoBodyForce->data.back().at(n) = part1->velocity;
 		part1->velocity = Vector{ 0.0, 0.0 };
-	}
+			}
 
 
 
@@ -435,139 +386,194 @@ void System::collect()
 		parts.at(i)->velocity = velocities.at(i);
 	}
 
-}
+		}
 
 
 
 #include<limits>
-void System::setTypeFriction(size_t i, double friction)
-{
-	if (friction < 0)
-		friction = std::numeric_limits<double>::infinity();
-	this->partSpecs->setFriction(i, friction);
-}
+		void System::setTypeFriction(size_t i, double friction)
+		{
+			if (friction < 0)
+				friction = std::numeric_limits<double>::infinity();
+			this->partSpecs->setFriction(i, friction);
+		}
 
-double System::getTypeFriction(size_t i)
-{
-	return this->partSpecs->getFriction(i);
-}
+		double System::getTypeFriction(size_t i)
+		{
+			return this->partSpecs->getFriction(i);
+		}
 
 
 
 #define NEWDEBUG
-void System::updatePositions(double dt, bool update)
-{
+		void System::updatePositions(double dt, bool update)
+		{
 #ifdef OMP
 #pragma omp parallel for
 #endif
-	for (int n = 0; n < parts.size(); n++)
-	{
-		size_t pt = parts.at(n)->type;
-		double friction = this->partSpecs->getFriction(pt);
-		double mass = this->partSpecs->partTypes.getPartTypes().at(pt).mass;
+			for (int n = 0; n < parts.size(); n++)
+			{
+				size_t pt = parts.at(n)->type;
+				double friction = this->partSpecs->getFriction(pt);
+				double mass = this->partSpecs->partTypes.getPartTypes().at(pt).mass;
 
 #ifdef NEWDEBUG
-		Vector oldPosition = parts.at(n)->position;
+				Vector oldPosition = parts.at(n)->position;
 #endif
-		
-		
-		//std::cout << "part" << parts.at(n)->type << " has f = " << friction << std::endl;
-		
 
 
-		parts.at(n)->position += parts.at(n)->velocity * (dt/(friction * mass));
+				//std::cout << "part" << parts.at(n)->type << " has f = " << friction << std::endl;
+
+
+
+				parts.at(n)->position += parts.at(n)->velocity * (dt / (friction * mass));
 
 #ifdef NEWDEBUG
-		Vector difference = parts.at(n)->position + (oldPosition * (-1) );
-		double diff = Vector::dotProduct(difference, difference);
-		if ( diff > 1 )
-		{
-			parts.at(n)->myBoxCell->printSubCellList(0);
-			printf("parts size: %d\n", parts.size());
-			printf("parts size: %d\n", parts.size());
-			printf("diff: %e\n", diff);
-		}
+				Vector difference = parts.at(n)->position + (oldPosition * (-1));
+				double diff = Vector::dotProduct(difference, difference);
+				if (diff > 1)
+				{
+					parts.at(n)->myBoxCell->printSubCellList(0);
+					printf("parts size: %d\n", parts.size());
+					printf("parts size: %d\n", parts.size());
+					printf("diff: %e\n", diff);
+				}
 #endif
-	}
+			}
 
 #ifdef LIST
-	if (update)
-	{
-		setSubBoxes();
-	}
+			if (update)
+			{
+				setSubBoxes();
+			}
 #endif
 
 }
 
-bool System::cellsAreBroken() const
+
+void System::eraseDeadCells()
 {
+	bool deadCells = false;
 	for (size_t c = 0; c < cells.size(); c++)
 	{
 		const Cell* cell = &cells.at(c);
-		if (this->partSpecs->cellIsBroken(cell, box))
-			return true;
+		if (this->partSpecs->cellIsDead(cell, box))
+		{
+			cells.erase(c);
+			c--;
+			deadCells = true;
+		}
 	}
-	return false;
+
+	if (deadCells)
+	{
+		this->constructPartsVector();
+		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
+	}
 }
 
 
-void System::resolveOverlaps()
+void System::duplicateCells()
 {
-	bool overlaps = true;
-	while (overlaps)
+	bool duplicated = false;
+	for (size_t c = 0; c < cells.size(); c++)
 	{
-		overlaps = false;
-		for (size_t n = 0; n < parts.size(); n++)
+		Cell* cell = &cells.at(c);
+
+		std::vector<Cell> newCells;
+		if (this->partSpecs->cellDuplicates(cell, &newCells, box))
 		{
-			// get the part
-			Part* part1 = parts.at(n);
-#ifdef LIST
-			// get the cell of this part
-			BoxCell* subBox1 = part1->myBoxCell;
-			// loop through the neighbours of subBox1
-			for (int J = 0; J < 9; J++)
+			for (size_t i = 0; i < newCells.size(); i++)
 			{
-				BoxCell* subBox2 = subBox1->neighbour[J];
-
-				// loop through particles in this subBox
-				Part* part2 = subBox2->head.next;
-				while (part2 != nullptr)
+				cells.push_back(newCells.at(i));
+				for (size_t p = 0; p < newCells.at(i).getNumOfParts(); p++)
 				{
-#else
-			for (size_t m = 0; m < parts.size(); m++)
+					cells.back().getPart(p).cell = cells.size() - 1;
+				}
+			}
+			
+			duplicated = true;
+		}
+		
+	}
+
+	if (duplicated)
+	{
+		this->constructPartsVector();
+		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
+	}
+}
+
+
+		bool System::cellsAreBroken() const
+		{
+			for (size_t c = 0; c < cells.size(); c++)
 			{
-				Part* part2 = parts.at(m);
-#endif
-				if (part2 != part1 && part1->cell != part2->cell) {
-					// check for overlaps
-					double sig1 = this->partSpecs->getDiameter(part1->type);
-					double sig2 = this->partSpecs->getDiameter(part2->type);
-					double sig = 0.5 * (sig1 + sig2);
-					
-					Vector distance21Vec = part1->position - part2->position;
-					double distance21 = sqrt(Vector::dotProduct(distance21Vec, distance21Vec));
+				const Cell* cell = &cells.at(c);
+				if (this->partSpecs->cellIsBroken(cell, box))
+					return true;
+			}
+			return false;
+		}
 
-					if (distance21 < sig)
+
+		void System::resolveOverlaps()
+		{
+			bool overlaps = true;
+			while (overlaps)
+			{
+				overlaps = false;
+				for (size_t n = 0; n < parts.size(); n++)
+				{
+					// get the part
+					Part* part1 = parts.at(n);
+#ifdef LIST
+					// get the cell of this part
+					BoxCell* subBox1 = part1->myBoxCell;
+					// loop through the neighbours of subBox1
+					for (int J = 0; J < 9; J++)
 					{
-						// overlapping: need to correct
-						double d = distance21;
-						double x = ( (sig + 0.001)/d - 1.0)/(sig1 + sig2);
-						part1->position += (distance21Vec * (sig2 * x)) ;
-						part2->position -= (distance21Vec * (sig1 * x));
+						BoxCell* subBox2 = subBox1->neighbour[J];
 
-						overlaps = true;
+						// loop through particles in this subBox
+						Part* part2 = subBox2->head.next;
+						while (part2 != nullptr)
+						{
+#else
+					for (size_t m = 0; m < parts.size(); m++)
+					{
+						Part* part2 = parts.at(m);
+#endif
+						if (part2 != part1 && part1->cell != part2->cell) {
+							// check for overlaps
+							double sig1 = this->partSpecs->getDiameter(part1->type);
+							double sig2 = this->partSpecs->getDiameter(part2->type);
+							double sig = 0.5 * (sig1 + sig2);
+
+							Vector distance21Vec = part1->position - part2->position;
+							double distance21 = sqrt(Vector::dotProduct(distance21Vec, distance21Vec));
+
+							if (distance21 < sig)
+							{
+								// overlapping: need to correct
+								double d = distance21;
+								double x = ((sig + 0.001) / d - 1.0) / (sig1 + sig2);
+								part1->position += (distance21Vec * (sig2 * x));
+								part2->position -= (distance21Vec * (sig1 * x));
+
+								overlaps = true;
+							}
+
+#ifdef LIST
+						}
+						part2 = part2->next;
+#endif
 					}
 
-#ifdef LIST
-				}
-				part2 = part2->next;
-#endif
-			}
+						}
+
+					}
 
 				}
-
 			}
 
-		}
-}
-	
