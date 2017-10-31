@@ -136,7 +136,7 @@ namespace pywrapper {
 
 
 #ifdef VISUALS
-		class_<visuals::Display, boost::noncopyable>("Display", init<int, int, Box*, PartSpecs*, SystemTrajectory*, bool>())
+		class_<visuals::Display, boost::noncopyable>("Display", init<int, int, double, Box*, PartSpecs*, SystemTrajectory*, bool>())
 			.def("run", &visuals::Display::run)
 			;
 #endif

@@ -247,6 +247,12 @@ bool CellColony::load(Hdf5* file, const char* name)
 	lightParts.resize(LENGTH);
 	dataset.read(&lightParts.at(0), partType);
 	
+
+#ifdef OBJECTPOOL
+	m_cells.resize(LENGTH);
+#else
+#endif
+
 	size_t currentCell = 0;
 	std::vector<Part> partsInCell;
 	for (size_t i = 0; i < LENGTH; i++) {

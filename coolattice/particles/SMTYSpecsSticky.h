@@ -23,8 +23,11 @@ class SMTYSpecsSticky : public PartSpecs
 	double m_gamma2;
 
 	double m_sigma2factor;
-
 	double m_cut;
+
+	double m_KT;
+	double m_variance;
+	double m_dt;
 
 public:
 	SMTYSpecsSticky();

@@ -30,16 +30,19 @@ void SMTYSpecsSticky::build()
 	addInterForce(2, sigmoidalABrepulsion);
 	addInterForce(3, sigmoidalBBrepulsion);
 	
-	Sigmoidal* sigmoidalAAattraction(new Sigmoidal{ m_a2, m_b2, m_gamma2, sigAA*m_sigma2factor, (sigAA *   sigAA * m_cut * m_cut) });
-	Sigmoidal* sigmoidalABattraction(new Sigmoidal{ m_a2, m_b2, m_gamma2, sigAB*m_sigma2factor, (sigAB *   sigAB * m_cut * m_cut) });
-	Sigmoidal* sigmoidalBAattraction(new Sigmoidal{ m_a2, m_b2, m_gamma2, sigAB*m_sigma2factor, (sigAB *   sigAB * m_cut * m_cut) });
-	Sigmoidal* sigmoidalBBattraction(new Sigmoidal{ m_a2, m_b2, m_gamma2, sigBB*m_sigma2factor, (sigBB *   sigBB * m_cut * m_cut) });
-	
-	addInterForce(0, sigmoidalAAattraction);
-	addInterForce(1, sigmoidalABattraction);
-	addInterForce(2, sigmoidalABattraction);
-	addInterForce(3, sigmoidalBBattraction);
-
+	if (m_a2 < 0.0) {
+		Sigmoidal* sigmoidalAAattraction(new Sigmoidal{ m_a2, m_b2, m_gamma2, sigAA*m_sigma2factor, (sigAA *   sigAA * m_cut * m_cut) });
+		Sigmoidal* sigmoidalABattraction(new Sigmoidal{ m_a2, m_b2, m_gamma2, sigAB*m_sigma2factor, (sigAB *   sigAB * m_cut * m_cut) });
+		Sigmoidal* sigmoidalBAattraction(new Sigmoidal{ m_a2, m_b2, m_gamma2, sigAB*m_sigma2factor, (sigAB *   sigAB * m_cut * m_cut) });
+		Sigmoidal* sigmoidalBBattraction(new Sigmoidal{ m_a2, m_b2, m_gamma2, sigBB*m_sigma2factor, (sigBB *   sigBB * m_cut * m_cut) });
+		addInterForce(0, sigmoidalAAattraction);
+		addInterForce(1, sigmoidalABattraction);
+		addInterForce(2, sigmoidalABattraction);
+		addInterForce(3, sigmoidalBBattraction);
+	}
+	else {
+		std::cerr << "SMTYSpecsSticky: Warning: sigmoidal attraction is not activated because a2 coefficient is not < 0." << std::endl;
+	}
 
 	FeneForce* feneAA(new FeneForce{ m_rMaxSquared, m_kappa });
 	FeneForce* feneAB(new FeneForce{ m_rMaxSquared, m_kappa });
@@ -54,10 +57,20 @@ void SMTYSpecsSticky::build()
 	addIntraForce(2, feneBA);
 	addIntraForce(3, feneBB);
 
-	GaussianRandomForce* random(new GaussianRandomForce{ 1.0, 0.001,1.0,1.0,5.0e-1 });
 
-	this->oneBodyForces.at(0).push_back(random); // TODO URGENT: pass dt etc
-	this->oneBodyForces.at(1).push_back(random); // TODO URGENT: pass dt etc
+
+	// the force coefficient is: sqrt(2.0 * KT * mass * friction * deltat) / deltat
+	if (m_KT > 0.0 && m_dt > 0.0 && m_variance > 0.0) {
+		GaussianRandomForce* randomF(new GaussianRandomForce{ m_variance, m_dt, this->partTypes.getPartTypes().at(0).friction,this->partTypes.getPartTypes().at(0).mass, m_KT });
+		GaussianRandomForce* randomB(new GaussianRandomForce{ m_variance, m_dt, this->partTypes.getPartTypes().at(1).friction,this->partTypes.getPartTypes().at(1).mass, m_KT });
+		this->oneBodyForces.at(0).push_back(randomF); 
+		this->oneBodyForces.at(1).push_back(randomB); 
+	}
+	else
+	{
+		std::cerr << "SMTYSpecsSticky: Warning: noise is not activated because KT or variance or dt coefficients are not > 0." << std::endl;
+	}
+
 
 	std::cout << " *** System's steady-state(ss) characteristics *** " << std::endl;
 	std::cout << " - Cell Length = " << ssCellLength << std::endl;
@@ -71,7 +84,7 @@ void SMTYSpecsSticky::build()
 SMTYSpecsSticky::SMTYSpecsSticky(const Parameters* params) : SMTYSpecsSticky()
 {
 
-	if (params->size() != 17)
+	if (params->size() != 20)
 	{
 		std::cerr << "SMTYSpecsSticky: not enough parameters." << std::endl;
 		assert(false);
@@ -95,6 +108,10 @@ SMTYSpecsSticky::SMTYSpecsSticky(const Parameters* params) : SMTYSpecsSticky()
 	double massF        = params->getParam(14);
 	double massB        = params->getParam(15);
 	double cut          = params->getParam(16);
+	double KT           = params->getParam(17);
+	double variance     = params->getParam(18);
+	double dt           = params->getParam(19);
+
 
 
 	m_motility = motility;
@@ -110,6 +127,9 @@ SMTYSpecsSticky::SMTYSpecsSticky(const Parameters* params) : SMTYSpecsSticky()
 	m_gamma2 = gamma2;
 	m_sigma2factor = sigma2factor;
 
+	m_KT = KT;
+	m_variance = variance;
+	m_dt = dt;
 
 	// particle types
 	this->partTypes.getPartTypes().at(0).name = "F";
@@ -140,10 +160,23 @@ bool SMTYSpecsSticky::load(Hdf5* file, const char* groupName)
 		}
 
 		m_motility = file->readAttributeDouble(groupName, "motility");
-		//m_epsilon = file->readAttributeDouble(groupName, "eps");
 		m_cut = file->readAttributeDouble(groupName, "cut");
 		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
 		m_kappa = file->readAttributeDouble(groupName, "k");
+
+
+		m_a1 = file->readAttributeDouble(groupName, "a1");
+		m_a2 = file->readAttributeDouble(groupName, "a2");
+		m_b1 = file->readAttributeDouble(groupName, "b1");
+		m_b2 = file->readAttributeDouble(groupName, "b2");
+		m_gamma1 = file->readAttributeDouble(groupName, "gamma1");
+		m_gamma2 = file->readAttributeDouble(groupName, "gamma2");
+		m_sigma2factor = file->readAttributeDouble(groupName, "sigma2factor");
+
+		m_KT       = file->readAttributeDouble(groupName, "KT");
+		m_variance = file->readAttributeDouble(groupName, "variance");
+		m_dt       = file->readAttributeDouble(groupName, "dt");
+
 
 		// save partType
 		char partTypesGroupName[64];
@@ -176,10 +209,21 @@ bool SMTYSpecsSticky::save(Hdf5* file, const char* groupName) const
 
 		file->writeAttributeString(groupName, "name", name.c_str());
 		file->writeAttributeDouble(groupName, "motility", m_motility);
-		//file->writeAttributeDouble(groupName, "eps", m_epsilon);
 		file->writeAttributeDouble(groupName, "cut", m_cut);
 		file->writeAttributeDouble(groupName, "rMax2", m_rMaxSquared);
 		file->writeAttributeDouble(groupName, "k", m_kappa);
+
+		file->writeAttributeDouble(groupName, "a1", m_a1);
+		file->writeAttributeDouble(groupName, "a2", m_a2);
+		file->writeAttributeDouble(groupName, "b1", m_b1);
+		file->writeAttributeDouble(groupName, "b2", m_b2);
+		file->writeAttributeDouble(groupName, "gamma1", m_gamma1);
+		file->writeAttributeDouble(groupName, "gamma2", m_gamma2);
+		file->writeAttributeDouble(groupName, "sigma2factor", m_sigma2factor);
+
+		file->writeAttributeDouble(groupName, "KT", m_KT);
+		file->writeAttributeDouble(groupName, "variance", m_variance);
+		file->writeAttributeDouble(groupName, "dt", m_dt);
 
 		// save partType
 		char partTypesGroupName[64];

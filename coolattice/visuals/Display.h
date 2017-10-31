@@ -46,7 +46,7 @@ namespace visuals {
 
 	public:
 		// TODO: sigma will not be passed. It will be taken from "trajectory"
-		Display(int width, int height, Box* box,  PartSpecs* partSpecs, SystemTrajectory* trajectory, bool lightRendering);
+		Display(int width, int height, double adjustFactor, Box* box, PartSpecs* partSpecs, SystemTrajectory* trajectory, bool lightRendering);
 		//~Display();
 
 		void run(int start, int end, int stride, int stepWait);
