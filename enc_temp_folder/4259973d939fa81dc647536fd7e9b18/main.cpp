@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 	//TODO URGENT: change to proper seed.
 	std::string seedStr = "123";//inputJson.at("SIMULATION").at("seed").dump();
 #ifdef LINUX
-	unsigned long int seed = mix(clock(), time(NULL), getpid());
+	unsigned long int seed = (seedStr == "") ? mix(clock(), time(NULL), getpid()) : std::stoul(seedStr);
 #else
 	unsigned long int seed = (seedStr == "") ? mix(clock(), time(NULL), 1) : std::stoul(seedStr);
 #endif

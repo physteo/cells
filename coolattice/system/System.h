@@ -121,6 +121,8 @@ public:
 	void   setTypeFriction(size_t i, double friction);
 	double getTypeFriction(size_t i);
 
+	void setPartSpecs(PartSpecs* partSpecsIn);
+
 	// to eliminate:
 	void addVelocity(double vx, double vy, size_t cell, size_t type)
 	{

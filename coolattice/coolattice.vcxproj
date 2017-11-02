@@ -182,6 +182,7 @@
     <ClCompile Include="particles\PartSpecs.cpp" />
     <ClCompile Include="particles\SMTYSpecs.cpp" />
     <ClCompile Include="particles\SMTYSpecsAdhesion.cpp" />
+    <ClCompile Include="particles\SMTYSpecsCycle.cpp" />
     <ClCompile Include="particles\SMTYSpecsNOCIL.cpp" />
     <ClCompile Include="particles\SMTYSpecsSticky.cpp" />
     <ClCompile Include="system\System.cpp" />
@@ -264,6 +265,7 @@
     <ClInclude Include="particles\SMTYSpecs.h" />
     <ClInclude Include="particles\PartType.h" />
     <ClInclude Include="particles\SMTYSpecsAdhesion.h" />
+    <ClInclude Include="particles\SMTYSpecsCycle.h" />
     <ClInclude Include="particles\SMTYSpecsNOCIL.h" />
     <ClInclude Include="particles\SMTYSpecsSticky.h" />
     <ClInclude Include="pythonInterface\Parameters.h" />

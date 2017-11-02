@@ -179,8 +179,12 @@ bool SMTYSpecsAdhesion::cellIsBroken(const Cell* cell, const Box* box) const
 
 }
 
+bool SMTYSpecsAdhesion::cellIsDead(const Cell* cell, const Box* box) 
+{
+	return false;
+}
 
-bool SMTYSpecsAdhesion::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box) const
+bool SMTYSpecsAdhesion::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
 {
 	// in this model, a cell can duplicate if its length is bigger than Rmax/2.0
 	Vector vectorDistance;
@@ -191,12 +195,12 @@ bool SMTYSpecsAdhesion::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, 
 		// bla
 		Cell newcell{ 2 };
 		newcell.getPart(0).type = 0;
-		newcell.getPart(0).cell = 373;
+		newcell.getPart(0).cell = currentNumberOfCells + 1;
 
 		newcell.getPart(0).position = cell->getPart(1).position;
 
 		newcell.getPart(1).type = 1;
-		newcell.getPart(1).cell = 373;
+		newcell.getPart(1).cell = currentNumberOfCells + 1;
 		newcell.getPart(1).position = cell->getPart(1).position;
 
 		cell->getPart(1).position = cell->getPart(0).position;

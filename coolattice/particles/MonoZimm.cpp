@@ -97,6 +97,17 @@ bool MonoZimm::save(Hdf5* file, const char* groupName) const
 }
 
 
+bool MonoZimm::cellIsDead(const Cell* cell, const Box* box)
+{
+	return false;
+}
+
+
+bool MonoZimm::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
+{
+	return false;
+}
+
 
 bool MonoZimm::cellIsBroken(const Cell* cell, const Box* box) const
 {

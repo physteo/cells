@@ -1,37 +1,35 @@
 #pragma once
 #include "../utils/Hdf5.h"
 #include "PartSpecs.h"
-#include "../interactions/Sigmoidal.h"
 
-#include "../pythonInterface/Parameters.h"
+#include <gsl/gsl_rng.h> 
+#include <gsl/gsl_randist.h>
+extern gsl_rng *g_rng;
+
+
 
 // Schnyder-Molina-Tanaka-Yamamoto model for cells, with no noise(for the moment).
-class SMTYSpecsSticky : public PartSpecs
+class SMTYSpecsCycle : public PartSpecs
 {
 	// params
+	//double m_sigAA;
+	//double m_sigBB;
 	double m_motility;
+	double m_epsilon;
+	double m_cut;
 	double m_rMaxSquared;
 	double m_kappa;
+	size_t m_cycleStage;
+	//double m_frictionF;
+	//double m_frictionB;
+	//double m_massF;
+	//double m_massB;
 
-	double m_a1;
-	double m_a2;
-	
-	double m_b1;
-	double m_b2;
-	
-	double m_gamma1;
-	double m_gamma2;
-
-	double m_sigma2factor;
-	double m_cut;
-
-	double m_KT;
-	double m_variance;
-	double m_dt;
 
 public:
-	SMTYSpecsSticky();
-	SMTYSpecsSticky(const Parameters* params);
+	SMTYSpecsCycle();
+	SMTYSpecsCycle(double sigAA, double sigBB, double motility,
+		double epsilon, double cut, double rMaxSquared, double kappa, double frictionF, double frictionB, double massF, double massB, size_t cycleStage);
 
 	inline double getSigBB() { return this->partTypes.getPartTypes().at(1).sig; }
 
@@ -46,5 +44,4 @@ private:
 	void build();
 
 };
-
 

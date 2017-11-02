@@ -179,3 +179,15 @@ bool SMTYSpecsNOCIL::cellIsBroken(const Cell* cell, const Box* box) const
 	return false;
 
 }
+
+
+bool SMTYSpecsNOCIL::cellIsDead(const Cell* cell, const Box* box)
+{
+	return false;
+}
+
+
+bool SMTYSpecsNOCIL::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
+{
+	return false;
+}

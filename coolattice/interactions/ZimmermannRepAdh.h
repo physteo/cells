@@ -1,5 +1,6 @@
 #pragma once
 #include "TwoBodyForce.h"
+#include <cmath>
 
 class ZimmermannRepAdh : public TwoBodyForce
 {

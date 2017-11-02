@@ -77,8 +77,8 @@ public:
 	bool save(Hdf5* file, const char* groupName) const    = 0;
 
 	virtual bool cellIsBroken(const Cell* cell, const Box* box) const = 0;
-	virtual bool cellIsDead(const Cell* cell, const Box* box) const { return false; } // TODO: URGENT make pure virtual
-	virtual bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box) const { return false; } // TODO: URGENT make pure virtual
+	virtual bool cellIsDead(const Cell* cell, const Box* box) = 0; 
+	virtual bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const = 0;
 
 	//virtual bool cellCanDuplicate(const Cell* cell, const Box* box) const = 0;
 

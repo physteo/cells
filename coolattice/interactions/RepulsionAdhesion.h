@@ -1,4 +1,7 @@
 #pragma once
+
+#include <cmath>
+
 #include "TwoBodyForce.h"
 
 class RepulsionAdhesion : public TwoBodyForce

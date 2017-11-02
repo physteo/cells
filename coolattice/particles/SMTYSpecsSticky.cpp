@@ -264,25 +264,13 @@ bool SMTYSpecsSticky::cellIsBroken(const Cell* cell, const Box* box) const
 }
 
 
-bool SMTYSpecsSticky::cellIsDead(const Cell* cell, const Box* box) const
+bool SMTYSpecsSticky::cellIsDead(const Cell* cell, const Box* box)
 {
-	// in this system, a cell cannot die
-
-
-	// a cell is dead when it's length is
-	// bigger than Rmax2 / 8.0
-	//Vector vectorDistance;
-	//double distance2 = box->computeDistanceSquaredPBC(cell->getPart(0).position, cell->getPart(1).position, vectorDistance);
-	//if (distance2 > m_rMaxSquared / 8.0)
-	//{
-	//	std::cout << "cell is dead" << std::endl;
-	//	return true;
-	//}
 	return false;
 }
 
 
-bool SMTYSpecsSticky::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box) const
+bool SMTYSpecsSticky::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
 {
 	// in this model, a cell can duplicate if its length is bigger than Rmax/2.0
 	Vector vectorDistance;
@@ -293,12 +281,12 @@ bool SMTYSpecsSticky::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, co
 		// bla
 		Cell newcell{ 2 };
 		newcell.getPart(0).type = 0;
-		newcell.getPart(0).cell = 373;
+		newcell.getPart(0).cell = currentNumberOfCells + 1;
 
 		newcell.getPart(0).position = cell->getPart(1).position;
 
 		newcell.getPart(1).type = 1;
-		newcell.getPart(1).cell = 373;
+		newcell.getPart(1).cell = currentNumberOfCells + 1;
 		newcell.getPart(1).position = cell->getPart(1).position;
 
 		cell->getPart(1).position = cell->getPart(0).position;

@@ -66,6 +66,8 @@ namespace pywrapper {
 			.def("load", pure_virtual(&PartSpecs::load))
 			.def("save", pure_virtual(&PartSpecs::save))
 			.def("cellIsBroken", pure_virtual(&PartSpecs::cellIsBroken))
+			.def("cellIsDead", pure_virtual(&PartSpecs::cellIsDead))
+			.def("cellDuplicates", pure_virtual(&PartSpecs::cellDuplicates))
 			;
 
 		class_<SMTYSpecs, bases<PartSpecs> >("SMTYSpecs", init<>())
@@ -73,6 +75,17 @@ namespace pywrapper {
 			.def("save", &SMTYSpecs::save)
 			.def("load", &SMTYSpecs::load)
 			.def("cellIsBroken", &SMTYSpecs::cellIsBroken)
+			.def("cellIsDead", &SMTYSpecs::cellIsDead)
+			.def("cellDuplicates", &SMTYSpecs::cellDuplicates)
+			;
+
+		class_<SMTYSpecsCycle, bases<PartSpecs> >("SMTYSpecsCycle", init<>())
+			.def(init<double, double, double, double, double, double, double, double, double, double, double, int>())
+			.def("save",		   &SMTYSpecsCycle::save)
+			.def("load",		   &SMTYSpecsCycle::load)
+			.def("cellIsBroken",   &SMTYSpecsCycle::cellIsBroken)
+			.def("cellIsDead",     &SMTYSpecsCycle::cellIsDead)
+			.def("cellDuplicates", &SMTYSpecsCycle::cellDuplicates)
 			;
 
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
@@ -80,6 +93,9 @@ namespace pywrapper {
 			.def("save", &SMTYSpecsAdhesion::save)
 			.def("load", &SMTYSpecsAdhesion::load)
 			.def("cellIsBroken", &SMTYSpecsAdhesion::cellIsBroken)
+			.def("cellIsBroken",   &SMTYSpecsAdhesion::cellIsBroken)
+			.def("cellIsDead",     &SMTYSpecsAdhesion::cellIsDead)
+			.def("cellDuplicates", &SMTYSpecsAdhesion::cellDuplicates)
 			;
 
 		class_<SMTYSpecsNOCIL, bases<PartSpecs> >("SMTYSpecsNOCIL", init<>())
@@ -87,6 +103,9 @@ namespace pywrapper {
 			.def("save", &SMTYSpecsNOCIL::save)
 			.def("load", &SMTYSpecsNOCIL::load)
 			.def("cellIsBroken", &SMTYSpecs::cellIsBroken)
+			.def("cellIsBroken",   &SMTYSpecsNOCIL::cellIsBroken)
+			.def("cellIsDead",     &SMTYSpecsNOCIL::cellIsDead)
+			.def("cellDuplicates", &SMTYSpecsNOCIL::cellDuplicates)
 			;
 
 		class_<SMTYSpecsSticky, bases<PartSpecs> >("SMTYSpecsSticky", init<>())
@@ -94,6 +113,9 @@ namespace pywrapper {
 			.def("save", &SMTYSpecsSticky::save)
 			.def("load", &SMTYSpecsSticky::load)
 			.def("cellIsBroken", &SMTYSpecsSticky::cellIsBroken)
+			.def("cellIsBroken",   &SMTYSpecsSticky::cellIsBroken)
+			.def("cellIsDead",     &SMTYSpecsSticky::cellIsDead)
+			.def("cellDuplicates", &SMTYSpecsSticky::cellDuplicates)
 			;
 
 		class_<MonoZimm, bases<PartSpecs> >("MonoZimm", init<>())
@@ -101,6 +123,9 @@ namespace pywrapper {
 			.def("save", &MonoZimm::save)
 			.def("load", &MonoZimm::load)
 			.def("cellIsBroken", &MonoZimm::cellIsBroken)
+			.def("cellIsBroken",   &MonoZimm::cellIsBroken)
+			.def("cellIsDead",     &MonoZimm::cellIsDead)
+			.def("cellDuplicates", &MonoZimm::cellDuplicates)
 			;
 
 		class_<MeasureTwoBodyForce>("MeasureTwoBodyForce", init<PartSpecs*, size_t, size_t, bool, size_t>())
@@ -121,6 +146,7 @@ namespace pywrapper {
 			.def("duplicateCells", &System::duplicateCells)
 			.def("setTypeFriction", &System::setTypeFriction)
 			.def("getTypeFriction", &System::getTypeFriction)
+			.def("setPartSpecs", &System::setPartSpecs)
 			.def("registerTwoBodyForceMeasurement", &System::registerTwoBodyForceMeasurement)
 			;
 

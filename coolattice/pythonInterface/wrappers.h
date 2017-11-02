@@ -16,6 +16,7 @@
 #include "../particles/SMTYSpecsNOCIL.h"
 #include "../particles/SMTYSpecsAdhesion.h"
 #include "../particles/SMTYSpecsSticky.h"
+#include "../particles/SMTYSpecsCycle.h"
 
 #include "../particles/MonoZimm.h"
 
@@ -57,6 +58,16 @@ namespace pywrapper {
 		bool cellIsBroken(const Cell* cell, const Box* box) const override
 		{
 			return this->get_override("cellIsBroken")();
+		}
+
+		bool cellIsDead(const Cell* cell, const Box* box) override
+		{
+			return this->get_override("cellIsDead")();
+		}
+
+		bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const override
+		{
+			return this->get_override("cellDuplicates")();
 		}
 
 

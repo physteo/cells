@@ -17,6 +17,8 @@
 #include "../utils/ObjectPool.h"
 #endif
 
+#include <cmath>
+
 extern gsl_rng *g_rng;
 
 

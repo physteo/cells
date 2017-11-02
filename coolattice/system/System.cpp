@@ -199,6 +199,14 @@ void System::clearSubBoxes()
 }
 
 
+void System::setPartSpecs(PartSpecs* partSpecsIn)
+{ 
+	//std::cout << " changing to: " << partSpecsIn << std::endl;
+	this->partSpecs = partSpecsIn;
+}
+
+
+
 #define DEBUG
 
 
@@ -235,7 +243,6 @@ void System::computeTwoBodyForces(Part* part1, const Part* part2, const PartSpec
 	for (size_t f = 0; f < specs->numberOfTwoBodyForces(part1, part2); f++)
 	{
 		const TwoBodyForce* force = specs->getTwoBodyForce(part1, part2, f);
-
 		Vector addedForce;
 		force->updateForce(part1, part2, box, addedForce);
 		//measureTwoBodyForce.measure(part1->type, f, addedForce);
@@ -295,11 +302,11 @@ void System::computeForces(double dt)
 
 		}
 
-	}
+}
 
 
 
-	void System::collect()
+void System::collect()
 	{
 		if (measureTwoBodyForce == nullptr)
 		{
@@ -391,61 +398,57 @@ void System::computeForces(double dt)
 
 
 #include<limits>
-		void System::setTypeFriction(size_t i, double friction)
-		{
-			if (friction < 0)
-				friction = std::numeric_limits<double>::infinity();
-			this->partSpecs->setFriction(i, friction);
-		}
+void System::setTypeFriction(size_t i, double friction)
+{
+	if (friction < 0)
+		friction = std::numeric_limits<double>::infinity();
+	this->partSpecs->setFriction(i, friction);
+}
 
-		double System::getTypeFriction(size_t i)
-		{
-			return this->partSpecs->getFriction(i);
-		}
+double System::getTypeFriction(size_t i)
+{
+	return this->partSpecs->getFriction(i);
+}
 
 
 
 #define NEWDEBUG
-		void System::updatePositions(double dt, bool update)
-		{
+void System::updatePositions(double dt, bool update)
+{
 #ifdef OMP
 #pragma omp parallel for
 #endif
-			for (int n = 0; n < parts.size(); n++)
-			{
-				size_t pt = parts.at(n)->type;
-				double friction = this->partSpecs->getFriction(pt);
-				double mass = this->partSpecs->partTypes.getPartTypes().at(pt).mass;
+	for (int n = 0; n < parts.size(); n++)
+	{
+		size_t pt = parts.at(n)->type;
+		double friction = this->partSpecs->getFriction(pt);
+		double mass = this->partSpecs->partTypes.getPartTypes().at(pt).mass;
 
 #ifdef NEWDEBUG
-				Vector oldPosition = parts.at(n)->position;
+		Vector oldPosition = parts.at(n)->position;
 #endif
 
-
-				//std::cout << "part" << parts.at(n)->type << " has f = " << friction << std::endl;
-
-
-
-				parts.at(n)->position += parts.at(n)->velocity * (dt / (friction * mass));
+		//parts.at(n)->position += parts.at(n)->velocity * (dt / (friction * mass));
+		parts.at(n)->position += parts.at(n)->velocity * (dt / (friction));
 
 #ifdef NEWDEBUG
-				Vector difference = parts.at(n)->position + (oldPosition * (-1));
-				double diff = Vector::dotProduct(difference, difference);
-				if (diff > 1)
-				{
-					parts.at(n)->myBoxCell->printSubCellList(0);
-					printf("parts size: %d\n", parts.size());
-					printf("parts size: %d\n", parts.size());
-					printf("diff: %e\n", diff);
-				}
+		Vector difference = parts.at(n)->position + (oldPosition * (-1));
+		double diff = Vector::dotProduct(difference, difference);
+		if (diff > 1)
+		{
+			parts.at(n)->myBoxCell->printSubCellList(0);
+			printf("parts size: %d\n", parts.size());
+			printf("parts size: %d\n", parts.size());
+			printf("diff: %e\n", diff);
+		}
 #endif
-			}
+	}
 
 #ifdef LIST
-			if (update)
-			{
-				setSubBoxes();
-			}
+	if (update)
+	{
+		setSubBoxes();
+	}
 #endif
 
 }
@@ -481,7 +484,7 @@ void System::duplicateCells()
 		Cell* cell = &cells.at(c);
 
 		std::vector<Cell> newCells;
-		if (this->partSpecs->cellDuplicates(cell, &newCells, box))
+		if (this->partSpecs->cellDuplicates(cell, &newCells, box, cells.size() ))
 		{
 			for (size_t i = 0; i < newCells.size(); i++)
 			{
@@ -505,75 +508,75 @@ void System::duplicateCells()
 }
 
 
-		bool System::cellsAreBroken() const
+bool System::cellsAreBroken() const
+{
+	for (size_t c = 0; c < cells.size(); c++)
+	{
+		const Cell* cell = &cells.at(c);
+		if (this->partSpecs->cellIsBroken(cell, box))
+			return true;
+	}
+	return false;
+}
+
+
+void System::resolveOverlaps()
+{
+	bool overlaps = true;
+	while (overlaps)
+	{
+		overlaps = false;
+		for (size_t n = 0; n < parts.size(); n++)
 		{
-			for (size_t c = 0; c < cells.size(); c++)
+			// get the part
+			Part* part1 = parts.at(n);
+#ifdef LIST
+			// get the cell of this part
+			BoxCell* subBox1 = part1->myBoxCell;
+			// loop through the neighbours of subBox1
+			for (int J = 0; J < 9; J++)
 			{
-				const Cell* cell = &cells.at(c);
-				if (this->partSpecs->cellIsBroken(cell, box))
-					return true;
+				BoxCell* subBox2 = subBox1->neighbour[J];
+
+				// loop through particles in this subBox
+				Part* part2 = subBox2->head.next;
+				while (part2 != nullptr)
+				{
+#else
+			for (size_t m = 0; m < parts.size(); m++)
+			{
+				Part* part2 = parts.at(m);
+#endif
+				if (part2 != part1 && part1->cell != part2->cell) {
+					// check for overlaps
+					double sig1 = this->partSpecs->getDiameter(part1->type);
+					double sig2 = this->partSpecs->getDiameter(part2->type);
+					double sig = 0.5 * (sig1 + sig2);
+
+					Vector distance21Vec = part1->position - part2->position;
+					double distance21 = sqrt(Vector::dotProduct(distance21Vec, distance21Vec));
+
+					if (distance21 < sig)
+					{
+						// overlapping: need to correct
+						double d = distance21;
+						double x = ((sig + 0.001) / d - 1.0) / (sig1 + sig2);
+						part1->position += (distance21Vec * (sig2 * x));
+						part2->position -= (distance21Vec * (sig1 * x));
+
+						overlaps = true;
+					}
+
+#ifdef LIST
+				}
+				part2 = part2->next;
+#endif
+				}
+
 			}
-			return false;
+
 		}
 
-
-		void System::resolveOverlaps()
-		{
-			bool overlaps = true;
-			while (overlaps)
-			{
-				overlaps = false;
-				for (size_t n = 0; n < parts.size(); n++)
-				{
-					// get the part
-					Part* part1 = parts.at(n);
-#ifdef LIST
-					// get the cell of this part
-					BoxCell* subBox1 = part1->myBoxCell;
-					// loop through the neighbours of subBox1
-					for (int J = 0; J < 9; J++)
-					{
-						BoxCell* subBox2 = subBox1->neighbour[J];
-
-						// loop through particles in this subBox
-						Part* part2 = subBox2->head.next;
-						while (part2 != nullptr)
-						{
-#else
-					for (size_t m = 0; m < parts.size(); m++)
-					{
-						Part* part2 = parts.at(m);
-#endif
-						if (part2 != part1 && part1->cell != part2->cell) {
-							// check for overlaps
-							double sig1 = this->partSpecs->getDiameter(part1->type);
-							double sig2 = this->partSpecs->getDiameter(part2->type);
-							double sig = 0.5 * (sig1 + sig2);
-
-							Vector distance21Vec = part1->position - part2->position;
-							double distance21 = sqrt(Vector::dotProduct(distance21Vec, distance21Vec));
-
-							if (distance21 < sig)
-							{
-								// overlapping: need to correct
-								double d = distance21;
-								double x = ((sig + 0.001) / d - 1.0) / (sig1 + sig2);
-								part1->position += (distance21Vec * (sig2 * x));
-								part2->position -= (distance21Vec * (sig1 * x));
-
-								overlaps = true;
-							}
-
-#ifdef LIST
-						}
-						part2 = part2->next;
-#endif
-					}
-
-						}
-
-					}
-
-				}
-			}
+	}
+}
 
