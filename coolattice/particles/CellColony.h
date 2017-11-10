@@ -13,6 +13,7 @@
 #include <gsl/gsl_rng.h> 
 #include <gsl/gsl_randist.h>
 
+
 #ifdef OBJECTPOOL
 #include "../utils/ObjectPool.h"
 #endif
@@ -49,10 +50,10 @@ public:
 
 	void addVelocity(double vx, double vy, size_t cell, size_t  type);
 
-	void addOnePartCell(double x, double y, double vx, double vy);
+	void addOnePartCell(double x, double y, double vx, double vy, unsigned short stage);
 	void addTwoPartsCell(double x1, double y1, double vx1, double vy1,
-		double x2, double y2, double vx2, double vy2);
-
+		double x2, double y2, double vx2, double vy2, unsigned short stage);
+	void assignCycleStage(unsigned short cycleLength);
 
 
 	// for comparison with john

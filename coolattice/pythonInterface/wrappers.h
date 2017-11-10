@@ -31,7 +31,7 @@
 // parameters
 #include "Parameters.h"
 
-namespace pywrapper {
+namespace pywrapper{
 
 	class OneBodyForceWrap : public OneBodyForce, public boost::python::wrapper<OneBodyForce>
 	{

@@ -64,6 +64,7 @@ System::System()
 	parts.resize(0);
 	box = nullptr;
 	measureTwoBodyForce = nullptr;
+	cycleLength = 0;
 }
 
 System::System(size_t n)
@@ -95,23 +96,21 @@ System::System(CellColony* cellsIn, Box* boxIn) : System{ cellsIn }
 	constructPartsVector();
 	box = boxIn;
 	measureTwoBodyForce = nullptr;
-}
 
-
-System::System(CellColony* cellsIn, PartSpecs* partSpecsIn, Box* boxIn) : System{ cellsIn, boxIn }
-{
-	partSpecs = partSpecsIn;
 	clearSubBoxes();
 	setSubBoxes();
-
-	//resolveOverlaps();
-
-	//clearSubBoxes();
-	//setSubBoxes();
-
-	measureTwoBodyForce = nullptr;
 }
 
+
+void System::addPartSpecs(PartSpecs* partSpecsIn)
+{
+	this->partSpecs.push_back(partSpecsIn);
+}
+
+void System::setCycleLength(unsigned short cycleLengthIn)
+{
+	cycleLength = cycleLengthIn;
+}
 
 void System::registerTwoBodyForceMeasurement(MeasureTwoBodyForce* m)
 {
@@ -201,8 +200,8 @@ void System::clearSubBoxes()
 
 void System::setPartSpecs(PartSpecs* partSpecsIn)
 { 
-	//std::cout << " changing to: " << partSpecsIn << std::endl;
-	this->partSpecs = partSpecsIn;
+	//this->partSpecs = partSpecsIn;
+	partSpecs.at(0) = partSpecsIn;
 }
 
 
@@ -249,8 +248,19 @@ void System::computeTwoBodyForces(Part* part1, const Part* part2, const PartSpec
 	}
 }
 
+size_t System::computeStage(size_t time, size_t n)
+{
+	unsigned short partStageTime = parts.at(n)->stage;
+	return ((time + partStageTime) % cycleLength) / (cycleLength/partSpecs.size());
+}
 
-void System::computeForces(double dt)
+size_t System::computeStage(size_t time, Part* part)
+{
+	unsigned short partStageTime = part->stage;
+	return ((time + partStageTime) % cycleLength) / (cycleLength / partSpecs.size());
+}
+
+void System::computeForces(size_t time, double dt)
 {
 	resetVelocities();
 
@@ -262,9 +272,11 @@ void System::computeForces(double dt)
 	{
 		// get the part
 		Part* part1 = parts.at(n);
+		size_t stage = computeStage(time, n);
+
 
 		// apply one body forces
-		computeOneBodyForces(part1, partSpecs);
+		computeOneBodyForces(part1, partSpecs.at(stage));
 
 #ifdef LIST
 		// get the cell of this part
@@ -286,7 +298,7 @@ void System::computeForces(double dt)
 
 			if (part2 != part1) {
 
-				computeTwoBodyForces(part1, part2, partSpecs);			
+				computeTwoBodyForces(part1, part2, partSpecs.at(stage));
 
 #ifdef LIST
 			}
@@ -301,6 +313,124 @@ void System::computeForces(double dt)
 	box->remap(part1->position);
 
 		}
+
+}
+
+
+
+void System::computeForcesVoronoi(size_t time, double dt)
+{
+	resetVelocities();
+
+	// loop over the subboxes
+		// for each subbox:
+		// construct voronoi of the subbox + its neighbours
+		// loop over the particles inside the subbox and compute forces with the neighbours according to the voronoi
+
+//#ifdef OMP
+//#pragma omp parallel for schedule(guided)
+//#endif
+	for (int sb = 0; sb < box->getBoxCells().size(); sb++)
+	{
+		BoxCell* subBox1 = &box->getBoxCells().at(sb);
+		// construct voronoi cell of the subBox and its neighbouring subBoxes
+		double baseWidthX = (subBox1->upperRightCorner.x - subBox1->downLeftCorner.x);
+		double baseWidthY = (subBox1->upperRightCorner.y - subBox1->downLeftCorner.y);
+
+		double min_x = subBox1->downLeftCorner.x - baseWidthX;
+		double min_y = subBox1->downLeftCorner.y - baseWidthY;
+
+
+		double width_x = 3.0 * baseWidthX;
+		double width_y = 3.0 * baseWidthY;
+
+		// loop over neighbours and collect particles inside a vector.
+		// if the neighbours are on the other side, then correct the position of the particles
+		std::vector<Part*> voroBoxParts; //TODO: need to copy really?
+		voroBoxParts.reserve(30);
+		for (int J = 0; J < 9; J++) // can be optimized knowing that certain J are at the left, or right, etc
+		{
+			Vector addition{ 0.0,0.0 };
+
+			BoxCell* subBox2 = subBox1->neighbour[J];
+			// x
+			if (subBox2->downLeftCorner.x > subBox1->upperRightCorner.x + baseWidthX / 2.0)
+			{
+				addition.x += -box->getBoxCellLengthX();
+			}
+
+			if (subBox2->upperRightCorner.x < subBox1->downLeftCorner.x - baseWidthX / 2.0)
+			{
+				addition.x += box->getBoxCellLengthX();
+			}
+			// y
+			Vector upperLeftCorner2{ subBox2->downLeftCorner.x, subBox2->upperRightCorner.y };
+			Vector downRightCorner2{ subBox2->upperRightCorner.x, subBox2->downLeftCorner.y };
+			Vector upperLeftCorner1{ subBox1->downLeftCorner.x,   subBox1->upperRightCorner.y };
+			Vector downRightCorner1{ subBox1->upperRightCorner.x, subBox1->downLeftCorner.y };
+			// downLeftCorner ->downRightCorner
+			//upperRightCorner->upperLeftCorner
+
+			if (downRightCorner2.y > upperLeftCorner1.y + baseWidthY / 2.0)
+			{
+				addition.y += -box->getBoxCellLengthY();
+			}
+
+			if (upperLeftCorner2.y < downRightCorner1.y - baseWidthY / 2.0)
+			{
+				addition.y += box->getBoxCellLengthY();
+			}
+
+			// loop through particles in this subBox
+			Part* part2 = subBox2->head.next;
+			while (part2 != nullptr)
+			{
+				part2->position += addition;
+				voroBoxParts.push_back(part2);
+				part2 = part2->next;
+			}
+
+		}
+
+		// now the vector voroBoxParts is ready and we can construct the voronoi box
+		voro::container con(min_x, min_x + width_x, min_y, min_y + width_y, -0.5, 0.5, 1, 1, 1,
+			false, false, false, 8);
+
+		for (int i = 0; i < voroBoxParts.size(); i++)
+			con.put(i, voroBoxParts.at(i)->position.x, voroBoxParts.at(i)->position.y, 0.0);
+
+		voro::c_loop_subset loop = voro::c_loop_subset(con);
+		loop.setup_box(	subBox1->downLeftCorner.x, subBox1->upperRightCorner.x,
+						subBox1->downLeftCorner.y, subBox1->upperRightCorner.y,
+						-0.5, 0.5, false); //TODO: false?
+		voro::voronoicell_neighbor c;
+		if (loop.start()) do if (con.compute_cell(c, loop)) {
+			int ID1;
+			ID1 = loop.pid();   // retrieve ID of particle
+			Part* part1 = voroBoxParts.at(ID1);
+			size_t stage = computeStage(time, part1);
+
+			computeOneBodyForces(part1, partSpecs.at(stage));
+
+			std::vector<int> neighbours;
+			c.neighbors(neighbours);
+			for (size_t j = 0; j < neighbours.size(); j++)
+			{
+				int ID2 = neighbours.at(j);
+				if (ID2 > 0)
+				{
+					Part* part2 = voroBoxParts.at(ID2);
+					// now i have part1 and part2
+					computeTwoBodyForces(part1, part2, partSpecs.at(stage));
+
+				}
+				//	std::cout << "(" << parts.at(ID).x << ", " << parts.at(ID).y << ") - ";
+			}
+
+			box->remap(part1->position);
+		} while (loop.inc());
+
+	}
 
 }
 
@@ -400,20 +530,22 @@ void System::collect()
 #include<limits>
 void System::setTypeFriction(size_t i, double friction)
 {
-	if (friction < 0)
-		friction = std::numeric_limits<double>::infinity();
-	this->partSpecs->setFriction(i, friction);
+	//if (friction < 0)
+	//	friction = std::numeric_limits<double>::infinity();
+	//this->currentPartSpecs->setFriction(i, friction);
+	assert(false);
 }
 
 double System::getTypeFriction(size_t i)
 {
-	return this->partSpecs->getFriction(i);
+	//return this->currentPartSpecs->getFriction(i);
+	return this->partSpecs.at(0)->getFriction(i);
 }
 
 
 
 #define NEWDEBUG
-void System::updatePositions(double dt, bool update)
+void System::updatePositions(size_t time, double dt, bool update)
 {
 #ifdef OMP
 #pragma omp parallel for
@@ -421,8 +553,11 @@ void System::updatePositions(double dt, bool update)
 	for (int n = 0; n < parts.size(); n++)
 	{
 		size_t pt = parts.at(n)->type;
-		double friction = this->partSpecs->getFriction(pt);
-		double mass = this->partSpecs->partTypes.getPartTypes().at(pt).mass;
+		size_t stage = computeStage(time, n);
+
+		double friction = this->partSpecs.at(stage)->getFriction(pt);
+		double mass = this->partSpecs.at(stage)->partTypes.getPartTypes().at(pt).mass;
+		
 
 #ifdef NEWDEBUG
 		Vector oldPosition = parts.at(n)->position;
@@ -454,13 +589,40 @@ void System::updatePositions(double dt, bool update)
 }
 
 
+void System::eraseRegionCells(double minX, double maxX, double minY, double maxY)
+{
+	bool deadCells = false;
+	for (size_t c = 0; c < cells.size(); c++)
+	{
+		const Cell* cell = &cells.at(c);
+		for (size_t p = 0; p < cell->getNumOfParts(); p++)
+		{
+			if (cell->getPart(p).position.x < minX || cell->getPart(p).position.x > maxX ||
+				cell->getPart(p).position.y < minY || cell->getPart(p).position.y > maxY)
+			{
+				cells.erase(c);
+				c--;
+				deadCells = true;
+				break;
+			}
+		}
+	}
+
+	if (deadCells)
+	{
+		this->constructPartsVector();
+		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
+	}
+
+}
+
 void System::eraseDeadCells()
 {
 	bool deadCells = false;
 	for (size_t c = 0; c < cells.size(); c++)
 	{
 		const Cell* cell = &cells.at(c);
-		if (this->partSpecs->cellIsDead(cell, box))
+		if (this->partSpecs.at(0)->cellIsDead(cell, box))
 		{
 			cells.erase(c);
 			c--;
@@ -484,7 +646,7 @@ void System::duplicateCells()
 		Cell* cell = &cells.at(c);
 
 		std::vector<Cell> newCells;
-		if (this->partSpecs->cellDuplicates(cell, &newCells, box, cells.size() ))
+		if (this->partSpecs.at(0)->cellDuplicates(cell, &newCells, box, cells.size() ))
 		{
 			for (size_t i = 0; i < newCells.size(); i++)
 			{
@@ -513,7 +675,7 @@ bool System::cellsAreBroken() const
 	for (size_t c = 0; c < cells.size(); c++)
 	{
 		const Cell* cell = &cells.at(c);
-		if (this->partSpecs->cellIsBroken(cell, box))
+		if (this->partSpecs.at(0)->cellIsBroken(cell, box))
 			return true;
 	}
 	return false;
@@ -549,8 +711,8 @@ void System::resolveOverlaps()
 #endif
 				if (part2 != part1 && part1->cell != part2->cell) {
 					// check for overlaps
-					double sig1 = this->partSpecs->getDiameter(part1->type);
-					double sig2 = this->partSpecs->getDiameter(part2->type);
+					double sig1 = this->partSpecs.at(0)->getDiameter(part1->type);
+					double sig2 = this->partSpecs.at(0)->getDiameter(part2->type);
 					double sig = 0.5 * (sig1 + sig2);
 
 					Vector distance21Vec = part1->position - part2->position;

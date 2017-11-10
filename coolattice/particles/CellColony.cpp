@@ -13,10 +13,10 @@ void CellColony::addVelocity(double vx, double vy, size_t cell, size_t  type)
 	this->m_cells.at(cell).getPart(type).velocity += Vector{vx, vy};
 }
 
-void CellColony::addOnePartCell(double x, double y, double vx, double vy)
+void CellColony::addOnePartCell(double x, double y, double vx, double vy, unsigned short stage)
 {
 	size_t cell = m_cells.size();
-	Part p{ Vector{ x, y }, Vector{ vx, vy }, 0, cell };
+	Part p{ Vector{ x, y }, Vector{ vx, vy }, 0, cell, stage };
 	std::vector<Part> parts = { p };
 #ifdef OBJECTPOOL
 	this->m_cells.addBackElement();
@@ -28,11 +28,11 @@ void CellColony::addOnePartCell(double x, double y, double vx, double vy)
 }
 
 void CellColony::addTwoPartsCell(double x1, double y1, double vx1, double vy1,
-	double x2, double y2, double vx2, double vy2)
+	double x2, double y2, double vx2, double vy2, unsigned short stage)
 {
 	size_t cell = m_cells.size();
-	Part p1{ Vector{ x1, y1 }, Vector{ vx1, vy1 }, 0, cell };
-	Part p2{ Vector{ x2, y2 }, Vector{ vx2, vy2 }, 1, cell };
+	Part p1{ Vector{ x1, y1 }, Vector{ vx1, vy1 }, 0, cell, stage };
+	Part p2{ Vector{ x2, y2 }, Vector{ vx2, vy2 }, 1, cell, stage };
 
 	std::vector<Part> parts = { p1, p2 };
 
@@ -44,6 +44,21 @@ void CellColony::addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 	this->m_cells.push_back(newCell);
 #endif
 }
+
+
+void CellColony::assignCycleStage(unsigned short cycleLength)
+{
+	for (size_t i = 0; i < m_cells.size(); i++)
+	{
+		unsigned short cellStage = gsl_rng_uniform_int(g_rng, cycleLength);
+		for (size_t j = 0; j < m_cells.at(i).getNumOfParts(); j++)
+		{
+			m_cells.at(i).getPart(j).stage = cellStage;
+		}
+	}
+}
+
+
 
 // N is the total number of particles we want. The resulting number of particles will be close to that number.
 // f is the slab dimension, as a submultiple of the boxLengthX 
@@ -77,9 +92,8 @@ void CellColony::populateSlab(double N, double f, double boxLengthX, double boxL
 			{
 				positionB = positionF;
 			}
-
-			cell.push_back(Part{ positionF, Vector{ 0.0, 0.0 },0,numberOfCells });
-			cell.push_back(Part{ positionB, Vector{ 0.0, 0.0 },1,numberOfCells });
+			cell.push_back(Part{ positionF, Vector{ 0.0, 0.0 },0,numberOfCells, 0 });
+			cell.push_back(Part{ positionB, Vector{ 0.0, 0.0 },1,numberOfCells, 0 });
 			this->push_back(cell);
 			numberOfCells++;
 		}
@@ -111,8 +125,8 @@ void CellColony::populate(double numPerLineX, double numPerLineY, double boxLeng
 				positionB = positionF;
 			}
 
-			cell.push_back(Part{ positionF, Vector{ 0.0, 0.0 },0,numberOfCells });
-			cell.push_back(Part{ positionB, Vector{ 0.0, 0.0 },1,numberOfCells });
+			cell.push_back(Part{ positionF, Vector{ 0.0, 0.0 },0,numberOfCells, 0 });
+			cell.push_back(Part{ positionB, Vector{ 0.0, 0.0 },1,numberOfCells, 0 });
 			this->push_back(cell);
 			numberOfCells++;
 		}
@@ -268,7 +282,7 @@ bool CellColony::load(Hdf5* file, const char* name)
 			partsInCell.resize(0);
 		}
 		Part part{ Vector{lightParts.at(i).x, lightParts.at(i).y}, Vector{ lightParts.at(i).vx , lightParts.at(i).vy },
-			lightParts.at(i).type , lightParts.at(i).cell };
+			lightParts.at(i).type , lightParts.at(i).cell, 0 };
 		partsInCell.push_back(part);
 	}
 		

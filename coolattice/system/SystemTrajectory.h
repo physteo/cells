@@ -29,6 +29,11 @@ public:
 	size_t		maxCells() const;
 
 
+	void assignCycleStage(size_t cycleLength)
+	{
+		m_trajectory.back().assignCycleStage(cycleLength);
+	}
+
 	bool load(Hdf5* file, const char* fileName)       override;
 	bool save(Hdf5* file, const char* fileName) const override;
 

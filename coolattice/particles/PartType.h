@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include "../utils/Hdf5.h"
+#include <limits> // to deal with infinity friction coefficients
 
 struct PartType
 {
@@ -47,6 +48,10 @@ public:
 				partTypes.at(t).mass = file->readAttributeDouble(groupName, massString);
 				partTypes.at(t).friction = file->readAttributeDouble(groupName, frictionString);
 
+				if (partTypes.at(t).friction <= 0.0)
+				{
+					partTypes.at(t).friction = std::numeric_limits<double>::infinity();
+				}
 
 			}
 
@@ -62,7 +67,6 @@ public:
 			return false;
 		}
 	}
-
 
 
 	virtual bool save(Hdf5* file, const char* groupName) const
@@ -89,7 +93,14 @@ public:
 				file->writeAttributeString(groupName, nameString, pt.name);
 				file->writeAttributeDouble(groupName, sigString, pt.sig );
 				file->writeAttributeDouble(groupName, massString, pt.mass);
-				file->writeAttributeDouble(groupName, frictionString, pt.friction);
+				if (pt.friction == std::numeric_limits<double>::infinity())
+				{
+					file->writeAttributeDouble(groupName, frictionString, -1.0);
+				}
+				else
+				{
+					file->writeAttributeDouble(groupName, frictionString, pt.friction);
+				}
 			}
 			
 			return true;

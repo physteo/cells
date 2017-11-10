@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
 	}
 	else if (argc == 1) {
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/script_load_cycle.py";
-		inputFilePath = "C:/Users/matte/Desktop/scripts/cycle-create-bf0.8.py";
+		inputFilePath = "C:/Users/matte/Desktop/scripts/cycle-create-bf0.8-desync.py";
 	}
 	else if (argc > 2) {
 		std::cerr << "maximum one input file." << std::endl;

@@ -20,6 +20,8 @@
 
 #include "../definitions.h"
 
+// voro++
+#include "../utils/voropp/voro++.hh"
 
 class MeasureOneBodyForce
 {
@@ -68,18 +70,22 @@ extern gsl_rng *g_rng;
 class System
 {
 public:
-	CellColony			cells;
-	std::vector<Part*>	parts;
-	Box*				box;
-	PartSpecs*			partSpecs;
+	CellColony				cells;
+	std::vector<Part*>		parts;
+	Box*					box;
+	std::vector<PartSpecs*>	partSpecs;
 
 	MeasureTwoBodyForce*			measureTwoBodyForce;
 	
+	unsigned short cycleLength;
+
 public:
 	System();
 	System(CellColony* cellsIn, Box* boxIn);
-	System(CellColony* cellsIn, PartSpecs* partSpecsIn, Box* boxIn);
-	System(CellColony* cellsIn, PartSpecs* partSpecsIn, PartSpecs* partSpecsMeasureIn, Box* boxIn);
+	//System(CellColony* cellsIn, PartSpecs* partSpecsMeasureIn, Box* boxIn);
+
+	void addPartSpecs(PartSpecs* partSpecsIn);
+	void setCycleLength(unsigned short cycleLengthIn);
 
 	//void saveMeasureTwoBodyForce()
 	//{
@@ -95,12 +101,17 @@ public:
 
 	CellColony getColony() const { return cells; }
 
-	void computeForces(double dt);
-	void updatePositions(double dt, bool update);
+	void computeForces(size_t time, double dt);
+	void computeForcesVoronoi(size_t time, double dt);
+
+
+	void updatePositions(size_t time, double dt, bool update);
 
 	void registerTwoBodyForceMeasurement(MeasureTwoBodyForce* m);
 	void collect();
 	bool cellsAreBroken() const;
+
+	void eraseRegionCells(double minX, double maxX, double minY, double maxY);
 	void eraseDeadCells();
 	void duplicateCells();
 	void resizeCellColony(size_t maxCells)
@@ -114,7 +125,7 @@ public:
 	inline const std::vector<Part*>&	getParts() const { return parts; }
 	inline const CellColony& getConstCellColony() const { return cells; }
 	inline const Box&  getBox() const { return *box; }
-	inline const PartSpecs& getPartSpecs() const { return *partSpecs; }
+	inline const PartSpecs& getPartSpecs(size_t i) const { return *partSpecs.at(i); }
 	inline const MeasureTwoBodyForce& getMeasureTwoBodyForce() const { return *measureTwoBodyForce; }
 
 
@@ -141,6 +152,10 @@ private:
 	void computeTwoBodyForces(Part* part1, const Part* part2, const PartSpecs* specs);
 
 	void resetVelocities();
+
+	size_t computeStage(size_t time, size_t n);
+	size_t computeStage(size_t time, Part* part);
+
 
 	// TODO: make sense out of these constructors
 	System(size_t n);

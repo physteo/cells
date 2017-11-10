@@ -29,17 +29,18 @@ namespace pywrapper {
 
 		class_<CellColony>("CellColony", init<>())
 			.def(init<int>())
-			.def("save", &CellColony::save)
-			.def("load", &CellColony::load)
-			.def("populate", &CellColony::populate)
-			.def("populateSlab", &CellColony::populateSlab)
-			.def("addOnePartCell", &CellColony::addOnePartCell)
-			.def("addTwoPartsCell", &CellColony::addTwoPartsCell )
-			.def("size", &CellColony::size)
-			.def("resize", &CellColony::resize)
-			.def("totalNumberOfParts", &CellColony::totalNumberOfParts)
-			.def("getPartX", &CellColony::getPartX)
-			.def("getPartY", &CellColony::getPartY)
+			.def("save",				&CellColony::save)
+			.def("load",				&CellColony::load)
+			.def("populate",			&CellColony::populate)
+			.def("populateSlab",		&CellColony::populateSlab)
+			.def("addOnePartCell",		&CellColony::addOnePartCell)
+			.def("addTwoPartsCell",		&CellColony::addTwoPartsCell )
+			.def("size",				&CellColony::size)
+			.def("resize",				&CellColony::resize)
+			.def("totalNumberOfParts",	&CellColony::totalNumberOfParts)
+			.def("getPartX",			&CellColony::getPartX)
+			.def("getPartY",			&CellColony::getPartY)
+			.def("assignCycleStage",	&CellColony::assignCycleStage)
 			;
 
 		class_<Box>("Box", init<>())
@@ -80,12 +81,13 @@ namespace pywrapper {
 			;
 
 		class_<SMTYSpecsCycle, bases<PartSpecs> >("SMTYSpecsCycle", init<>())
-			.def(init<double, double, double, double, double, double, double, double, double, double, double, int>())
+			.def(init<Parameters*, size_t, size_t>())
 			.def("save",		   &SMTYSpecsCycle::save)
 			.def("load",		   &SMTYSpecsCycle::load)
 			.def("cellIsBroken",   &SMTYSpecsCycle::cellIsBroken)
 			.def("cellIsDead",     &SMTYSpecsCycle::cellIsDead)
 			.def("cellDuplicates", &SMTYSpecsCycle::cellDuplicates)
+			.def("getCycleLength", &SMTYSpecsCycle::getCycleLength)
 			;
 
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
@@ -133,20 +135,24 @@ namespace pywrapper {
 			.def("load", &MeasureTwoBodyForce::load)
 			;
 
-		class_<System>("System", init<CellColony*, PartSpecs*, Box*>())
+		class_<System>("System", init<CellColony*, Box*>())
 			.def("addVelocity", &System::addVelocity)
 			.def("updatePositions", &System::updatePositions)
 			.def("computeForces", &System::computeForces)
+			.def("computeForcesVoronoi", &System::computeForcesVoronoi)
 			.def("collectForces",  &System::collect)
 			.def("getColony", &System::getColony)
 			.def("getNumberOfCells", &System::getNumberOfCells)
 			.def("resizeCellColony", &System::resizeCellColony)
 			.def("cellsAreBroken", &System::cellsAreBroken)
 			.def("eraseDeadCells", &System::eraseDeadCells)
+			.def("eraseRegionCells", &System::eraseRegionCells)
 			.def("duplicateCells", &System::duplicateCells)
 			.def("setTypeFriction", &System::setTypeFriction)
 			.def("getTypeFriction", &System::getTypeFriction)
 			.def("setPartSpecs", &System::setPartSpecs)
+			.def("addPartSpecs", &System::addPartSpecs)
+			.def("setCycleLength", &System::setCycleLength)
 			.def("registerTwoBodyForceMeasurement", &System::registerTwoBodyForceMeasurement)
 			;
 
@@ -157,6 +163,7 @@ namespace pywrapper {
 			.def("size", &SystemTrajectory::size)
 			.def("push_back", &SystemTrajectory::push_back)
 			.def("copyColony", &SystemTrajectory::copyColony)
+			.def("assignCycleStage", &SystemTrajectory::assignCycleStage)
 			;
 
 

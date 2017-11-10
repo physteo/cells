@@ -17,10 +17,13 @@ void SMTYSpecsCycle::build()
 	double sigAB = .5*(sigAA + sigBB);
 
 	// characteristics
-	double ssCellLength = sqrt(m_rMaxSquared) * sqrt(1.0 - m_kappa * (1.0 / frictionF + 1.0 / frictionB) / (m_motility / frictionF));
-	double ssSpeed = ssCellLength * m_motility / (frictionF + frictionB);
-	double migrationTime = sqrt(m_rMaxSquared) / ssSpeed;
-
+	//double ssCellLength = sqrt(m_rMaxSquared) * sqrt(1.0 - m_kappa * (1.0 / frictionF + 1.0 / frictionB) / (m_motility / frictionF));
+	//double ssSpeed = ssCellLength * m_motility / (frictionF + frictionB);
+	//double migrationTime = sqrt(m_rMaxSquared) / ssSpeed;
+	//std::cout << " *** System's steady-state(ss) characteristics *** " << std::endl;
+	//std::cout << " - Cell Length = " << ssCellLength << std::endl;
+	//std::cout << " - Spees at ss = " << ssSpeed << std::endl;
+	//std::cout << " - Migration t = " << migrationTime << std::endl;
 
 	LJForce* lja(new LJForce{ sigAA, m_epsilon, (sigAA *   sigAA * m_cut * m_cut) });
 	LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
@@ -63,14 +66,18 @@ void SMTYSpecsCycle::build()
 
 
 
-	std::cout << " *** System's steady-state(ss) characteristics *** " << std::endl;
-	std::cout << " - Cell Length = " << ssCellLength << std::endl;
-	std::cout << " - Spees at ss = " << ssSpeed << std::endl;
-	std::cout << " - Migration t = " << migrationTime << std::endl;
+	
+	
+	
+	
 }
 
+
 SMTYSpecsCycle::SMTYSpecsCycle(double sigAA, double sigBB, double motility,
-	double epsilon, double cut, double rMaxSquared, double kappa, double frictionF, double frictionB, double massF, double massB, size_t cycleStage) : SMTYSpecsCycle()
+	double epsilon, double cut, double rMaxSquared, double kappa, double frictionF,
+	double frictionB, double massF, double massB,
+	double rateDuplication, double thresholdDuplication,
+	size_t cycleStage, size_t cycleLength) : SMTYSpecsCycle()
 {
 
 	m_motility = motility;
@@ -79,6 +86,9 @@ SMTYSpecsCycle::SMTYSpecsCycle(double sigAA, double sigBB, double motility,
 	m_rMaxSquared = rMaxSquared;
 	m_kappa = kappa;
 	m_cycleStage = cycleStage;
+	m_cycleLength = cycleLength;
+	m_rateDuplication = rateDuplication;
+	m_thresholdDuplication = thresholdDuplication;
 
 	// particle types
 	this->partTypes.getPartTypes().at(0).name = "F";
@@ -87,10 +97,43 @@ SMTYSpecsCycle::SMTYSpecsCycle(double sigAA, double sigBB, double motility,
 	this->partTypes.getPartTypes().at(1).mass = massB;
 	this->partTypes.getPartTypes().at(0).sig = sigAA;
 	this->partTypes.getPartTypes().at(1).sig = sigBB;
-	this->partTypes.getPartTypes().at(0).friction = frictionF;
-	this->partTypes.getPartTypes().at(1).friction = frictionB;
 
+	if (frictionF <= 0) {
+		this->partTypes.getPartTypes().at(0).friction = std::numeric_limits<double>::infinity();
+	}
+	else
+	{
+		this->partTypes.getPartTypes().at(0).friction = frictionF;
+	}
+
+	if (frictionB <= 0) {
+		this->partTypes.getPartTypes().at(1).friction = std::numeric_limits<double>::infinity();
+	}
+	else
+	{
+		this->partTypes.getPartTypes().at(1).friction = frictionB;
+	}
+	
 	build();
+}
+
+
+SMTYSpecsCycle::SMTYSpecsCycle(const Parameters* params, size_t cycleStage, size_t cycleLength) : 
+	SMTYSpecsCycle(	params->getParam(0),
+					params->getParam(1),
+					params->getParam(2),
+					params->getParam(3),
+					params->getParam(4),
+					params->getParam(5),
+					params->getParam(6),
+					params->getParam(7),
+					params->getParam(8),
+					params->getParam(9),
+					params->getParam(10),
+					params->getParam(11),
+					params->getParam(12),
+					cycleStage, cycleLength)
+{
 }
 
 
@@ -112,6 +155,10 @@ bool SMTYSpecsCycle::load(Hdf5* file, const char* groupName)
 		m_cut = file->readAttributeDouble(groupName, "cut");
 		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
 		m_kappa = file->readAttributeDouble(groupName, "k");
+		m_rateDuplication = file->readAttributeDouble(groupName, "rateDuplication");
+		m_thresholdDuplication = file->readAttributeDouble(groupName, "thresholdDuplication");
+		m_cycleStage = file->readAttributeInteger(groupName, "cycleStage");
+		m_cycleLength = file->readAttributeInteger(groupName, "cycleLength");
 
 		// save partType
 		char partTypesGroupName[64];
@@ -148,6 +195,11 @@ bool SMTYSpecsCycle::save(Hdf5* file, const char* groupName) const
 		file->writeAttributeDouble(groupName, "cut", m_cut);
 		file->writeAttributeDouble(groupName, "rMax2", m_rMaxSquared);
 		file->writeAttributeDouble(groupName, "k", m_kappa);
+		file->writeAttributeDouble(groupName, "rateDuplication", m_rateDuplication);
+		file->writeAttributeDouble(groupName, "thresholdDuplication", m_thresholdDuplication);
+		file->writeAttributeInteger(groupName, "cycleStage", m_cycleStage);
+		file->writeAttributeInteger(groupName, "cycleLength", m_cycleLength);
+
 
 		// save partType
 		char partTypesGroupName[64];
@@ -200,29 +252,35 @@ bool SMTYSpecsCycle::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, con
 	Vector vectorDistance;
 	double distance2 = box->computeDistanceSquaredPBC(cell->getPart(0).position, cell->getPart(1).position, vectorDistance);
 
-	if (distance2 > m_rMaxSquared / 8.0 )
+	// a cell can duplicate once its length is bigger than a threshold (submultiple of Rmax)
+	if (distance2 > m_rMaxSquared * m_thresholdDuplication * m_thresholdDuplication)
 	{
-		// bla
-		Cell newcell{ 2 };
-		newcell.getPart(0).type = 0;
-		newcell.getPart(0).cell = currentNumberOfCells + 1;
+		if (gsl_rng_uniform(g_rng) < m_rateDuplication) {
+			
+			Cell newcell{ 2 };
+			newcell.getPart(0).type = 0;
+			newcell.getPart(0).cell = currentNumberOfCells + 1;
 
-		newcell.getPart(0).position = cell->getPart(1).position;
+			newcell.getPart(0).position = cell->getPart(1).position;
 
-		newcell.getPart(1).type = 1;
-		newcell.getPart(1).cell = currentNumberOfCells + 1;
-		newcell.getPart(1).position = cell->getPart(1).position;
+			newcell.getPart(1).type = 1;
+			newcell.getPart(1).cell = currentNumberOfCells + 1;
+			newcell.getPart(1).position = cell->getPart(1).position;
 
-		cell->getPart(1).position = cell->getPart(0).position;
+			cell->getPart(1).position = cell->getPart(0).position;
 
-		// set velocities to zero
-		newcell.getPart(0).velocity = Vector{ 0.0, 0.0 };
-		newcell.getPart(1).velocity = Vector{ 0.0, 0.0 };
-		cell->getPart(0).velocity = Vector{ 0.0,0.0 };
-		cell->getPart(1).velocity = Vector{ 0.0,0.0 };
+			// set velocities to zero
+			newcell.getPart(0).velocity = Vector{ 0.0, 0.0 };
+			newcell.getPart(1).velocity = Vector{ 0.0, 0.0 };
+			cell->getPart(0).velocity = Vector{ 0.0,0.0 };
+			cell->getPart(1).velocity = Vector{ 0.0,0.0 };
 
-		newCells->push_back(newcell);
-		return true;
+			newcell.getPart(0).stage = gsl_rng_uniform_int(g_rng, m_cycleLength);
+			newcell.getPart(1).stage = newcell.getPart(0).stage;
+
+			newCells->push_back(newcell);
+			return true;
+		}
 	}
 	return false;
 }
