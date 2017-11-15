@@ -15,10 +15,10 @@ MeasureTwoBodyForce::MeasureTwoBodyForce(PartSpecs* partSpecsIn, size_t partID1i
 
 	Part part1;
 	Part part2;
-	part1.cell = 0;
-	part1.type = partID1;
-	part2.cell = intra ? 0 : 1;
-	part2.type = partID2;
+	//TODO: now part.cell is not accessible//part1.getCell() = 0;
+	//TODO: now part.cell is not accessible//part1.type = partID1;
+	//TODO: now part.cell is not accessible//part2.cell = intra ? 0 : 1;
+	//TODO: now part.cell is not accessible//part2.type = partID2;
 
 	twoBodyForce = partSpecsIn->getTwoBodyForce(&part1, &part2, forceID);
 	//twoBodyForce = partSpecsIn->oneBodyForces.at(0).at(0);
@@ -58,27 +58,39 @@ bool MeasureTwoBodyForce::save(Hdf5* file, const char* name) const
 
 
 
-System::System()
-{
-	cells.resize(0);
-	parts.resize(0);
-	box = nullptr;
-	measureTwoBodyForce = nullptr;
-	cycleLength = 0;
-}
+//System::System()
+//{
+//	cells.reserve(0);
+//	parts.resize(0);
+//	box = nullptr;
+//	measureTwoBodyForce = nullptr;
+//	cycleLength = 0;
+//	maxPredictedCells = 0;
+//	cellCounter = 0;
+//}
 
 System::System(size_t n)
 {
-	cells.resize(n);
-	parts.resize(0);
+	cells.reserve(n);
+	maxPredictedCells = n;
+
+	parts.reserve(2 * n); // there will be probably 2 * n parts 
 	box = nullptr;
 	measureTwoBodyForce = nullptr;
+
+	maxPredictedCells = n;
+	cellCounter = n+1;
 }
 
-System::System(CellColony* cellsIn)
+System::System(CellColony* cellsIn, size_t maxPredictedCellsIn)
 {
 #ifdef OBJECTPOOL
-	cells.reserve(cellsIn->size());
+	cells.reserve(maxPredictedCellsIn);
+	if (maxPredictedCellsIn < cellsIn->size())
+	{
+		maxPredictedCellsIn = 2 * cellsIn->size();
+	}
+	maxPredictedCells = maxPredictedCellsIn;
 #else
 	cells.reserve(cellsIn->size());
 #endif
@@ -88,17 +100,23 @@ System::System(CellColony* cellsIn)
 	}
 	box = nullptr;
 	measureTwoBodyForce = nullptr;
+
+	cellCounter = maxPredictedCells + 1;
 }
 
 
-System::System(CellColony* cellsIn, Box* boxIn) : System{ cellsIn }
+System::System(CellColony* cellsIn, Box* boxIn, size_t maxPredictedCellsIn) : System{ cellsIn, maxPredictedCellsIn }
 {
 	constructPartsVector();
 	box = boxIn;
+	std::cout << this << std::endl;
 	measureTwoBodyForce = nullptr;
 
-	clearSubBoxes();
+	clearSubBoxes();  
 	setSubBoxes();
+	std::cout << this << std::endl;
+
+	
 }
 
 
@@ -132,6 +150,8 @@ void System::constructPartsVector()
 	for (size_t c = 0; c < cells.size(); c++)
 	{
 		for (size_t p = 0; p < cells.at(c).getNumOfParts(); p++) {
+			//if (cells.at(c).getPart(p).type > 1)
+			//	std::cout << "lol" << std::endl;
 			parts.push_back(&cells.at(c).getPart(p));
 		}
 	}
@@ -184,10 +204,20 @@ void System::setSubBoxes()
 	//#ifdef OMP
 	//#pragma omp parallel for
 	//#endif
-	for (size_t n = 0; n < parts.size(); n++) {
-		Part* particle = parts.at(n);
-		box->putPartInSubBox(particle, n);
+	size_t n = 0;
+	for (size_t c = 0; c < cells.size(); c++)
+	{
+		for (size_t p = 0; p < cells.at(c).getNumOfParts(); p++)
+		{
+			box->putPartInSubBox(&cells.at(c).getPart(p), n);
+		}
+		n += cells.at(c).getNumOfParts();
 	}
+
+	//for (size_t n = 0; n < parts.size(); n++) {
+	//	Part* particle = parts.at(n);
+	//	box->putPartInSubBox(particle, n);
+	//}
 
 }
 
@@ -264,7 +294,7 @@ void System::computeForces(size_t time, double dt)
 {
 	resetVelocities();
 
-	// loop over all parts
+	// loop over all parts //TODO URGENT PUT AGAIN THE OMP
 #ifdef OMP
 #pragma omp parallel for schedule(guided)
 #endif
@@ -297,6 +327,9 @@ void System::computeForces(size_t time, double dt)
 #endif
 
 			if (part2 != part1) {
+
+				if (part2->type > 1 || part1->type > 1)
+					int a = 1;
 
 				computeTwoBodyForces(part1, part2, partSpecs.at(stage));
 
@@ -497,7 +530,7 @@ void System::collect()
 #endif
 				if (part2 != part1) {
 					// measureTwoBodyForce
-					if (part1->type == measureTwoBodyForce->partID1 && part2->type == measureTwoBodyForce->partID2 && ((part1->cell == part2->cell) == (measureTwoBodyForce->intra)))
+					if (part1->type == measureTwoBodyForce->partID1 && part2->type == measureTwoBodyForce->partID2 && ((part1->getCell() == part2->getCell()) == (measureTwoBodyForce->intra)))
 					{
 						Vector addedVector{};
 						measureTwoBodyForce->twoBodyForce->updateForce(part1, part2, box, addedVector);
@@ -545,8 +578,9 @@ double System::getTypeFriction(size_t i)
 
 
 #define NEWDEBUG
-void System::updatePositions(size_t time, double dt, bool update)
+int System::updatePositions(size_t time, double dt, bool update)
 {
+	int result = 1;
 #ifdef OMP
 #pragma omp parallel for
 #endif
@@ -575,6 +609,7 @@ void System::updatePositions(size_t time, double dt, bool update)
 			printf("parts size: %d\n", parts.size());
 			printf("parts size: %d\n", parts.size());
 			printf("diff: %e\n", diff);
+			result = 0;
 		}
 #endif
 	}
@@ -585,7 +620,7 @@ void System::updatePositions(size_t time, double dt, bool update)
 		setSubBoxes();
 	}
 #endif
-
+	return result;
 }
 
 
@@ -600,6 +635,12 @@ void System::eraseRegionCells(double minX, double maxX, double minY, double maxY
 			if (cell->getPart(p).position.x < minX || cell->getPart(p).position.x > maxX ||
 				cell->getPart(p).position.y < minY || cell->getPart(p).position.y > maxY)
 			{
+				// remove particle from the subboxes
+				for (size_t r = 0; r < cell->getNumOfParts(); r++)
+				{
+					// remove particle from the subboxes
+					cells.at(c).getPart(r).remove();
+				}
 				cells.erase(c);
 				c--;
 				deadCells = true;
@@ -610,8 +651,9 @@ void System::eraseRegionCells(double minX, double maxX, double minY, double maxY
 
 	if (deadCells)
 	{
-		this->constructPartsVector();
-		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
+		//clearSubBoxes();
+		constructPartsVector();
+		setSubBoxes();
 	}
 
 }
@@ -653,8 +695,9 @@ void System::duplicateCells()
 				cells.push_back(newCells.at(i));
 				for (size_t p = 0; p < newCells.at(i).getNumOfParts(); p++)
 				{
-					cells.back().getPart(p).cell = cells.size() - 1;
+					cells.back().getPart(p).cell = cellCounter;//1000000 - cells.size() - 1;
 				}
+				cellCounter++;
 			}
 			
 			duplicated = true;
@@ -664,11 +707,29 @@ void System::duplicateCells()
 
 	if (duplicated)
 	{
+		//for (size_t c = 0; c < cells.size(); c++)
+		//{
+		//	Cell* cell = &cells.at(c);
+		//	for (size_t r = 0; r < cell->getNumOfParts(); r++)
+		//	{
+		//		// remove particle from the subboxes
+		//		cells.at(c).getPart(r).remove();
+		//	}
+		//}
 		this->constructPartsVector();
 		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
 	}
 }
 
+//void System::resizeCellColony(size_t maxCells)
+//{
+//	//this->cells.resize(maxCells);
+//	assert(false);
+//	
+//	//this->constructPartsVector();
+//	//this->setSubBoxes();
+//	//std::cout << "resized" << std::endl;
+//}
 
 bool System::cellsAreBroken() const
 {
@@ -678,6 +739,27 @@ bool System::cellsAreBroken() const
 		if (this->partSpecs.at(0)->cellIsBroken(cell, box))
 			return true;
 	}
+	return false;
+}
+
+bool System::twinCells() const
+{
+	std::vector<size_t> cellIDs;
+	cellIDs.reserve(cells.size());
+	for (size_t c = 0; c < cells.size(); c++)
+	{
+		cellIDs.emplace_back(cells.at(c).getPart(0).cell);
+	}
+	std::sort(cellIDs.begin(), cellIDs.end());
+
+	for (size_t c = 0; c < cellIDs.size()-1; c++)
+	{
+		if (cellIDs.at(c) == cellIDs.at(c + 1))
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -709,7 +791,7 @@ void System::resolveOverlaps()
 			{
 				Part* part2 = parts.at(m);
 #endif
-				if (part2 != part1 && part1->cell != part2->cell) {
+				if (part2 != part1 && part1->getCell() != part2->getCell()) {
 					// check for overlaps
 					double sig1 = this->partSpecs.at(0)->getDiameter(part1->type);
 					double sig2 = this->partSpecs.at(0)->getDiameter(part2->type);

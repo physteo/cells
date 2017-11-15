@@ -4,6 +4,10 @@
 #include <iostream>
 #include <string>
 #include <boost/python.hpp>
+#include <boost/python/module.hpp>
+#include <boost/python/def.hpp>
+#include <boost/python/exception_translator.hpp>
+#include <exception>
 
 #include "../definitions.h"
 #include "../math/Vector.h"
@@ -17,6 +21,8 @@
 #include "../particles/SMTYSpecsAdhesion.h"
 #include "../particles/SMTYSpecsSticky.h"
 #include "../particles/SMTYSpecsCycle.h"
+#include "../particles/SMTYSpecsCycleSoftCore.h"
+
 
 #include "../particles/MonoZimm.h"
 
@@ -32,6 +38,14 @@
 #include "Parameters.h"
 
 namespace pywrapper{
+
+	void translate(std::runtime_error const& e)
+	{
+		// Use the Python 'C' API to set up an exception object
+		PyErr_SetString(PyExc_RuntimeError, e.what());
+	}
+
+
 
 	class OneBodyForceWrap : public OneBodyForce, public boost::python::wrapper<OneBodyForce>
 	{

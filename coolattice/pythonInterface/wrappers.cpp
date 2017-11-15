@@ -5,6 +5,10 @@ namespace pywrapper {
 	using namespace boost::python;
 
 	BOOST_PYTHON_MODULE(Cellulae) {
+
+
+		register_exception_translator<std::runtime_error>(&translate);
+
 		class_<Vector>("Vector", init<>())
 			// non default constructors
 			.def(init<double, double>())
@@ -36,7 +40,7 @@ namespace pywrapper {
 			.def("addOnePartCell",		&CellColony::addOnePartCell)
 			.def("addTwoPartsCell",		&CellColony::addTwoPartsCell )
 			.def("size",				&CellColony::size)
-			.def("resize",				&CellColony::resize)
+			.def("reserve",				&CellColony::reserve)
 			.def("totalNumberOfParts",	&CellColony::totalNumberOfParts)
 			.def("getPartX",			&CellColony::getPartX)
 			.def("getPartY",			&CellColony::getPartY)
@@ -90,6 +94,16 @@ namespace pywrapper {
 			.def("getCycleLength", &SMTYSpecsCycle::getCycleLength)
 			;
 
+		class_<SMTYSpecsCycleSoftCore, bases<PartSpecs> >("SMTYSpecsCycleSoftCore", init<>())
+			.def(init<Parameters*, size_t, size_t>())
+			.def("save", &SMTYSpecsCycleSoftCore::save)
+			.def("load", &SMTYSpecsCycleSoftCore::load)
+			.def("cellIsBroken", &SMTYSpecsCycleSoftCore::cellIsBroken)
+			.def("cellIsDead",   &SMTYSpecsCycleSoftCore::cellIsDead)
+			.def("cellDuplicates", &SMTYSpecsCycleSoftCore::cellDuplicates)
+			.def("getCycleLength", &SMTYSpecsCycleSoftCore::getCycleLength)
+			;
+
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
 			.def(init<double, double, double, double, double, double, double, double, double, double, double>())
 			.def("save", &SMTYSpecsAdhesion::save)
@@ -135,7 +149,7 @@ namespace pywrapper {
 			.def("load", &MeasureTwoBodyForce::load)
 			;
 
-		class_<System>("System", init<CellColony*, Box*>())
+		class_<System>("System", init<CellColony*, Box*, size_t>())
 			.def("addVelocity", &System::addVelocity)
 			.def("updatePositions", &System::updatePositions)
 			.def("computeForces", &System::computeForces)
@@ -143,8 +157,8 @@ namespace pywrapper {
 			.def("collectForces",  &System::collect)
 			.def("getColony", &System::getColony)
 			.def("getNumberOfCells", &System::getNumberOfCells)
-			.def("resizeCellColony", &System::resizeCellColony)
 			.def("cellsAreBroken", &System::cellsAreBroken)
+			.def("twinCells", &System::twinCells)
 			.def("eraseDeadCells", &System::eraseDeadCells)
 			.def("eraseRegionCells", &System::eraseRegionCells)
 			.def("duplicateCells", &System::duplicateCells)

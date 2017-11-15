@@ -1,18 +1,17 @@
-#include "SMTYSpecsCycle.h"
+#include "SMTYSpecsCycleSoftCore.h"
 
-SMTYSpecsCycle::SMTYSpecsCycle() : PartSpecs(2)
+SMTYSpecsCycleSoftCore::SMTYSpecsCycleSoftCore() : PartSpecs(2)
 {
-	name = "SMTY-Cycle";
+	name = "SMTY-Cycle-SoftCore";
 }
 
-void SMTYSpecsCycle::build()
+void SMTYSpecsCycleSoftCore::build()
 {
 
 	const double& sigAA = this->partTypes.getPartTypes().at(0).sig;
 	const double& sigBB = this->partTypes.getPartTypes().at(1).sig;
 	const double& frictionF = this->partTypes.getPartTypes().at(0).friction;
 	const double& frictionB = this->partTypes.getPartTypes().at(1).friction;
-
 
 	double sigAB = .5*(sigAA + sigBB);
 
@@ -25,22 +24,19 @@ void SMTYSpecsCycle::build()
 	//std::cout << " - Spees at ss = " << ssSpeed << std::endl;
 	//std::cout << " - Migration t = " << migrationTime << std::endl;
 
-	LJForce* lja(new LJForce{ sigAA, m_epsilon, (sigAA *   sigAA * m_cut * m_cut) });
-	LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
-	LJForce* ljc(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
-	LJForce* ljd(new LJForce{ sigBB, m_epsilon, (sigBB *   sigBB * m_cut * m_cut) });
+	SMSoftCore* scAA(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAA });
+	SMSoftCore* scAB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAB });
+	SMSoftCore* scBB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigBB });
 
-	addInterForce(0, lja);
-	addInterForce(1, ljb);
-	addInterForce(2, ljc);
-	addInterForce(3, ljd);
+	addInterForce(0, scAA);
+	addInterForce(1, scAB);
+	addInterForce(2, scAB);
+	addInterForce(3, scBB);
 
 	FeneForce* feneAA(new FeneForce{ m_rMaxSquared, m_kappa });
 	FeneForce* feneAB(new FeneForce{ m_rMaxSquared, m_kappa });
 	FeneForce* feneBA(new FeneForce{ m_rMaxSquared, m_kappa });
 	FeneForce* feneBB(new FeneForce{ m_rMaxSquared, m_kappa });
-
-
 
 	addIntraForce(0, feneAA);
 	addIntraForce(1, feneAB);
@@ -53,36 +49,26 @@ void SMTYSpecsCycle::build()
 		addIntraForce(2, cil);
 	}
 
-	//else if (m_cycleStage == 1)
-	//{
-	//	CilForce*  cil(new CilForce{ m_motility });
-	//	addIntraForce(1, cil);
-	//	addIntraForce(2, cil);
-	//
-	//}
-
+	// noise
 	//partSpecs.oneBodyForces.at(0).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7})))); // TODO URGENT: pass dt etc
 	//partSpecs.oneBodyForces.at(1).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7 })))); // TODO URGENT: pass dt etc
 
-
-
-	
-	
-	
-	
 }
 
 
-SMTYSpecsCycle::SMTYSpecsCycle(double sigAA, double sigBB, double motility,
-	double epsilon, double cut, double rMaxSquared, double kappa, double frictionF,
+SMTYSpecsCycleSoftCore::SMTYSpecsCycleSoftCore(double sigAA, double sigBB, double motility,
+	double ewell, double ecore, double xi, double rMaxSquared, double kappa, double frictionF,
 	double frictionB, double massF, double massB,
 	double rateDuplication, double thresholdDuplication,
-	size_t cycleStage, size_t cycleLength) : SMTYSpecsCycle()
+	size_t cycleStage, size_t cycleLength) : SMTYSpecsCycleSoftCore()
 {
 
 	m_motility = motility;
-	m_epsilon = epsilon;
-	m_cut = cut;
+	
+	m_ewell = ewell;
+	m_ecore = ecore;
+	m_xi = xi;
+
 	m_rMaxSquared = rMaxSquared;
 	m_kappa = kappa;
 	m_cycleStage = cycleStage;
@@ -113,31 +99,33 @@ SMTYSpecsCycle::SMTYSpecsCycle(double sigAA, double sigBB, double motility,
 	{
 		this->partTypes.getPartTypes().at(1).friction = frictionB;
 	}
-	
+
 	build();
 }
 
 
-SMTYSpecsCycle::SMTYSpecsCycle(const Parameters* params, size_t cycleStage, size_t cycleLength) : 
-	SMTYSpecsCycle(	params->getParam(0),
-					params->getParam(1),
-					params->getParam(2),
-					params->getParam(3),
-					params->getParam(4),
-					params->getParam(5),
-					params->getParam(6),
-					params->getParam(7),
-					params->getParam(8),
-					params->getParam(9),
-					params->getParam(10),
-					params->getParam(11),
-					params->getParam(12),
-					cycleStage, cycleLength)
+SMTYSpecsCycleSoftCore::SMTYSpecsCycleSoftCore(const Parameters* params, size_t cycleStage, size_t cycleLength) :
+
+	SMTYSpecsCycleSoftCore(params->getParam(0),
+		params->getParam(1),
+		params->getParam(2),
+		params->getParam(3),
+		params->getParam(4),
+		params->getParam(5),
+		params->getParam(6),
+		params->getParam(7),
+		params->getParam(8),
+		params->getParam(9),
+		params->getParam(10),
+		params->getParam(11),
+		params->getParam(12),
+		params->getParam(13),
+		cycleStage, cycleLength)
 {
 }
 
 
-bool SMTYSpecsCycle::load(Hdf5* file, const char* groupName)
+bool SMTYSpecsCycleSoftCore::load(Hdf5* file, const char* groupName)
 {
 	try {
 		H5::Group group = file->openGroup(groupName);
@@ -151,8 +139,9 @@ bool SMTYSpecsCycle::load(Hdf5* file, const char* groupName)
 		}
 
 		m_motility = file->readAttributeDouble(groupName, "motility");
-		m_epsilon = file->readAttributeDouble(groupName, "eps");
-		m_cut = file->readAttributeDouble(groupName, "cut");
+		m_ewell = file->readAttributeDouble(groupName, "ewell");
+		m_ecore = file->readAttributeDouble(groupName, "ecore");
+		m_xi = file->readAttributeDouble(groupName, "xi");
 		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
 		m_kappa = file->readAttributeDouble(groupName, "k");
 		m_rateDuplication = file->readAttributeDouble(groupName, "rateDuplication");
@@ -183,7 +172,7 @@ bool SMTYSpecsCycle::load(Hdf5* file, const char* groupName)
 
 
 
-bool SMTYSpecsCycle::save(Hdf5* file, const char* groupName) const
+bool SMTYSpecsCycleSoftCore::save(Hdf5* file, const char* groupName) const
 {
 	try {
 		file->createNewGroup(groupName);
@@ -191,8 +180,9 @@ bool SMTYSpecsCycle::save(Hdf5* file, const char* groupName) const
 
 		file->writeAttributeString(groupName, "name", name.c_str());
 		file->writeAttributeDouble(groupName, "motility", m_motility);
-		file->writeAttributeDouble(groupName, "eps", m_epsilon);
-		file->writeAttributeDouble(groupName, "cut", m_cut);
+		file->writeAttributeDouble(groupName, "ewell", m_ewell);
+		file->writeAttributeDouble(groupName, "ecore", m_ecore);
+		file->writeAttributeDouble(groupName, "xi", m_xi);
 		file->writeAttributeDouble(groupName, "rMax2", m_rMaxSquared);
 		file->writeAttributeDouble(groupName, "k", m_kappa);
 		file->writeAttributeDouble(groupName, "rateDuplication", m_rateDuplication);
@@ -218,7 +208,7 @@ bool SMTYSpecsCycle::save(Hdf5* file, const char* groupName) const
 
 
 
-bool SMTYSpecsCycle::cellIsBroken(const Cell* cell, const Box* box) const
+bool SMTYSpecsCycleSoftCore::cellIsBroken(const Cell* cell, const Box* box) const
 {
 	// in the SMTY system a cell is broken when it's length is
 	// bigger than Rmax
@@ -240,13 +230,13 @@ bool SMTYSpecsCycle::cellIsBroken(const Cell* cell, const Box* box) const
 }
 
 
-bool SMTYSpecsCycle::cellIsDead(const Cell* cell, const Box* box) 
+bool SMTYSpecsCycleSoftCore::cellIsDead(const Cell* cell, const Box* box)
 {
 	return false;
 }
 
 
-bool SMTYSpecsCycle::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
+bool SMTYSpecsCycleSoftCore::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
 {
 	// in this model, a cell can duplicate if its length is bigger than Rmax/2.0
 	Vector vectorDistance;
@@ -256,7 +246,7 @@ bool SMTYSpecsCycle::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, con
 	if (distance2 > m_rMaxSquared * m_thresholdDuplication * m_thresholdDuplication)
 	{
 		if (gsl_rng_uniform(g_rng) < m_rateDuplication) {
-			
+
 			// bla
 			Cell newcell = Cell(2);
 			newcell.getPart(0).type = 0;

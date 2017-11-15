@@ -18,7 +18,7 @@ void BoxCell::printSubCellList(int subCellNumber) const
 	std::cout << "subBox: " << subCellNumber << " --- ";
 	while (current != nullptr)
 	{
-		std::cout << current->cell << "/" << (current->type ? "B" : "F") << "->";
+		std::cout << current->getCell() << "/" << (current->type ? "B" : "F") << "->";
 		current = current->next;
 	}
 	std::cout << std::endl;

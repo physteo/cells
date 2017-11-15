@@ -192,8 +192,8 @@ bool SMTYSpecsAdhesion::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, 
 
 	if (distance2 > m_rMaxSquared / 8.0)
 	{
-		// bla
-		Cell newcell{ 2 };
+
+		Cell newcell = Cell(2);
 		newcell.getPart(0).type = 0;
 		newcell.getPart(0).cell = currentNumberOfCells + 1;
 

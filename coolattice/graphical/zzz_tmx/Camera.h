@@ -91,7 +91,9 @@ namespace tmx { namespace graphics {
 		inline const Frustum& getFrustum() const { return m_frustum; }
 
 
-		inline const glm::vec3& getPosition() { return m_eye; }
+		inline const glm::vec3& getPosition() const { return m_eye; }
+		inline       glm::vec3& getPosition() { return m_eye; }
+
 		inline const glm::vec3& getCenter() { return m_center; }
 	private:
 		void updateFrustum();

@@ -231,6 +231,12 @@
     <ClCompile Include="main.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="interactions\SMSoftCore.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="particles\SMTYSpecsCycleSoftCore.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphical\graphics\buffers\buffer.h">
@@ -476,9 +482,6 @@
     <ClInclude Include="interactions\OneBodyPropulsion.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="utils\ObjectPool.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="interactions\Sigmoidal.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -531,6 +534,15 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="utils\voropp\vcell.hh">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ObjectPool.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="interactions\SMSoftCore.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\SMTYSpecsCycleSoftCore.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

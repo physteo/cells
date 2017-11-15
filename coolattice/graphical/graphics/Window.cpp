@@ -79,6 +79,12 @@ namespace sparky { namespace graphics {
     }
 
 
+	void Window::makeCurrentContext() const
+	{
+		glfwMakeContextCurrent(m_Window);
+	}
+
+
     bool Window::isKeyPressed(unsigned int keycode) const
     {
         // TODO: Log this!

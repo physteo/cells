@@ -172,6 +172,7 @@
     <ClCompile Include="interactions\OneBodyPropulsion.cpp" />
     <ClCompile Include="interactions\PlanarWall.cpp" />
     <ClCompile Include="interactions\RepulsionAdhesion.cpp" />
+    <ClCompile Include="interactions\SMSoftCore.cpp" />
     <ClCompile Include="interactions\ZimmermannRepAdh.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Vector.cpp" />
@@ -183,6 +184,7 @@
     <ClCompile Include="particles\SMTYSpecs.cpp" />
     <ClCompile Include="particles\SMTYSpecsAdhesion.cpp" />
     <ClCompile Include="particles\SMTYSpecsCycle.cpp" />
+    <ClCompile Include="particles\SMTYSpecsCycleSoftCore.cpp" />
     <ClCompile Include="particles\SMTYSpecsNOCIL.cpp" />
     <ClCompile Include="particles\SMTYSpecsSticky.cpp" />
     <ClCompile Include="system\System.cpp" />
@@ -262,6 +264,7 @@
     <ClInclude Include="interactions\OneBodyPropulsion.h" />
     <ClInclude Include="interactions\PlanarWall.h" />
     <ClInclude Include="interactions\RepulsionAdhesion.h" />
+    <ClInclude Include="interactions\SMSoftCore.h" />
     <ClInclude Include="interactions\TwoBodyForce.h" />
     <ClInclude Include="interactions\ZimmermannRepAdh.h" />
     <ClInclude Include="math\Vector.h" />
@@ -276,6 +279,7 @@
     <ClInclude Include="particles\PartType.h" />
     <ClInclude Include="particles\SMTYSpecsAdhesion.h" />
     <ClInclude Include="particles\SMTYSpecsCycle.h" />
+    <ClInclude Include="particles\SMTYSpecsCycleSoftCore.h" />
     <ClInclude Include="particles\SMTYSpecsNOCIL.h" />
     <ClInclude Include="particles\SMTYSpecsSticky.h" />
     <ClInclude Include="pythonInterface\Parameters.h" />

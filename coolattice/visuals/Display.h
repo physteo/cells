@@ -20,6 +20,7 @@ typedef std::vector<System> Trajectory;
 
 namespace visuals {
 
+
 	class Display
 	{
 		sparky::graphics::Window m_window;
@@ -39,6 +40,9 @@ namespace visuals {
 		tmx::graphics::MTexturedQuad m_inactiveSite;
 		tmx::graphics::MTexturedQuad m_subBox;
 
+		tmx::graphics::MTexturedQuad m_play;
+		tmx::graphics::MTexturedQuad m_stop;
+
 		//std::vector<tmx::graphics::Renderable>* m_renderables;
 		tmx::memory::ObjectPool<tmx::graphics::Renderable> m_renderablesPool;
 
@@ -50,8 +54,35 @@ namespace visuals {
 		//~Display();
 
 		void run(int start, int end, int stride, int stepWait);
+
+
+		void playbackControls();
 	private:
 		void fillRenderables(int step);
+		void fillPlaybackRenderables(int step);
+
+		void addSteps(size_t s);
+		void substractSteps(size_t s);
+		void moveCamera();
+
+		bool buttonPressed;
+		bool pause;
+		size_t currentStep;
+		size_t totalSteps;
+		size_t jumpSteps;
+
+		bool mousePressed;
+		bool mousePressedOnce;
+		double ix; 
+		double iy;
+		double fx;
+		double fy;
+
+		double current_ix;
+		double current_fx;
+		double current_iy;
+		double current_fy;
+
 	};
 
 }

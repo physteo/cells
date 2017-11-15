@@ -279,7 +279,8 @@ bool SMTYSpecsSticky::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, co
 	if (distance2 > m_rMaxSquared / 8.0)
 	{
 		// bla
-		Cell newcell{ 2 };
+		// bla
+		Cell newcell = Cell(2);
 		newcell.getPart(0).type = 0;
 		newcell.getPart(0).cell = currentNumberOfCells + 1;
 

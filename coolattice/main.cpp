@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
 
 	std::cout << "rd: " << H5F_ACC_RDONLY << std::endl;
 	std::cout << "tr: " << H5F_ACC_TRUNC << std::endl;
-
+	 
 	std::string currentExecName = argv[0];
 	std::string inputFilePath;
 

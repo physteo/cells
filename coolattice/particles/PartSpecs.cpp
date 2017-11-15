@@ -12,7 +12,7 @@ const std::vector< TwoBodyForce* >& TwoBodyForceVectors::operator()(const Part* 
 {
 	size_t a = part1->type;
 	size_t b = part2->type;
-	bool sameCell = part1->cell == part2->cell;
+	bool sameCell = part1->getCell() == part2->getCell();
 
 	assert(a < numberOfTypes && b < numberOfTypes);
 

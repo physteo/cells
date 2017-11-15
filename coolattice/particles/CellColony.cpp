@@ -19,8 +19,10 @@ void CellColony::addOnePartCell(double x, double y, double vx, double vy, unsign
 	Part p{ Vector{ x, y }, Vector{ vx, vy }, 0, cell, stage };
 	std::vector<Part> parts = { p };
 #ifdef OBJECTPOOL
-	this->m_cells.addBackElement();
-	m_cells.back().init(parts);
+	this->m_cells.addBackElement(parts);
+	
+	//this->m_cells.addBackElement();
+	//m_cells.back().init(parts);
 #else
 	Cell newCell{ parts };
 	this->m_cells.push_back(newCell);
@@ -37,8 +39,9 @@ void CellColony::addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 	std::vector<Part> parts = { p1, p2 };
 
 #ifdef OBJECTPOOL
-	this->m_cells.addBackElement();
-	m_cells.back().init(parts);
+	this->m_cells.addBackElement(parts);
+	//this->m_cells.addBackElement();
+	//m_cells.back().init(parts);
 #else
 	Cell newCell{ parts };
 	this->m_cells.push_back(newCell);
@@ -78,7 +81,8 @@ void CellColony::populateSlab(double N, double f, double boxLengthX, double boxL
 	{
 		for (int y = 0; y < numPerLineY; y++)
 		{
-			std::vector<Part> cell;
+			//std::vector<Part> cell;
+			Cell cell = Cell(2);
 			Vector positionF{ startX + (x + 0.5) * lx, startY + (y + 0.5) * ly };
 			
 			Vector positionB = positionF +
@@ -92,8 +96,20 @@ void CellColony::populateSlab(double N, double f, double boxLengthX, double boxL
 			{
 				positionB = positionF;
 			}
-			cell.push_back(Part{ positionF, Vector{ 0.0, 0.0 },0,numberOfCells, 0 });
-			cell.push_back(Part{ positionB, Vector{ 0.0, 0.0 },1,numberOfCells, 0 });
+			cell.getPart(0).position = positionF;
+			cell.getPart(1).position = positionB;
+			cell.getPart(0).velocity = Vector{0.0,0.0};
+			cell.getPart(1).velocity = Vector{0.0,0.0};
+			cell.getPart(0).type = 0;
+			cell.getPart(1).type = 1;
+
+			cell.getPart(0).stage = 0;
+			cell.getPart(1).stage = 0;
+
+			cell.getPart(0).cell = numberOfCells;
+			cell.getPart(1).cell = numberOfCells;
+
+
 			this->push_back(cell);
 			numberOfCells++;
 		}
@@ -111,7 +127,8 @@ void CellColony::populate(double numPerLineX, double numPerLineY, double boxLeng
 	{
 		for (int y = 0; y < numPerLineY; y++)
 		{
-			std::vector<Part> cell;
+			Cell cell = Cell(2);
+
 			Vector positionF{ (x + 0.5)*lx, (y + 0.5)*ly };
 			Vector positionB = positionF +
 				Vector{ (lx - sigMin) * (2.0 * gsl_rng_uniform(g_rng) - 1.0),
@@ -125,8 +142,19 @@ void CellColony::populate(double numPerLineX, double numPerLineY, double boxLeng
 				positionB = positionF;
 			}
 
-			cell.push_back(Part{ positionF, Vector{ 0.0, 0.0 },0,numberOfCells, 0 });
-			cell.push_back(Part{ positionB, Vector{ 0.0, 0.0 },1,numberOfCells, 0 });
+			cell.getPart(0).position = positionF;
+			cell.getPart(1).position = positionB;
+			cell.getPart(0).velocity = Vector{ 0.0,0.0 };
+			cell.getPart(1).velocity = Vector{ 0.0,0.0 };
+			cell.getPart(0).type = 0;
+			cell.getPart(1).type = 1;
+
+			cell.getPart(0).stage = 0;
+			cell.getPart(1).stage = 0;
+
+			cell.getPart(0).cell = numberOfCells;
+			cell.getPart(1).cell = numberOfCells;
+
 			this->push_back(cell);
 			numberOfCells++;
 		}
@@ -154,7 +182,7 @@ bool CellColony::save(Hdf5* file, const char* name) const
 	for (size_t i = 0; i < m_cells.size(); i++) {
 		for (size_t j = 0; j < m_cells.at(i).getNumOfParts(); j++) {
 			const Part* part = &m_cells.at(i).getPart(j);
-			parts.at(partCounter) = LightPartwCell{ part->position.x, part->position.y, part->velocity.x, part->velocity.y, part->cell, part->type };
+			parts.at(partCounter) = LightPartwCell{ part->position.x, part->position.y, part->velocity.x, part->velocity.y, part->getCell(), part->type };
 			partCounter++;
 		}
 	}
@@ -263,19 +291,22 @@ bool CellColony::load(Hdf5* file, const char* name)
 	
 
 #ifdef OBJECTPOOL
-	m_cells.resize(LENGTH);
+	m_cells.reserve(LENGTH);
+	//m_cells.resize(LENGTH);
 #else
 #endif
 
-	size_t currentCell = 0;
+	size_t currentCell = lightParts.at(0).cell;
 	std::vector<Part> partsInCell;
 	for (size_t i = 0; i < LENGTH; i++) {
 		if (!(lightParts.at(i).cell == currentCell))
 		{
 			currentCell++;
 #ifdef OBJECTPOOL
-			this->m_cells.addBackElement();
-			m_cells.back().init(partsInCell);
+			this->m_cells.addBackElement(partsInCell);
+			
+			//this->m_cells.addBackElement();
+			//m_cells.back().init(partsInCell);
 #else
 			m_cells.push_back(partsInCell);
 #endif
@@ -287,8 +318,10 @@ bool CellColony::load(Hdf5* file, const char* name)
 	}
 		
 #ifdef OBJECTPOOL
-	this->m_cells.addBackElement();
-	m_cells.back().init(partsInCell);
+	this->m_cells.addBackElement(partsInCell);
+
+	//this->m_cells.addBackElement();
+	//m_cells.back().init(partsInCell);
 #else
 	m_cells.push_back(partsInCell);
 #endif
@@ -303,8 +336,10 @@ bool CellColony::load(Hdf5* file, const char* name)
 void CellColony::push_back(const Cell& cc)
 {
 #ifdef OBJECTPOOL
-	this->m_cells.addBackElement();
-	m_cells.back() = cc;
+	this->m_cells.addBackElement(cc);
+
+	//this->m_cells.addBackElement();
+	//m_cells.back() = cc;
 #else
 	m_cells.push_back(cc);
 #endif
@@ -330,21 +365,12 @@ const Cell	CellColony::back() const
 	return m_cells.back();
 }
 
-void CellColony::resize(size_t i)
-{
-#ifdef OBJECTPOOL
-	//std::cout << "trying to resize cellColony" << std::endl;
-	//std::cin.get();
-	m_cells.resize(i);
-#else
-	m_cells.resize(i);
-#endif
-}
 
 void CellColony::reserve(size_t i)
 {
 #ifdef OBJECTPOOL
-	m_cells.resize(i); // TODO URGENT: see if i can define a suitable reserve function
+	m_cells.reserve(i); // TODO URGENT: see if i can define a suitable reserve function
+	//m_cells.resize(i);
 #else
 	m_cells.reserve(i);
 #endif

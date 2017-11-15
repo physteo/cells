@@ -81,7 +81,7 @@ void Box::putPartInSubBox(Part* part, int n)
 //#pragma omp critical
 //#endif
 	{
-		part->remove();
+		part->remove(); 
 		subBox->head.insert(part);
 	}
 

@@ -6,57 +6,50 @@ class ObjectPool
 {
 
 private:
-	size_t			  activeElements;
+	//size_t			  activeElements;
 	std::vector<Element> elements;
 
 public:
 	ObjectPool(size_t maxElements)
 	{
-		activeElements = 0;
-		elements.resize(maxElements);
+		elements.reserve(maxElements);
+	}
+
+	size_t capacity() const
+	{
+		return elements.capacity();
 	}
 
 	size_t size() const
 	{
-		return activeElements;
+		return elements.size();
 	}
 
 	Element& at(size_t index)
 	{
-		if (index >= activeElements) {
-			throw std::out_of_range("System: element requested is not active.");
-		}
 		return elements.at(index);
 	}
 
 	const Element& at(size_t index) const
 	{
-		if (index >= activeElements) {
-			throw std::out_of_range("System: element requested is not active.");
-		}
 		return elements.at(index);
 	}
 
 	Element& back()
 	{
-		if (activeElements <= 0) {
-			throw std::out_of_range("System: number of active elements is zero.");
-		}
-		return elements.at((size_t)(activeElements - 1));
+		return elements.back();
 	}
 
 	const Element& back() const
 	{
-		if (activeElements <= 0) {
-			throw std::out_of_range("System: number of active elements is zero.");
-		}
-		return elements.at((size_t)(activeElements - 1));
+		return elements.back();
 	}
 
-	void addBackElement()
+	template< class... Args >
+	void addBackElement(Args&&... args) //todo: rename as emplace_back
 	{
-		if (activeElements < elements.size()) {
-			activeElements++;
+		if (this->size() < this->capacity()) {
+			elements.emplace_back(std::forward<Args>(args)...);
 		}
 		else
 		{
@@ -64,24 +57,25 @@ public:
 		}
 	}
 
-	void deleteElement(size_t index)
+	void deleteElement(size_t index) //TODO: rename as erase
 	{
-		if (index >= activeElements) {
+		if (index >= this->size()) {
 			throw std::out_of_range("System: element requested is not active.");
 		}
-		activeElements--;
-		swapElements(activeElements, index);
+		swapElements(elements.size() - 1, index);
+		elements.pop_back();
 	}
 
-	void resize(size_t maxElements)
+	void reserve(size_t maxElements)
 	{
-		elements.resize(maxElements);
+		elements.reserve(maxElements);
 	}
 
 private:
 	void swapElements(size_t i, size_t j)
 	{
-		std::swap(elements.at(i), elements.at(j));
+		using std::swap;
+		swap(elements.at(i), elements.at(j));
 	}
 };
 

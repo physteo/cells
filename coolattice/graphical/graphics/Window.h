@@ -42,6 +42,7 @@ namespace sparky {
 			inline int getWidth() const { return m_Width; }
 			inline int getHeight() const { return m_Height; }
 
+			void makeCurrentContext() const;
 			bool isKeyPressed(unsigned int keycode) const;
 			bool isMouseButtonPressed(unsigned int button) const;
 			void getMousePosition(double& x, double& y) const;

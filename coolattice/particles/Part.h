@@ -18,7 +18,6 @@ public:
 	size_t cell;
 	unsigned short stage;
 
-
 	BoxCell* myBoxCell;
 
 	Part* next;
@@ -70,5 +69,5 @@ public:
 		next = prev = nullptr;
 	}
 
-
+	inline size_t getCell() const { return this->cell; }
 };

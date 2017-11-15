@@ -73,7 +73,6 @@ public:
 	Cell&			back();
 	const Cell		back() const;
 
-	void CellColony::resize(size_t i);
 	void reserve(size_t i);
 	void erase(size_t i);
 

@@ -20,6 +20,10 @@
 
 #include "../definitions.h"
 
+
+// for sorting
+#include <algorithm>
+
 // voro++
 #include "../utils/voropp/voro++.hh"
 
@@ -77,11 +81,12 @@ public:
 
 	MeasureTwoBodyForce*			measureTwoBodyForce;
 	
-	unsigned short cycleLength;
-
+	unsigned short	cycleLength;
+	size_t			maxPredictedCells;
+	size_t			cellCounter;
+	
 public:
-	System();
-	System(CellColony* cellsIn, Box* boxIn);
+	System(CellColony* cellsIn, Box* boxIn, size_t maxPredictedCellsIn);
 	//System(CellColony* cellsIn, PartSpecs* partSpecsMeasureIn, Box* boxIn);
 
 	void addPartSpecs(PartSpecs* partSpecsIn);
@@ -105,19 +110,17 @@ public:
 	void computeForcesVoronoi(size_t time, double dt);
 
 
-	void updatePositions(size_t time, double dt, bool update);
+	int updatePositions(size_t time, double dt, bool update);
 
 	void registerTwoBodyForceMeasurement(MeasureTwoBodyForce* m);
 	void collect();
 	bool cellsAreBroken() const;
+	bool twinCells() const;
 
 	void eraseRegionCells(double minX, double maxX, double minY, double maxY);
 	void eraseDeadCells();
 	void duplicateCells();
-	void resizeCellColony(size_t maxCells)
-	{
-		this->cells.resize(maxCells);
-	}
+	void resizeCellColony(size_t maxCells) = delete; // deleted because of the issues with cell numbering arising when adding/erasing new cells
 
 	size_t getTotalNumOfParts();
 	inline size_t getNumberOfCells() { return cells.size(); }
@@ -159,8 +162,8 @@ private:
 
 	// TODO: make sense out of these constructors
 	System(size_t n);
-public:
-	System(CellColony* cellsIn);
+	System(CellColony* cellsIn, size_t maxPredictedCellsIn);
+
 };
 
 

@@ -5,6 +5,12 @@
 void SystemTrajectory::push_back(const CellColony& cc)
 {
 	m_trajectory.push_back(cc);
+	//std::cout << this << std::endl;
+	//
+	//std::cout << &cc << std::endl;
+	//std::cout << &this->at(0).at(0) << std::endl;
+	//
+	//std::cout << this->at(0).at(0).getPart(0).getCell() << std::endl;
 }
 
 CellColony& SystemTrajectory::at(size_t i)
@@ -65,6 +71,8 @@ bool SystemTrajectory::load(Hdf5* file, const char* name)
 	
 	for (size_t t = 0; t < size(); t++)
 	{
+		if (t == 99)
+			std::cout << t << std::endl;
 		// create new group
 		char groupName[1024];
 		sprintf(groupName, "%s/%u", name, (unsigned int)t);
