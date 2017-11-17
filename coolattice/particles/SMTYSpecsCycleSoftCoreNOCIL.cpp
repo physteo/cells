@@ -1,11 +1,11 @@
-#include "SMTYSpecsCycleSoftCore.h"
+#include "SMTYSpecsCycleSoftCoreNOCIL.h"
 
-SMTYSpecsCycleSoftCore::SMTYSpecsCycleSoftCore() : PartSpecs(2)
+SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL() : PartSpecs(2)
 {
-	name = "SMTY-Cycle-SoftCore";
+	name = "SMTY-Cycle-SoftCore-NOCIL";
 }
 
-void SMTYSpecsCycleSoftCore::build()
+void SMTYSpecsCycleSoftCoreNOCIL::build()
 {
 	const double& sigAA = this->partTypes.getPartTypes().at(0).sig;
 	const double& sigBB = this->partTypes.getPartTypes().at(1).sig;
@@ -39,9 +39,9 @@ void SMTYSpecsCycleSoftCore::build()
 	addIntraForce(3, feneBB);
 
 	if (m_cycleStage == 0) {
-		CilForce*  cil(new CilForce{ m_motility });
-		addIntraForce(1, cil);
-		addIntraForce(2, cil);
+		ConstantPropulsionForce* nocil(new ConstantPropulsionForce{m_motility * m_ssCellLength});
+		addIntraForce(1, nocil);
+		addIntraForce(2, nocil);
 	}
 
 	// noise
@@ -51,15 +51,15 @@ void SMTYSpecsCycleSoftCore::build()
 }
 
 
-SMTYSpecsCycleSoftCore::SMTYSpecsCycleSoftCore(double sigAA, double sigBB, double motility,
+SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL(double sigAA, double sigBB, double motility,
 	double ewell, double ecore, double xi, double rMaxSquared, double kappa, double frictionF, double originalFrictionF,
 	double frictionB, double originalFrictionB, double massF, double massB,
 	double rateDuplication, double thresholdDuplication,
-	size_t cycleStage, size_t cycleLength) : SMTYSpecsCycleSoftCore()
+	size_t cycleStage, size_t cycleLength) : SMTYSpecsCycleSoftCoreNOCIL()
 {
 
 	m_motility = motility;
-	
+
 	m_ewell = ewell;
 	m_ecore = ecore;
 	m_xi = xi;
@@ -107,9 +107,9 @@ SMTYSpecsCycleSoftCore::SMTYSpecsCycleSoftCore(double sigAA, double sigBB, doubl
 }
 
 
-SMTYSpecsCycleSoftCore::SMTYSpecsCycleSoftCore(const Parameters* params, size_t cycleStage, size_t cycleLength) :
+SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL(const Parameters* params, size_t cycleStage, size_t cycleLength) :
 
-	SMTYSpecsCycleSoftCore(params->getParam(0),
+	SMTYSpecsCycleSoftCoreNOCIL(params->getParam(0),
 		params->getParam(1),
 		params->getParam(2),
 		params->getParam(3),
@@ -130,7 +130,7 @@ SMTYSpecsCycleSoftCore::SMTYSpecsCycleSoftCore(const Parameters* params, size_t 
 }
 
 
-bool SMTYSpecsCycleSoftCore::load(Hdf5* file, const char* groupName)
+bool SMTYSpecsCycleSoftCoreNOCIL::load(Hdf5* file, const char* groupName)
 {
 	try {
 		H5::Group group = file->openGroup(groupName);
@@ -144,14 +144,14 @@ bool SMTYSpecsCycleSoftCore::load(Hdf5* file, const char* groupName)
 		}
 
 		m_motility = file->readAttributeDouble(groupName, "motility");
-		m_ewell =    file->readAttributeDouble(groupName, "ewell");
-		m_ecore =    file->readAttributeDouble(groupName, "ecore");
+		m_ewell = file->readAttributeDouble(groupName, "ewell");
+		m_ecore = file->readAttributeDouble(groupName, "ecore");
 		m_xi = file->readAttributeDouble(groupName, "xi");
 		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
 		m_kappa = file->readAttributeDouble(groupName, "k");
 		m_rateDuplication = file->readAttributeDouble(groupName, "rateDuplication");
 		m_thresholdDuplication = file->readAttributeDouble(groupName, "thresholdDuplication");
-		m_cycleStage =  file->readAttributeInteger(groupName, "cycleStage");
+		m_cycleStage = file->readAttributeInteger(groupName, "cycleStage");
 		m_cycleLength = file->readAttributeInteger(groupName, "cycleLength");
 
 		// save partType
@@ -160,8 +160,8 @@ bool SMTYSpecsCycleSoftCore::load(Hdf5* file, const char* groupName)
 		strcat(partTypesGroupName, "/Types");
 		this->partTypes.load(file, partTypesGroupName);
 
-		m_ssCellLength  = file->readAttributeDouble(groupName, "ssCellLength");
-		m_ssSpeed       = file->readAttributeDouble(groupName, "ssSpeed");
+		m_ssCellLength = file->readAttributeDouble(groupName, "ssCellLength");
+		m_ssSpeed = file->readAttributeDouble(groupName, "ssSpeed");
 		m_migrationTime = file->readAttributeDouble(groupName, "migrationTime");
 
 		build();
@@ -180,7 +180,7 @@ bool SMTYSpecsCycleSoftCore::load(Hdf5* file, const char* groupName)
 
 
 
-bool SMTYSpecsCycleSoftCore::save(Hdf5* file, const char* groupName) const
+bool SMTYSpecsCycleSoftCoreNOCIL::save(Hdf5* file, const char* groupName) const
 {
 	try {
 		file->createNewGroup(groupName);
@@ -198,9 +198,9 @@ bool SMTYSpecsCycleSoftCore::save(Hdf5* file, const char* groupName) const
 		file->writeAttributeInteger(groupName, "cycleStage", m_cycleStage);
 		file->writeAttributeInteger(groupName, "cycleLength", m_cycleLength);
 
-		file->writeAttributeDouble(groupName, "ssCellLength",   m_ssCellLength);
-		file->writeAttributeDouble(groupName, "ssSpeed",		m_ssSpeed);
-		file->writeAttributeDouble(groupName, "migrationTime",  m_migrationTime);
+		file->writeAttributeDouble(groupName, "ssCellLength", m_ssCellLength);
+		file->writeAttributeDouble(groupName, "ssSpeed", m_ssSpeed);
+		file->writeAttributeDouble(groupName, "migrationTime", m_migrationTime);
 
 
 		// save partType
@@ -220,7 +220,7 @@ bool SMTYSpecsCycleSoftCore::save(Hdf5* file, const char* groupName) const
 
 
 
-bool SMTYSpecsCycleSoftCore::cellIsBroken(const Cell* cell, const Box* box) const
+bool SMTYSpecsCycleSoftCoreNOCIL::cellIsBroken(const Cell* cell, const Box* box) const
 {
 	// in the SMTY system a cell is broken when it's length is
 	// bigger than Rmax
@@ -242,13 +242,13 @@ bool SMTYSpecsCycleSoftCore::cellIsBroken(const Cell* cell, const Box* box) cons
 }
 
 
-bool SMTYSpecsCycleSoftCore::cellIsDead(const Cell* cell, const Box* box)
+bool SMTYSpecsCycleSoftCoreNOCIL::cellIsDead(const Cell* cell, const Box* box)
 {
 	return false;
 }
 
 
-bool SMTYSpecsCycleSoftCore::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
+bool SMTYSpecsCycleSoftCoreNOCIL::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
 {
 	// in this model, a cell can duplicate if its length is bigger than Rmax/2.0
 	Vector vectorDistance;
@@ -274,7 +274,7 @@ bool SMTYSpecsCycleSoftCore::cellDuplicates(Cell* cell, std::vector<Cell>* newCe
 			// set velocities to zero
 			newcell.getPart(0).velocity = Vector{ 0.0, 0.0 };
 			newcell.getPart(1).velocity = Vector{ 0.0, 0.0 };
-			
+
 			// assign stage
 			unsigned short cellStage = gsl_rng_uniform_int(g_rng, cycleLength);
 			newcell.getPart(0).stage = cellStage;
@@ -283,7 +283,7 @@ bool SMTYSpecsCycleSoftCore::cellDuplicates(Cell* cell, std::vector<Cell>* newCe
 
 			newCells->push_back(newcell);
 			cellCounter++;
-			
+
 			// modify old cell. Do not change its cell ID!
 			cell->getPart(1).position = cell->getPart(0).position;
 			cell->getPart(0).velocity = Vector{ 0.0,0.0 };

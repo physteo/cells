@@ -22,6 +22,7 @@
 #include "../particles/SMTYSpecsSticky.h"
 #include "../particles/SMTYSpecsCycle.h"
 #include "../particles/SMTYSpecsCycleSoftCore.h"
+#include "../particles/SMTYSpecsCycleSoftCoreNOCIL.h"
 
 
 #include "../particles/MonoZimm.h"

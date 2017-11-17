@@ -104,6 +104,17 @@ namespace pywrapper {
 			.def("getCycleLength", &SMTYSpecsCycleSoftCore::getCycleLength)
 			;
 
+		class_<SMTYSpecsCycleSoftCoreNOCIL, bases<PartSpecs> >("SMTYSpecsCycleSoftCoreNOCIL", init<>())
+			.def(init<Parameters*, size_t, size_t>())
+			.def("save", &SMTYSpecsCycleSoftCoreNOCIL::save)
+			.def("load", &SMTYSpecsCycleSoftCoreNOCIL::load)
+			.def("cellIsBroken", &SMTYSpecsCycleSoftCoreNOCIL::cellIsBroken)
+			.def("cellIsDead", &SMTYSpecsCycleSoftCoreNOCIL::cellIsDead)
+			.def("cellDuplicates", &SMTYSpecsCycleSoftCoreNOCIL::cellDuplicates)
+			.def("getCycleLength", &SMTYSpecsCycleSoftCoreNOCIL::getCycleLength)
+			;
+
+
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
 			.def(init<double, double, double, double, double, double, double, double, double, double, double>())
 			.def("save", &SMTYSpecsAdhesion::save)

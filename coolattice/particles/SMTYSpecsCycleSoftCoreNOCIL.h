@@ -11,7 +11,7 @@ extern gsl_rng *g_rng;
 
 
 // Schnyder-Molina-Tanaka-Yamamoto model for cells, with Soft Core repulsion/attraction and no noise(for the moment).
-class SMTYSpecsCycleSoftCore : public PartSpecs
+class SMTYSpecsCycleSoftCoreNOCIL : public PartSpecs
 {
 	// params
 	double m_motility;
@@ -33,9 +33,9 @@ class SMTYSpecsCycleSoftCore : public PartSpecs
 
 
 public:
-	SMTYSpecsCycleSoftCore();
-	SMTYSpecsCycleSoftCore(const Parameters* params, size_t cycleStage, size_t cycleLength);
-	SMTYSpecsCycleSoftCore(double sigAA, double sigBB, double motility,
+	SMTYSpecsCycleSoftCoreNOCIL();
+	SMTYSpecsCycleSoftCoreNOCIL(const Parameters* params, size_t cycleStage, size_t cycleLength);
+	SMTYSpecsCycleSoftCoreNOCIL(double sigAA, double sigBB, double motility,
 		double ewell, double ecore, double xi, double rMaxSquared, double kappa, double frictionF, double originalFrictionF,
 		double frictionB, double originalFrictionB, double massF, double massB,
 		double rateDuplication, double thresholdDuplication,
