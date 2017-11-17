@@ -72,6 +72,8 @@ bool SystemTrajectory::load(Hdf5* file, const char* name)
 	for (size_t t = 0; t < size(); t++)
 	{
 		// create new group
+		if (t == 110)
+			std::cout << "a" << std::endl;
 		char groupName[1024];
 		sprintf(groupName, "%s/%u", name, (unsigned int)t);
 		at(t).load(file, groupName);

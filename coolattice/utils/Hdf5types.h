@@ -24,6 +24,7 @@ class Hdf5types
 		double vy;
 		size_t cell;
 		size_t type;
+		size_t stage;
 	};
 
 private:

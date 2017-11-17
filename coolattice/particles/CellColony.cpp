@@ -182,7 +182,7 @@ bool CellColony::save(Hdf5* file, const char* name) const
 	for (size_t i = 0; i < m_cells.size(); i++) {
 		for (size_t j = 0; j < m_cells.at(i).getNumOfParts(); j++) {
 			const Part* part = &m_cells.at(i).getPart(j);
-			parts.at(partCounter) = LightPartwCell{ part->position.x, part->position.y, part->velocity.x, part->velocity.y, part->getCell(), part->type };
+			parts.at(partCounter) = LightPartwCell{ part->position.x, part->position.y, part->velocity.x, part->velocity.y, part->getCell(), part->type, part->stage };
 			partCounter++;
 		}
 	}
@@ -301,7 +301,10 @@ bool CellColony::load(Hdf5* file, const char* name)
 	for (size_t i = 0; i < LENGTH; i++) {
 		if (!(lightParts.at(i).cell == currentCell))
 		{
-			currentCell++;
+			if (i + 1 < LENGTH) {
+				currentCell = lightParts.at(i + 1).cell;
+			}
+
 #ifdef OBJECTPOOL
 			this->m_cells.addBackElement(partsInCell);
 			
@@ -313,7 +316,7 @@ bool CellColony::load(Hdf5* file, const char* name)
 			partsInCell.resize(0);
 		}
 		Part part{ Vector{lightParts.at(i).x, lightParts.at(i).y}, Vector{ lightParts.at(i).vx , lightParts.at(i).vy },
-			lightParts.at(i).type , lightParts.at(i).cell, 0 };
+			lightParts.at(i).type , lightParts.at(i).cell, lightParts.at(i).stage };
 		partsInCell.push_back(part);
 	}
 		

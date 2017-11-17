@@ -28,7 +28,7 @@ public:
 	bool save(Hdf5* file, const char* groupName) const    override;
 	bool cellIsBroken(const Cell* cell, const Box* box) const override;
 	bool cellIsDead(const Cell* cell, const Box* box) override;
-	bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const override;
+	bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const override;
 
 private:
 	void build();

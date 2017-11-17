@@ -78,7 +78,7 @@ public:
 
 	virtual bool cellIsBroken(const Cell* cell, const Box* box) const = 0;
 	virtual bool cellIsDead(const Cell* cell, const Box* box) = 0; 
-	virtual bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const = 0;
+	virtual bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const = 0;
 
 	//virtual bool cellCanDuplicate(const Cell* cell, const Box* box) const = 0;
 

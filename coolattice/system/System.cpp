@@ -595,6 +595,9 @@ int System::updatePositions(size_t time, double dt, bool update)
 
 #ifdef NEWDEBUG
 		Vector oldPosition = parts.at(n)->position;
+		//Vector currentVelocity = parts.at(n)->velocity;
+		//if (currentVelocity.x > 20 || currentVelocity.y > 20)
+		//	std::cout << "problem" << std::endl;
 #endif
 
 		//parts.at(n)->position += parts.at(n)->velocity * (dt / (friction * mass));
@@ -688,18 +691,12 @@ void System::duplicateCells()
 		Cell* cell = &cells.at(c);
 
 		std::vector<Cell> newCells;
-		if (this->partSpecs.at(0)->cellDuplicates(cell, &newCells, box, cells.size() ))
+		if (this->partSpecs.at(0)->cellDuplicates(cell, &newCells, box, cellCounter, cycleLength ))
 		{
 			for (size_t i = 0; i < newCells.size(); i++)
 			{
 				cells.push_back(newCells.at(i));
-				for (size_t p = 0; p < newCells.at(i).getNumOfParts(); p++)
-				{
-					cells.back().getPart(p).cell = cellCounter;//1000000 - cells.size() - 1;
-				}
-				cellCounter++;
 			}
-			
 			duplicated = true;
 		}
 		
@@ -707,15 +704,6 @@ void System::duplicateCells()
 
 	if (duplicated)
 	{
-		//for (size_t c = 0; c < cells.size(); c++)
-		//{
-		//	Cell* cell = &cells.at(c);
-		//	for (size_t r = 0; r < cell->getNumOfParts(); r++)
-		//	{
-		//		// remove particle from the subboxes
-		//		cells.at(c).getPart(r).remove();
-		//	}
-		//}
 		this->constructPartsVector();
 		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
 	}

@@ -187,7 +187,7 @@ bool SMTYSpecsNOCIL::cellIsDead(const Cell* cell, const Box* box)
 }
 
 
-bool SMTYSpecsNOCIL::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
+bool SMTYSpecsNOCIL::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
 {
 	return false;
 }

@@ -246,7 +246,7 @@ bool SMTYSpecsCycle::cellIsDead(const Cell* cell, const Box* box)
 }
 
 
-bool SMTYSpecsCycle::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
+bool SMTYSpecsCycle::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
 {
 	// in this model, a cell can duplicate if its length is bigger than Rmax/2.0
 	Vector vectorDistance;
@@ -257,16 +257,24 @@ bool SMTYSpecsCycle::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, con
 	{
 		if (gsl_rng_uniform(g_rng) < m_rateDuplication) {
 			
+
 			// bla
 			Cell newcell = Cell(2);
 			newcell.getPart(0).type = 0;
-			newcell.getPart(0).cell = currentNumberOfCells + 1;
+			newcell.getPart(0).cell = cellCounter;
 
 			newcell.getPart(0).position = cell->getPart(1).position;
 
 			newcell.getPart(1).type = 1;
-			newcell.getPart(1).cell = currentNumberOfCells + 1;
+			newcell.getPart(1).cell = cellCounter;
 			newcell.getPart(1).position = cell->getPart(1).position;
+
+			// assign stage
+			unsigned short cellStage = gsl_rng_uniform_int(g_rng, cycleLength);
+			newcell.getPart(0).stage = cellStage;
+			newcell.getPart(1).stage = cellStage;
+
+
 
 			cell->getPart(1).position = cell->getPart(0).position;
 
@@ -277,6 +285,7 @@ bool SMTYSpecsCycle::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, con
 			cell->getPart(1).velocity = Vector{ 0.0,0.0 };
 
 			newCells->push_back(newcell);
+			cellCounter++;
 			return true;
 		}
 	}

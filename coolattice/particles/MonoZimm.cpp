@@ -103,7 +103,7 @@ bool MonoZimm::cellIsDead(const Cell* cell, const Box* box)
 }
 
 
-bool MonoZimm::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
+bool MonoZimm::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
 {
 	return false;
 }

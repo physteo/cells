@@ -79,7 +79,7 @@ namespace pywrapper{
 			return this->get_override("cellIsDead")();
 		}
 
-		bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const override
+		bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const override
 		{
 			return this->get_override("cellDuplicates")();
 		}

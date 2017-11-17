@@ -92,6 +92,7 @@ private:
 		double vy;
 		size_t cell;
 		size_t type;
+		size_t stage;
 	};
 
 

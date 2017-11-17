@@ -44,7 +44,8 @@ void SMTYSpecsCycleSoftCore::build()
 	addIntraForce(3, feneBB);
 
 	if (m_cycleStage == 0) {
-		CilForce*  cil(new CilForce{ m_motility });
+		//CilForce*  cil(new CilForce{ m_motility });
+		ConstantPropulsionForce*  cil(new ConstantPropulsionForce{ m_motility });
 		addIntraForce(1, cil);
 		addIntraForce(2, cil);
 	}
@@ -236,7 +237,7 @@ bool SMTYSpecsCycleSoftCore::cellIsDead(const Cell* cell, const Box* box)
 }
 
 
-bool SMTYSpecsCycleSoftCore::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t currentNumberOfCells) const
+bool SMTYSpecsCycleSoftCore::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
 {
 	// in this model, a cell can duplicate if its length is bigger than Rmax/2.0
 	Vector vectorDistance;
@@ -250,23 +251,32 @@ bool SMTYSpecsCycleSoftCore::cellDuplicates(Cell* cell, std::vector<Cell>* newCe
 			// bla
 			Cell newcell = Cell(2);
 			newcell.getPart(0).type = 0;
-			newcell.getPart(0).cell = currentNumberOfCells + 1;
+			newcell.getPart(0).cell = cellCounter;
 
 			newcell.getPart(0).position = cell->getPart(1).position;
 
 			newcell.getPart(1).type = 1;
-			newcell.getPart(1).cell = currentNumberOfCells + 1;
+			newcell.getPart(1).cell = cellCounter;
 			newcell.getPart(1).position = cell->getPart(1).position;
 
-			cell->getPart(1).position = cell->getPart(0).position;
 
 			// set velocities to zero
 			newcell.getPart(0).velocity = Vector{ 0.0, 0.0 };
 			newcell.getPart(1).velocity = Vector{ 0.0, 0.0 };
-			cell->getPart(0).velocity = Vector{ 0.0,0.0 };
-			cell->getPart(1).velocity = Vector{ 0.0,0.0 };
+			
+			// assign stage
+			unsigned short cellStage = gsl_rng_uniform_int(g_rng, cycleLength);
+			newcell.getPart(0).stage = cellStage;
+			newcell.getPart(1).stage = cellStage;
+
 
 			newCells->push_back(newcell);
+			cellCounter++;
+			
+			// modify old cell. Do not change its cell ID!
+			cell->getPart(1).position = cell->getPart(0).position;
+			cell->getPart(0).velocity = Vector{ 0.0,0.0 };
+			cell->getPart(1).velocity = Vector{ 0.0,0.0 };
 			return true;
 		}
 	}
