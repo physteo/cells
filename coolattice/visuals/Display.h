@@ -23,6 +23,8 @@ namespace visuals {
 
 	class Display
 	{
+		size_t m_defaultStage;
+
 		sparky::graphics::Window m_window;
 		tmx::graphics::Camera m_camera;
 		tmx::graphics::SimpleRenderer m_renderer;
@@ -38,6 +40,8 @@ namespace visuals {
 
 		tmx::graphics::MTexturedQuad m_activeSite;
 		tmx::graphics::MTexturedQuad m_inactiveSite;
+		tmx::graphics::MTexturedQuad m_dividingCell;
+
 		tmx::graphics::MTexturedQuad m_subBox;
 
 		tmx::graphics::MTexturedQuad m_play;

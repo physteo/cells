@@ -165,16 +165,7 @@
     <ClCompile Include="visuals\LightDisplay.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="particles\SMTYSpecs.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="particles\SMTYSpecsNOCIL.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="interactions\RepulsionAdhesion.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="particles\SMTYSpecsAdhesion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="interactions\PlanarWall.cpp">
@@ -183,19 +174,10 @@
     <ClCompile Include="interactions\ZimmermannRepAdh.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="particles\MonoZimm.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="interactions\OneBodyPropulsion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="interactions\Sigmoidal.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="particles\SMTYSpecsSticky.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="particles\SMTYSpecsCycle.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="utils\voropp\c_loops.cc">
@@ -232,9 +214,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="interactions\SMSoftCore.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="particles\SMTYSpecsCycleSoftCore.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="particles\SMTYSpecsCycleSoftCoreNOCIL.cpp">
@@ -461,16 +440,7 @@
     <ClInclude Include="utils\myOpenmp.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="particles\SMTYSpecs.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="particles\SMTYSpecsNOCIL.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="interactions\RepulsionAdhesion.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="particles\SMTYSpecsAdhesion.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="interactions\PlanarWall.h">
@@ -479,22 +449,13 @@
     <ClInclude Include="interactions\ZimmermannRepAdh.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="particles\MonoZimm.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="interactions\OneBodyPropulsion.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="interactions\Sigmoidal.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="particles\SMTYSpecsSticky.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="pythonInterface\Parameters.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="particles\SMTYSpecsCycle.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="utils\voropp\c_loops.hh">
@@ -543,9 +504,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="interactions\SMSoftCore.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="particles\SMTYSpecsCycleSoftCore.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="particles\SMTYSpecsCycleSoftCoreNOCIL.h">

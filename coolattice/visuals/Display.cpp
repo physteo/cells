@@ -3,16 +3,19 @@
 namespace visuals {
 
 	Display::Display(int width, int height, double adjustFactor, Box* box, PartSpecs* partSpecs, SystemTrajectory* trajectory, bool lightRendering) :
+		m_defaultStage(0),
 		m_window{ "Cells", width, height },
 		m_box{box},
 		m_camera(glm::vec3{ 0.0f,0.0f,1.0f }, glm::vec3{ 0.0f,0.0f,-1.0f }, glm::vec3{ 0.0f,1.0f,0.0f }, &m_window),
 		m_renderer{ &m_camera },
 		m_shader{},
 		m_trajectory(trajectory),
-		m_activeSite{ (GLuint) width * adjustFactor * partSpecs->partTypes.getPartTypes().at(0).sig / m_box->getLx(), (GLuint) height * adjustFactor * partSpecs->partTypes.getPartTypes().at(0).sig / m_box->getLy(),
+		m_activeSite{ (GLuint) width * adjustFactor * partSpecs->partTypes.at(m_defaultStage).getPartTypes().at(0).sig / m_box->getLx(), (GLuint) height * adjustFactor * partSpecs->partTypes.at(m_defaultStage).getPartTypes().at(0).sig / m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/smile.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
-		m_inactiveSite{ (GLuint)width * adjustFactor * partSpecs->partTypes.getPartTypes().at(partSpecs->numberOfTypes - 1).sig / m_box->getLx(), (GLuint)height * adjustFactor * partSpecs->partTypes.getPartTypes().at(partSpecs->numberOfTypes - 1).sig / m_box->getLy(),
+		m_inactiveSite{ (GLuint)width * adjustFactor * partSpecs->partTypes.at(m_defaultStage).getPartTypes().at(partSpecs->numberOfTypes - 1).sig / m_box->getLx(), (GLuint)height * adjustFactor * partSpecs->partTypes.at(m_defaultStage).getPartTypes().at(partSpecs->numberOfTypes - 1).sig / m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/redsiteCool.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
+		m_dividingCell{ (GLuint)width * adjustFactor * partSpecs->partTypes.at(m_defaultStage).getPartTypes().at(partSpecs->numberOfTypes - 1).sig / m_box->getLx(), (GLuint)height * adjustFactor * partSpecs->partTypes.at(m_defaultStage).getPartTypes().at(partSpecs->numberOfTypes - 1).sig / m_box->getLy(),
+		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/redsiteSmall.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
 		m_subBox{ (GLuint)width * 0.9 * m_box->getBoxCellLengthX() / m_box->getLx(), (GLuint)height * 0.9 * m_box->getBoxCellLengthY()/ m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/subBox.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
 		m_play{ (GLuint)width * 0.05, (GLuint)height * 0.05,
@@ -478,12 +481,24 @@ namespace visuals {
 				}
 
 				if (part.type == 0) {
-					renderable.init(&m_activeSite, &m_shader, glm::vec3{ (GLfloat)pbcPosition.x * m_window.getWidth() / m_box->getLx() ,//+   0.5 * m_window.getWidth(),
+					if (part.currentStage == 2) {
+						renderable.init(&m_dividingCell, &m_shader, glm::vec3{ (GLfloat)pbcPosition.x * m_window.getWidth() / m_box->getLx() ,//+   0.5 * m_window.getWidth(),
 																		 (GLfloat)pbcPosition.y * m_window.getHeight() / m_box->getLy() ,//+   0.5 * m_window.getHeight(),
 																		 (GLfloat) 0.0f },
-						glm::vec3{ 0,1,0 },
-						0.0f,
-						1.0f);
+							glm::vec3{ 0,1,0 },
+							0.0f,
+							1.0f);
+					}
+					else
+					{
+						renderable.init(&m_activeSite, &m_shader, glm::vec3{ (GLfloat)pbcPosition.x * m_window.getWidth() / m_box->getLx() ,//+   0.5 * m_window.getWidth(),
+							(GLfloat)pbcPosition.y * m_window.getHeight() / m_box->getLy() ,//+   0.5 * m_window.getHeight(),
+							(GLfloat) 0.0f },
+							glm::vec3{ 0,1,0 },
+							0.0f,
+							1.0f);
+					}
+
 				}
 				else if (!m_lightRendering)
 				{

@@ -17,6 +17,8 @@ public:
 	size_t type;
 	size_t cell;
 	unsigned short stage;
+	unsigned short currentStage;
+	size_t currentStageTime;
 
 	BoxCell* myBoxCell;
 
@@ -28,6 +30,8 @@ public:
 	Part() :  position(), velocity(), type(), cell(), stage(0), myBoxCell(nullptr), next(nullptr), prev(nullptr)
 	{
 		data.resize(0);
+		currentStage = 0;
+		currentStageTime = 0;
 	}
 
 	//Part(const Vector& positionIn, const Vector& velocityIn, size_t typeIn, size_t cellIn)
@@ -40,6 +44,8 @@ public:
 		: position{ positionIn }, velocity{ velocityIn }, type(typeIn), cell(cellIn), stage(stageIn), myBoxCell(nullptr), next(nullptr), prev(nullptr)
 	{
 		data.resize(0);
+		currentStage = 0;
+		currentStageTime = 0;
 	}
 
 	void insert(Part* newOne)

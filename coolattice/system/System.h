@@ -27,48 +27,6 @@
 // voro++
 #include "../utils/voropp/voro++.hh"
 
-class MeasureOneBodyForce
-{
-public:
-	PartSpecs*		partSpecsMeasure;
-	OneBodyForce*   oneBodyForce;
-	size_t			partID;
-
-	size_t			forceID;
-	std::vector< std::vector<Vector> > data; // contains the measurements
-
-public:
-	MeasureOneBodyForce(PartSpecs* partSpecsIn, size_t partIDin, size_t forceIDin)
-	{
-		partID = partIDin;
-		partSpecsMeasure = partSpecsIn;
-		oneBodyForce = partSpecsIn->oneBodyForces.at(partIDin).at(forceIDin); // TODO
-	}
-};
-
-
-class MeasureTwoBodyForce : BinarySavable
-{
-public:
-	PartSpecs*		partSpecsMeasure;
-	TwoBodyForce*   twoBodyForce;
-	size_t			partID1;
-	size_t			partID2;
-	bool			intra;
-	size_t			forceID;
-	std::vector<std::vector<Vector> > data;
-public:
-	MeasureTwoBodyForce(PartSpecs* partSpecsIn, size_t partID1in, size_t partID2in,
-		bool intraIn, size_t forceIDin);
-
-	bool load(Hdf5* file, const char* name) override;
-	bool save(Hdf5* file, const char* name) const override;
-};
-
-
-
-
-
 extern gsl_rng *g_rng;
 
 class System
@@ -78,8 +36,6 @@ public:
 	std::vector<Part*>		parts;
 	Box*					box;
 	std::vector<PartSpecs*>	partSpecs;
-
-	MeasureTwoBodyForce*			measureTwoBodyForce;
 	
 	unsigned short	cycleLength;
 	size_t			maxPredictedCells;
@@ -112,8 +68,7 @@ public:
 
 	int updatePositions(size_t time, double dt, bool update);
 
-	void registerTwoBodyForceMeasurement(MeasureTwoBodyForce* m);
-	void collect();
+	//void collect();
 	bool cellsAreBroken() const;
 	bool twinCells() const;
 
@@ -129,11 +84,10 @@ public:
 	inline const CellColony& getConstCellColony() const { return cells; }
 	inline const Box&  getBox() const { return *box; }
 	inline const PartSpecs& getPartSpecs(size_t i) const { return *partSpecs.at(i); }
-	inline const MeasureTwoBodyForce& getMeasureTwoBodyForce() const { return *measureTwoBodyForce; }
 
 
 	void   setTypeFriction(size_t i, double friction);
-	double getTypeFriction(size_t i);
+	double getTypeFriction(size_t stage, size_t i);
 
 	void setPartSpecs(PartSpecs* partSpecsIn);
 
@@ -148,16 +102,16 @@ public:
 	void printCoordDiff();
 
 private:
-	void System::constructPartsVector();
-	void System::resolveOverlaps();
+	void constructPartsVector();
 
-	void computeOneBodyForces(Part* part1, const PartSpecs* specs);
-	void computeTwoBodyForces(Part* part1, const Part* part2, const PartSpecs* specs);
+	void computeOneBodyForces(Part* part1);
+	void computeTwoBodyForces(Part* part1, const Part* part2);
 
 	void resetVelocities();
 
-	size_t computeStage(size_t time, size_t n);
-	size_t computeStage(size_t time, Part* part);
+	//x//size_t computeStage(size_t time, size_t n);
+	//x//size_t computeStage(size_t time, Part* part);
+
 
 
 	// TODO: make sense out of these constructors

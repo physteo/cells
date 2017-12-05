@@ -3,61 +3,6 @@
 #define DEBUG1
 
 
-MeasureTwoBodyForce::MeasureTwoBodyForce(PartSpecs* partSpecsIn, size_t partID1in, size_t partID2in,
-	bool intraIn, size_t forceIDin)
-{
-
-	partSpecsMeasure = partSpecsIn;
-	partID1 = partID1in;
-	partID2 = partID2in;
-	intra = intraIn;
-	forceID = forceIDin;
-
-	Part part1;
-	Part part2;
-	//TODO: now part.cell is not accessible//part1.getCell() = 0;
-	//TODO: now part.cell is not accessible//part1.type = partID1;
-	//TODO: now part.cell is not accessible//part2.cell = intra ? 0 : 1;
-	//TODO: now part.cell is not accessible//part2.type = partID2;
-
-	twoBodyForce = partSpecsIn->getTwoBodyForce(&part1, &part2, forceID);
-	//twoBodyForce = partSpecsIn->oneBodyForces.at(0).at(0);
-}
-
-bool MeasureTwoBodyForce::load(Hdf5* file, const char* name)
-{
-	std::cerr << "Not possible to load force measurements in this version of the code." << std::endl;
-	assert(false);
-	return false;
-}
-
-bool MeasureTwoBodyForce::save(Hdf5* file, const char* name) const
-{
-	file->createNewGroup(name);
-	H5::Group groupCells = file->openGroup(name);
-	const H5::CompType& h5type = Hdf5types::getSimonType();
-
-	for (size_t i = 0; i < data.size(); i++)
-	{
-		char stringName[1024];
-		sprintf(stringName, "%s_%u", "t", (unsigned int)i);
-
-		size_t LENGTH = this->data.at(i).size();
-		int RANK = 1;
-		hsize_t dim[] = { LENGTH };   /* Dataspace dimensions */
-		H5::DataSpace space(RANK, dim);
-		H5::DataSet* dataset = new H5::DataSet(groupCells.createDataSet(stringName, h5type, space));
-		dataset->write(&data.at(i).at(0), h5type);
-		delete dataset;
-	}
-	return true;
-}
-
-
-
-
-
-
 //System::System()
 //{
 //	cells.reserve(0);
@@ -76,7 +21,6 @@ System::System(size_t n)
 
 	parts.reserve(2 * n); // there will be probably 2 * n parts 
 	box = nullptr;
-	measureTwoBodyForce = nullptr;
 
 	maxPredictedCells = n;
 	cellCounter = n+1;
@@ -99,7 +43,6 @@ System::System(CellColony* cellsIn, size_t maxPredictedCellsIn)
 		cells.push_back(cellsIn->at(i));
 	}
 	box = nullptr;
-	measureTwoBodyForce = nullptr;
 
 	cellCounter = maxPredictedCells + 1;
 }
@@ -110,7 +53,6 @@ System::System(CellColony* cellsIn, Box* boxIn, size_t maxPredictedCellsIn) : Sy
 	constructPartsVector();
 	box = boxIn;
 	std::cout << this << std::endl;
-	measureTwoBodyForce = nullptr;
 
 	clearSubBoxes();  
 	setSubBoxes();
@@ -130,10 +72,6 @@ void System::setCycleLength(unsigned short cycleLengthIn)
 	cycleLength = cycleLengthIn;
 }
 
-void System::registerTwoBodyForceMeasurement(MeasureTwoBodyForce* m)
-{
-	this->measureTwoBodyForce = m;
-}
 
 
 void System::resizePartsDataSlots(size_t slots)
@@ -253,46 +191,49 @@ void System::resetVelocities()
 
 
 
-void System::computeOneBodyForces(Part* part1, const PartSpecs* specs)
+void System::computeOneBodyForces(Part* part1)
 {
-	for (size_t f = 0; f < specs->oneBodyForces.at(part1->type).size(); f++)
-	{
-		//x/OneBodyForce* force = partSpecs->oneBodyForces.at(part1->type).at(f).get();
-		OneBodyForce* force = specs->oneBodyForces.at(part1->type).at(f); // .get() <- not here anymore cause i swtiched to raw pointers in order to make python interface
-
-		Vector addedForce;
-		force->updateForce(part1, box, addedForce);
-		//measureOneBodyForce.measure(part1->type, f, addedForce);
-	}
+	partSpecs.at(0)->computeOneBodyForces(part1, box);
 }
 
 
-void System::computeTwoBodyForces(Part* part1, const Part* part2, const PartSpecs* specs)
+void System::computeTwoBodyForces(Part* part1, const Part* part2)
 {
-	for (size_t f = 0; f < specs->numberOfTwoBodyForces(part1, part2); f++)
-	{
-		const TwoBodyForce* force = specs->getTwoBodyForce(part1, part2, f);
-		Vector addedForce;
-		force->updateForce(part1, part2, box, addedForce);
-		//measureTwoBodyForce.measure(part1->type, f, addedForce);
-	}
+	partSpecs.at(0)->computeTwoBodyForces(part1, part2, box);
 }
 
-size_t System::computeStage(size_t time, size_t n)
-{
-	unsigned short partStageTime = parts.at(n)->stage;
-	return ((time + partStageTime) % cycleLength) / (cycleLength/partSpecs.size());
-}
+//x//size_t System::computeStage(size_t time, size_t n)
+//x//{
+//x//	return partSpecs.at(0)->computeStage(time, parts.at(n));
+//x//}
+//x//
+//x//size_t System::computeStage(size_t time, Part* part)
+//x//{
+//x//	return partSpecs.at(0)->computeStage(time, part);
+//x//}
 
-size_t System::computeStage(size_t time, Part* part)
-{
-	unsigned short partStageTime = part->stage;
-	return ((time + partStageTime) % cycleLength) / (cycleLength / partSpecs.size());
-}
+//size_t System::computeStage(size_t time, Part* part)
+//{
+//	unsigned short partStageTime = part->stage;
+//	return ((time + partStageTime) % cycleLength) / (cycleLength / partSpecs.size());
+//}
 
 void System::computeForces(size_t time, double dt)
 {
 	resetVelocities();
+
+
+
+	//std::cout << time << std::endl;
+
+#ifdef OMP
+#pragma omp parallel for schedule(guided)
+#endif
+	for (int c = 0; c < cells.size(); c++)
+	{
+		// update the stage of the particle
+		partSpecs.at(0)->updateStage(time, &cells.at(c));
+	}
 
 	// loop over all parts //TODO URGENT PUT AGAIN THE OMP
 #ifdef OMP
@@ -302,11 +243,9 @@ void System::computeForces(size_t time, double dt)
 	{
 		// get the part
 		Part* part1 = parts.at(n);
-		size_t stage = computeStage(time, n);
-
 
 		// apply one body forces
-		computeOneBodyForces(part1, partSpecs.at(stage));
+		computeOneBodyForces(part1);
 
 #ifdef LIST
 		// get the cell of this part
@@ -325,14 +264,8 @@ void System::computeForces(size_t time, double dt)
 		{
 			Part* part2 = parts.at(m);
 #endif
-
 			if (part2 != part1) {
-
-				if (part2->type > 1 || part1->type > 1)
-					int a = 1;
-
-				computeTwoBodyForces(part1, part2, partSpecs.at(stage));
-
+				computeTwoBodyForces(part1, part2);
 #ifdef LIST
 			}
 			part2 = part2->next;
@@ -342,12 +275,38 @@ void System::computeForces(size_t time, double dt)
 		}
 
 			}
+	// update particle's internal stage time
+	part1->currentStageTime++;
 
-	box->remap(part1->position);
-
-		}
+	}
 
 }
+
+
+
+
+//void System::divideCell(Cell* cell)
+//{
+//	bool duplicated = false;
+//
+//	std::vector<Cell> newCells;
+//	if (this->partSpecs.at(0)->cellDuplicates(cell, &newCells, box, cellCounter, cycleLength))
+//	{
+//		for (size_t i = 0; i < newCells.size(); i++)
+//		{
+//			cells.push_back(newCells.at(i));
+//		}
+//		duplicated = true;
+//	}
+//
+//	
+//
+//	if (duplicated)
+//	{
+//		this->constructPartsVector();
+//		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
+//	}
+//}
 
 
 
@@ -441,9 +400,9 @@ void System::computeForcesVoronoi(size_t time, double dt)
 			int ID1;
 			ID1 = loop.pid();   // retrieve ID of particle
 			Part* part1 = voroBoxParts.at(ID1);
-			size_t stage = computeStage(time, part1);
+			size_t stage = part1->currentStage;
 
-			computeOneBodyForces(part1, partSpecs.at(stage));
+			//x//computeOneBodyForces(part1, partSpecs.at(stage));
 
 			std::vector<int> neighbours;
 			c.neighbors(neighbours);
@@ -454,7 +413,7 @@ void System::computeForcesVoronoi(size_t time, double dt)
 				{
 					Part* part2 = voroBoxParts.at(ID2);
 					// now i have part1 and part2
-					computeTwoBodyForces(part1, part2, partSpecs.at(stage));
+					//x//computeTwoBodyForces(part1, part2, partSpecs.at(stage));
 
 				}
 				//	std::cout << "(" << parts.at(ID).x << ", " << parts.at(ID).y << ") - ";
@@ -469,97 +428,6 @@ void System::computeForcesVoronoi(size_t time, double dt)
 
 
 
-void System::collect()
-	{
-		if (measureTwoBodyForce == nullptr)
-		{
-			std::cerr << "No force to be measured has been registered." << std::endl;
-		}
-
-
-		//measureOneBodyForce->data.push_back(std::vector<Vector>{});
-		measureTwoBodyForce->data.push_back(std::vector<Vector>{});
-		//measureOneBodyForce->data.back().resize(this->parts.size());
-		measureTwoBodyForce->data.back().resize(this->parts.size());
-
-
-		// store the velocities. They will be restored into the particles velocity vector
-		std::vector<Vector> velocities;
-		velocities.resize(parts.size());
-#ifdef OMP
-#pragma omp parallel for schedule(guided)
-#endif
-		for (int i = 0; i < parts.size(); i++)
-		{
-			velocities.at(i) = parts.at(i)->velocity;
-			measureTwoBodyForce->data.back().at(i) = Vector{ 0.0, 0.0 };
-		}
-
-		// reset to zero so we can extract the forces
-		resetVelocities();
-
-		// measure the forces I want and store them into a vector
-#ifdef OMP
-#pragma omp parallel for schedule(guided)
-#endif
-		for (int n = 0; n < parts.size(); n++)
-		{
-			Part* part1 = parts.at(n);
-			// look at measureOneBodyForce
-			//if (part1->type == measureOneBodyForce->partID)
-			//{
-			//	// apply force
-			//	Vector addedVector{};
-			//	measureOneBodyForce->oneBodyForce->updateForce(part1, addedVector);
-			//}
-			//measureOneBodyForce->data.back().push_back(part1->velocity);
-			//part1->velocity = Vector{ 0.0,0.0 }; // necessary for the next measure (twoBodyForces) !
-
-#ifdef LIST
-			BoxCell* subBox1 = part1->myBoxCell;
-			for (int J = 0; J < 9; J++)
-			{
-				BoxCell* subBox2 = subBox1->neighbour[J];
-				Part* part2 = subBox2->head.next;
-				while (part2 != nullptr)
-				{
-#else
-			for (size_t m = 0; m < parts.size(); m++)
-			{
-				Part* part2 = parts.at(m);
-#endif
-				if (part2 != part1) {
-					// measureTwoBodyForce
-					if (part1->type == measureTwoBodyForce->partID1 && part2->type == measureTwoBodyForce->partID2 && ((part1->getCell() == part2->getCell()) == (measureTwoBodyForce->intra)))
-					{
-						Vector addedVector{};
-						measureTwoBodyForce->twoBodyForce->updateForce(part1, part2, box, addedVector);
-					}
-#ifdef LIST
-				}
-				part2 = part2->next;
-#endif
-			}
-				}
-		measureTwoBodyForce->data.back().at(n) = part1->velocity;
-		part1->velocity = Vector{ 0.0, 0.0 };
-			}
-
-
-
-	// restore velocities
-#ifdef OMP
-#pragma omp parallel for schedule(guided)
-#endif
-	for (int i = 0; i < parts.size(); i++)
-	{
-		parts.at(i)->velocity = velocities.at(i);
-	}
-
-		}
-
-
-
 #include<limits>
 void System::setTypeFriction(size_t i, double friction)
 {
@@ -569,10 +437,10 @@ void System::setTypeFriction(size_t i, double friction)
 	assert(false);
 }
 
-double System::getTypeFriction(size_t i)
+double System::getTypeFriction(size_t stage, size_t i)
 {
 	//return this->currentPartSpecs->getFriction(i);
-	return this->partSpecs.at(0)->getFriction(i);
+	return this->partSpecs.at(0)->getFriction(stage, i);
 }
 
 
@@ -587,11 +455,13 @@ int System::updatePositions(size_t time, double dt, bool update)
 	for (int n = 0; n < parts.size(); n++)
 	{
 		size_t pt = parts.at(n)->type;
-		size_t stage = computeStage(time, n);
-
-		double friction = this->partSpecs.at(stage)->getFriction(pt);
-		double mass = this->partSpecs.at(stage)->partTypes.getPartTypes().at(pt).mass;
+		//x//size_t stage = computeStage(time, n);
+		//x//double friction = this->partSpecs.at(stage)->getFriction(pt);
+		//x//double mass = this->partSpecs.at(stage)->partTypes.getPartTypes().at(pt).mass;
 		
+		double friction = this->partSpecs.at(0)->getFriction(parts.at(n)->currentStage, pt);
+		double mass     = this->partSpecs.at(0)->partTypes.at(parts.at(n)->currentStage).getPartTypes().at(pt).mass;
+
 
 #ifdef NEWDEBUG
 		Vector oldPosition = parts.at(n)->position;
@@ -690,18 +560,26 @@ void System::duplicateCells()
 	{
 		Cell* cell = &cells.at(c);
 
-		std::vector<Cell> newCells;
-		if (this->partSpecs.at(0)->cellDuplicates(cell, &newCells, box, cellCounter, cycleLength ))
+		if (partSpecs.at(0)->endOfDivisionStage(cell, box))
 		{
+			// cell divides
+			std::vector<Cell> newCells;
+			
+			// new cells are created and put into newCells
+			this->partSpecs.at(0)->cellDuplicates(cell, &newCells, box, cellCounter, cycleLength);
+
+			// the vector of new cells is inserted into the cells vector
 			for (size_t i = 0; i < newCells.size(); i++)
 			{
 				cells.push_back(newCells.at(i));
 			}
+
 			duplicated = true;
 		}
 		
 	}
 
+	// if new cells were created, update the parts vector and the subBoxes
 	if (duplicated)
 	{
 		this->constructPartsVector();
@@ -750,65 +628,3 @@ bool System::twinCells() const
 
 	return false;
 }
-
-
-void System::resolveOverlaps()
-{
-	bool overlaps = true;
-	while (overlaps)
-	{
-		overlaps = false;
-		for (size_t n = 0; n < parts.size(); n++)
-		{
-			// get the part
-			Part* part1 = parts.at(n);
-#ifdef LIST
-			// get the cell of this part
-			BoxCell* subBox1 = part1->myBoxCell;
-			// loop through the neighbours of subBox1
-			for (int J = 0; J < 9; J++)
-			{
-				BoxCell* subBox2 = subBox1->neighbour[J];
-
-				// loop through particles in this subBox
-				Part* part2 = subBox2->head.next;
-				while (part2 != nullptr)
-				{
-#else
-			for (size_t m = 0; m < parts.size(); m++)
-			{
-				Part* part2 = parts.at(m);
-#endif
-				if (part2 != part1 && part1->getCell() != part2->getCell()) {
-					// check for overlaps
-					double sig1 = this->partSpecs.at(0)->getDiameter(part1->type);
-					double sig2 = this->partSpecs.at(0)->getDiameter(part2->type);
-					double sig = 0.5 * (sig1 + sig2);
-
-					Vector distance21Vec = part1->position - part2->position;
-					double distance21 = sqrt(Vector::dotProduct(distance21Vec, distance21Vec));
-
-					if (distance21 < sig)
-					{
-						// overlapping: need to correct
-						double d = distance21;
-						double x = ((sig + 0.001) / d - 1.0) / (sig1 + sig2);
-						part1->position += (distance21Vec * (sig2 * x));
-						part2->position -= (distance21Vec * (sig1 * x));
-
-						overlaps = true;
-					}
-
-#ifdef LIST
-				}
-				part2 = part2->next;
-#endif
-				}
-
-			}
-
-		}
-
-	}
-}
-

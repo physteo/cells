@@ -66,15 +66,17 @@ namespace pywrapper {
 			;
 
 		class_<PartSpecsWrap, boost::noncopyable>("PartSpecs")
-			.def("setFriction",  &PartSpecs::setFriction)
 			.def("addOneBodyForce", &PartSpecs::addOneBodyForce)
 			.def("load", pure_virtual(&PartSpecs::load))
 			.def("save", pure_virtual(&PartSpecs::save))
 			.def("cellIsBroken", pure_virtual(&PartSpecs::cellIsBroken))
 			.def("cellIsDead", pure_virtual(&PartSpecs::cellIsDead))
 			.def("cellDuplicates", pure_virtual(&PartSpecs::cellDuplicates))
+			.def("endOfDivisionStage",	pure_virtual(&PartSpecs::endOfDivisionStage))
+			.def("divisionCriterion", pure_virtual(&PartSpecs::divisionCriterion))
+			.def("updateStage", pure_virtual(&PartSpecs::updateStage))
 			;
-
+/*
 		class_<SMTYSpecs, bases<PartSpecs> >("SMTYSpecs", init<>())
 			.def(init<double, double, double, double, double, double, double, double, double, double, double>())
 			.def("save", &SMTYSpecs::save)
@@ -103,6 +105,7 @@ namespace pywrapper {
 			.def("cellDuplicates", &SMTYSpecsCycleSoftCore::cellDuplicates)
 			.def("getCycleLength", &SMTYSpecsCycleSoftCore::getCycleLength)
 			;
+*/
 
 		class_<SMTYSpecsCycleSoftCoreNOCIL, bases<PartSpecs> >("SMTYSpecsCycleSoftCoreNOCIL", init<>())
 			.def(init<Parameters*, size_t, size_t>())
@@ -114,7 +117,7 @@ namespace pywrapper {
 			.def("getCycleLength", &SMTYSpecsCycleSoftCoreNOCIL::getCycleLength)
 			;
 
-
+/*
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
 			.def(init<double, double, double, double, double, double, double, double, double, double, double>())
 			.def("save", &SMTYSpecsAdhesion::save)
@@ -154,18 +157,15 @@ namespace pywrapper {
 			.def("cellIsDead",     &MonoZimm::cellIsDead)
 			.def("cellDuplicates", &MonoZimm::cellDuplicates)
 			;
+*/
 
-		class_<MeasureTwoBodyForce>("MeasureTwoBodyForce", init<PartSpecs*, size_t, size_t, bool, size_t>())
-			.def("save", &MeasureTwoBodyForce::save)
-			.def("load", &MeasureTwoBodyForce::load)
-			;
 
 		class_<System>("System", init<CellColony*, Box*, size_t>())
 			.def("addVelocity", &System::addVelocity)
 			.def("updatePositions", &System::updatePositions)
 			.def("computeForces", &System::computeForces)
 			.def("computeForcesVoronoi", &System::computeForcesVoronoi)
-			.def("collectForces",  &System::collect)
+			//.def("collectForces",  &System::collect)
 			.def("getColony", &System::getColony)
 			.def("getNumberOfCells", &System::getNumberOfCells)
 			.def("cellsAreBroken", &System::cellsAreBroken)
@@ -178,7 +178,6 @@ namespace pywrapper {
 			.def("setPartSpecs", &System::setPartSpecs)
 			.def("addPartSpecs", &System::addPartSpecs)
 			.def("setCycleLength", &System::setCycleLength)
-			.def("registerTwoBodyForceMeasurement", &System::registerTwoBodyForceMeasurement)
 			;
 
 

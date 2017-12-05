@@ -14,18 +14,19 @@
 #include "../particles/PartSpecs.h"
 #include "../utils/myOpenmp.h"
 
+#include "../interactions/PlanarWall.h"
 
 #include "../particles/CellColony.h"
-#include "../particles/SMTYSpecs.h"
-#include "../particles/SMTYSpecsNOCIL.h"
-#include "../particles/SMTYSpecsAdhesion.h"
-#include "../particles/SMTYSpecsSticky.h"
-#include "../particles/SMTYSpecsCycle.h"
-#include "../particles/SMTYSpecsCycleSoftCore.h"
+//#include "../particles/SMTYSpecs.h"
+//#include "../particles/SMTYSpecsNOCIL.h"
+//#include "../particles/SMTYSpecsAdhesion.h"
+//#include "../particles/SMTYSpecsSticky.h"
+//#include "../particles/SMTYSpecsCycle.h"
+//#include "../particles/SMTYSpecsCycleSoftCore.h"
 #include "../particles/SMTYSpecsCycleSoftCoreNOCIL.h"
+//#include "../particles/MonoZimm.h"
 
 
-#include "../particles/MonoZimm.h"
 
 
 #include "../system/System.h"
@@ -85,6 +86,30 @@ namespace pywrapper{
 			return this->get_override("cellDuplicates")();
 		}
 
+		void computeOneBodyForces(Part* part1, Box* box) const override
+		{
+			this->get_override("computeOneBodyForces")();
+		}
+
+		void computeTwoBodyForces(Part* part1, const Part* part2, Box* box) const override
+		{
+			this->get_override("computeTwoBodyForces")();
+		}
+
+		void updateStage(size_t time, Cell* cell) const override
+		{
+			this->get_override("updateStage")();
+		}
+
+		bool endOfDivisionStage(Cell* cell, const Box* box) const
+		{
+			return this->get_override("endOfDivisionStage")();
+		}
+
+		bool divisionCriterion(Cell* cell, const Box* box) const
+		{
+			return this->get_override("divisionCriterion")();
+		}
 
 	};
 
