@@ -50,9 +50,9 @@ public:
 
 	void addVelocity(double vx, double vy, size_t cell, size_t  type);
 
-	void addOnePartCell(double x, double y, double vx, double vy, unsigned short stage);
+	void addOnePartCell(double x, double y, double vx, double vy, unsigned short stage, size_t currentStageTime);
 	void addTwoPartsCell(double x1, double y1, double vx1, double vy1,
-		double x2, double y2, double vx2, double vy2, unsigned short stage);
+		double x2, double y2, double vx2, double vy2, unsigned short stage, size_t currentStageTime);
 	void assignCycleStage(unsigned short cycleLength);
 
 
@@ -76,24 +76,6 @@ public:
 	void reserve(size_t i);
 	void erase(size_t i);
 
-
-private:
-	struct LightPart {
-		double x;
-		double y;
-		double vx;
-		double vy;
-	};
-
-	struct LightPartwCell {
-		double x;
-		double y;
-		double vx;
-		double vy;
-		size_t cell;
-		size_t type;
-		size_t stage;
-	};
 
 
 };

@@ -23,7 +23,10 @@
 //#include "../particles/SMTYSpecsSticky.h"
 //#include "../particles/SMTYSpecsCycle.h"
 //#include "../particles/SMTYSpecsCycleSoftCore.h"
-#include "../particles/SMTYSpecsCycleSoftCoreNOCIL.h"
+#include "../particles/SMTYSpecsCycleSoftCore.h"
+#include "../particles/SMTYSpecsCycleLJ.h"
+#include "../particles/SMTYSpecsCoarseGrained.h"
+
 //#include "../particles/MonoZimm.h"
 
 
@@ -81,29 +84,14 @@ namespace pywrapper{
 			return this->get_override("cellIsDead")();
 		}
 
-		bool cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const override
+		bool cellDivides(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const override
 		{
-			return this->get_override("cellDuplicates")();
+			return this->get_override("cellDivides")();
 		}
 
-		void computeOneBodyForces(Part* part1, Box* box) const override
+		bool endOfSuccessfullDivisionStage(Cell* cell, const Box* box) const
 		{
-			this->get_override("computeOneBodyForces")();
-		}
-
-		void computeTwoBodyForces(Part* part1, const Part* part2, Box* box) const override
-		{
-			this->get_override("computeTwoBodyForces")();
-		}
-
-		void updateStage(size_t time, Cell* cell) const override
-		{
-			this->get_override("updateStage")();
-		}
-
-		bool endOfDivisionStage(Cell* cell, const Box* box) const
-		{
-			return this->get_override("endOfDivisionStage")();
+			return this->get_override("endOfSuccessfullDivisionStage")();
 		}
 
 		bool divisionCriterion(Cell* cell, const Box* box) const

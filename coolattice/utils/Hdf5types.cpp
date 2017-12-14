@@ -45,7 +45,8 @@ const H5::CompType& Hdf5types::getPartTypewCell()
 			m_partTypewCell->insertMember("vy", HOFFSET(LightPartwCell, vy),     H5::PredType::NATIVE_DOUBLE);
 			m_partTypewCell->insertMember("c",  HOFFSET(LightPartwCell, cell),   H5::PredType::NATIVE_INT);
 			m_partTypewCell->insertMember("t",  HOFFSET(LightPartwCell, type),   H5::PredType::NATIVE_INT);
-			m_partTypewCell->insertMember("s",  HOFFSET(LightPartwCell, stage),  H5::PredType::NATIVE_INT);
+			m_partTypewCell->insertMember("s",  HOFFSET(LightPartwCell, currentStage),  H5::PredType::NATIVE_INT);
+			m_partTypewCell->insertMember("st", HOFFSET(LightPartwCell, currentStageTime),	 H5::PredType::NATIVE_INT);
 		}
 	};
 	static Initializer ListInitializationGuard;

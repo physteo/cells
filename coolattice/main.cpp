@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 
 	// random number generator seed **********************************************
 	//TODO URGENT: change to proper seed.
-	std::string seedStr = "";//inputJson.at("SIMULATION").at("seed").dump();
+	std::string seedStr = "1";//inputJson.at("SIMULATION").at("seed").dump();
 #ifdef LINUX
 	unsigned long int seed = mix(clock(), time(NULL), getpid());
 #else

@@ -25,7 +25,7 @@
 #include <algorithm>
 
 // voro++
-#include "../utils/voropp/voro++.hh"
+//#include "../utils/voropp/voro++.hh"
 
 extern gsl_rng *g_rng;
 
@@ -48,13 +48,6 @@ public:
 	void addPartSpecs(PartSpecs* partSpecsIn);
 	void setCycleLength(unsigned short cycleLengthIn);
 
-	//void saveMeasureTwoBodyForce()
-	//{
-	//	Hdf5 file{ "C:/Users/matte/Desktop/testMeasure.h5", 2 };
-	//	measureTwoBodyForce->save(&file, "CIL");
-	//	file.closeFile();
-	//}
-
 	void resizePartsDataSlots(size_t slots);
 
 	void clearSubBoxes();
@@ -63,9 +56,9 @@ public:
 	CellColony getColony() const { return cells; }
 
 	void computeForces(size_t time, double dt);
-	void computeForcesVoronoi(size_t time, double dt);
+	//void computeForcesVoronoi(size_t time, double dt);
 
-
+	void updateStages(size_t time);	
 	int updatePositions(size_t time, double dt, bool update);
 
 	//void collect();
@@ -74,7 +67,7 @@ public:
 
 	void eraseRegionCells(double minX, double maxX, double minY, double maxY);
 	void eraseDeadCells();
-	void duplicateCells();
+	void divideCells();
 	void resizeCellColony(size_t maxCells) = delete; // deleted because of the issues with cell numbering arising when adding/erasing new cells
 
 	size_t getTotalNumOfParts();

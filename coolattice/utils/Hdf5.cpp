@@ -100,7 +100,10 @@ std::string Hdf5::readAttributeString(const char* name, const char* attribute)
 }
 
 
-
+const char* Hdf5::readName(const char* name)
+{
+	return readAttributeString(name, "name").c_str();
+}
 
 H5::Group Hdf5::createGroupNoThrow(const char* name)
 {

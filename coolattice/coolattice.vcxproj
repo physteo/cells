@@ -180,7 +180,9 @@
     <ClCompile Include="particles\CellColony.cpp" />
     <ClCompile Include="particles\Part.cpp" />
     <ClCompile Include="particles\PartSpecs.cpp" />
-    <ClCompile Include="particles\SMTYSpecsCycleSoftCoreNOCIL.cpp" />
+    <ClCompile Include="particles\SMTYSpecsCoarseGrained.cpp" />
+    <ClCompile Include="particles\SMTYSpecsCycleLJ.cpp" />
+    <ClCompile Include="particles\SMTYSpecsCycleSoftCore.cpp" />
     <ClCompile Include="system\System.cpp" />
     <ClCompile Include="system\SystemTrajectory.cpp" />
     <ClCompile Include="utils\Hdf5.cpp" />
@@ -269,7 +271,14 @@
     <ClInclude Include="particles\Part.h" />
     <ClInclude Include="particles\PartSpecs.h" />
     <ClInclude Include="particles\PartType.h" />
-    <ClInclude Include="particles\SMTYSpecsCycleSoftCoreNOCIL.h" />
+    <ClInclude Include="particles\SMTYSpecsCoarseGrained.h" />
+    <ClInclude Include="particles\SMTYSpecsCycleLJ.h" />
+    <ClInclude Include="particles\SMTYSpecsCycleSoftCore.h" />
+    <ClInclude Include="particles\utilities\checkBroken.h" />
+    <ClInclude Include="particles\utilities\checkDead.h" />
+    <ClInclude Include="particles\utilities\checkLength.h" />
+    <ClInclude Include="particles\utilities\division.h" />
+    <ClInclude Include="particles\utilities\cycleManager.h" />
     <ClInclude Include="pythonInterface\Parameters.h" />
     <ClInclude Include="pythonInterface\wrappers.h" />
     <ClInclude Include="system\System.h" />

@@ -2,7 +2,7 @@
 #include "../utils/Hdf5.h"
 #include "../pythonInterface/Parameters.h"
 #include "PartSpecs.h"
-#include "../interactions/SMSoftCore.h"
+#include "../interactions/LJForce.h"
 
 #include <gsl/gsl_rng.h> 
 #include <gsl/gsl_randist.h>
@@ -14,18 +14,17 @@ extern gsl_rng *g_rng;
 #include "utilities/cycleManager.h"
 
 // Schnyder-Molina-Tanaka-Yamamoto model for cells, with Soft Core repulsion/attraction and no noise(for the moment).
-class SMTYSpecsCycleSoftCore : public PartSpecs
+class SMTYSpecsCycleLJ : public PartSpecs
 {
 
 	// name
-	const std::string specsName = "SMTY-Cycle-SoftCore";
+	const std::string specsName = "SMTY-Cycle-LJ";
 
 	// params
 	double m_motility;
 
-	double m_ewell;
-	double m_ecore;
-	double m_xi;
+	double m_epsilon;
+	double m_cut;
 
 	double m_rMaxSquared;
 	double m_kappa;
@@ -39,16 +38,16 @@ class SMTYSpecsCycleSoftCore : public PartSpecs
 	double m_ssCellLength;
 	double m_ssSpeed;
 	double m_migrationTime;
-	
+
 	enum {
-		EXTENSION   = 0,
+		EXTENSION = 0,
 		CONTRACTION = 1,
-		DIVISION    = 2
+		DIVISION = 2
 	};
 
 public:
-	SMTYSpecsCycleSoftCore();
-	SMTYSpecsCycleSoftCore(const Parameters* params, size_t cycleLength, size_t divisionCycleLength, bool CIL, bool division);
+	SMTYSpecsCycleLJ();
+	SMTYSpecsCycleLJ(const Parameters* params, size_t cycleLength, size_t divisionCycleLength, bool CIL, bool division);
 
 	inline double getSigBB(size_t stage) const { return this->partTypes.at(stage).getPartTypes().at(1).sig; }
 	inline size_t getCycleLength() const { return this->m_cycleLength; }
@@ -64,8 +63,8 @@ public:
 	bool save(Hdf5* file, const char* groupName) const    override;
 
 private:
-	SMTYSpecsCycleSoftCore(double sigAA, double sigBB, double motility,
-		double ewell, double ecore, double xi, double rMaxSquared, double kappa, double frictionF, double originalFrictionF,
+	SMTYSpecsCycleLJ(double sigAA, double sigBB, double motility,
+		double epsilon, double cut, double rMaxSquared, double kappa, double frictionF, double originalFrictionF,
 		double frictionB, double originalFrictionB, double massF, double massB,
 		double rateDuplication, double thresholdDuplication,
 		size_t cycleLength, size_t divisionCycleLength, bool CIL, bool division);

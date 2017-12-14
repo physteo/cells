@@ -3,17 +3,6 @@
 #define DEBUG1
 
 
-//System::System()
-//{
-//	cells.reserve(0);
-//	parts.resize(0);
-//	box = nullptr;
-//	measureTwoBodyForce = nullptr;
-//	cycleLength = 0;
-//	maxPredictedCells = 0;
-//	cellCounter = 0;
-//}
-
 System::System(size_t n)
 {
 	cells.reserve(n);
@@ -56,8 +45,6 @@ System::System(CellColony* cellsIn, Box* boxIn, size_t maxPredictedCellsIn) : Sy
 
 	clearSubBoxes();  
 	setSubBoxes();
-	std::cout << this << std::endl;
-
 	
 }
 
@@ -67,11 +54,11 @@ void System::addPartSpecs(PartSpecs* partSpecsIn)
 	this->partSpecs.push_back(partSpecsIn);
 }
 
+
 void System::setCycleLength(unsigned short cycleLengthIn)
 {
 	cycleLength = cycleLengthIn;
 }
-
 
 
 void System::resizePartsDataSlots(size_t slots)
@@ -81,6 +68,7 @@ void System::resizePartsDataSlots(size_t slots)
 		parts.at(n)->data.resize(slots);
 	}
 }
+
 
 void System::constructPartsVector()
 {
@@ -95,6 +83,7 @@ void System::constructPartsVector()
 	}
 }
 
+
 size_t System::getTotalNumOfParts()
 {
 	size_t total = 0;
@@ -104,6 +93,7 @@ size_t System::getTotalNumOfParts()
 	}
 	return total;
 }
+
 
 void System::printCoord()
 {
@@ -119,6 +109,7 @@ void System::printCoord()
 		}
 	}
 }
+
 
 void System::printCoordDiff()
 {
@@ -168,7 +159,6 @@ void System::clearSubBoxes()
 
 void System::setPartSpecs(PartSpecs* partSpecsIn)
 { 
-	//this->partSpecs = partSpecsIn;
 	partSpecs.at(0) = partSpecsIn;
 }
 
@@ -190,7 +180,6 @@ void System::resetVelocities()
 }
 
 
-
 void System::computeOneBodyForces(Part* part1)
 {
 	partSpecs.at(0)->computeOneBodyForces(part1, box);
@@ -202,30 +191,9 @@ void System::computeTwoBodyForces(Part* part1, const Part* part2)
 	partSpecs.at(0)->computeTwoBodyForces(part1, part2, box);
 }
 
-//x//size_t System::computeStage(size_t time, size_t n)
-//x//{
-//x//	return partSpecs.at(0)->computeStage(time, parts.at(n));
-//x//}
-//x//
-//x//size_t System::computeStage(size_t time, Part* part)
-//x//{
-//x//	return partSpecs.at(0)->computeStage(time, part);
-//x//}
 
-//size_t System::computeStage(size_t time, Part* part)
-//{
-//	unsigned short partStageTime = part->stage;
-//	return ((time + partStageTime) % cycleLength) / (cycleLength / partSpecs.size());
-//}
-
-void System::computeForces(size_t time, double dt)
+void System::updateStages(size_t time)
 {
-	resetVelocities();
-
-
-
-	//std::cout << time << std::endl;
-
 #ifdef OMP
 #pragma omp parallel for schedule(guided)
 #endif
@@ -234,8 +202,16 @@ void System::computeForces(size_t time, double dt)
 		// update the stage of the particle
 		partSpecs.at(0)->updateStage(time, &cells.at(c));
 	}
+}
 
-	// loop over all parts //TODO URGENT PUT AGAIN THE OMP
+
+
+
+void System::computeForces(size_t time, double dt)
+{
+	resetVelocities();
+	updateStages(time);
+
 #ifdef OMP
 #pragma omp parallel for schedule(guided)
 #endif
@@ -264,18 +240,16 @@ void System::computeForces(size_t time, double dt)
 		{
 			Part* part2 = parts.at(m);
 #endif
-			if (part2 != part1) {
-				computeTwoBodyForces(part1, part2);
+				if (part2 != part1) {
+					computeTwoBodyForces(part1, part2);
 #ifdef LIST
-			}
-			part2 = part2->next;
+				}
+				part2 = part2->next;
 #endif
-
+			}
 
 		}
-
-			}
-	// update particle's internal stage time
+	// update particle's internal time
 	part1->currentStageTime++;
 
 	}
@@ -284,32 +258,8 @@ void System::computeForces(size_t time, double dt)
 
 
 
-
-//void System::divideCell(Cell* cell)
-//{
-//	bool duplicated = false;
-//
-//	std::vector<Cell> newCells;
-//	if (this->partSpecs.at(0)->cellDuplicates(cell, &newCells, box, cellCounter, cycleLength))
-//	{
-//		for (size_t i = 0; i < newCells.size(); i++)
-//		{
-//			cells.push_back(newCells.at(i));
-//		}
-//		duplicated = true;
-//	}
-//
-//	
-//
-//	if (duplicated)
-//	{
-//		this->constructPartsVector();
-//		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
-//	}
-//}
-
-
-
+// voronoi stuff
+/*
 void System::computeForcesVoronoi(size_t time, double dt)
 {
 	resetVelocities();
@@ -425,6 +375,7 @@ void System::computeForcesVoronoi(size_t time, double dt)
 	}
 
 }
+*/
 
 
 
@@ -458,10 +409,8 @@ int System::updatePositions(size_t time, double dt, bool update)
 		//x//size_t stage = computeStage(time, n);
 		//x//double friction = this->partSpecs.at(stage)->getFriction(pt);
 		//x//double mass = this->partSpecs.at(stage)->partTypes.getPartTypes().at(pt).mass;
-		
-		double friction = this->partSpecs.at(0)->getFriction(parts.at(n)->currentStage, pt);
-		double mass     = this->partSpecs.at(0)->partTypes.at(parts.at(n)->currentStage).getPartTypes().at(pt).mass;
-
+		double friction = this->partSpecs.at(0)->getFriction(parts.at(n));
+		double mass		= this->partSpecs.at(0)->getMass(parts.at(n));
 
 #ifdef NEWDEBUG
 		Vector oldPosition = parts.at(n)->position;
@@ -472,20 +421,23 @@ int System::updatePositions(size_t time, double dt, bool update)
 
 		//parts.at(n)->position += parts.at(n)->velocity * (dt / (friction * mass));
 		parts.at(n)->position += parts.at(n)->velocity * (dt / (friction));
+		this->box->remap(parts.at(n)->position); // TODO: URGENT. VERIFY THIS MAKES SENSE!
 
 #ifdef NEWDEBUG
-		Vector difference = parts.at(n)->position + (oldPosition * (-1));
+		Vector difference;// = parts.at(n)->position + (oldPosition * (-1));
+		box->computeDistanceVectorPBC(oldPosition, parts.at(n)->position, difference);
 		double diff = Vector::dotProduct(difference, difference);
 		if (diff > 1)
 		{
+			std::cout << "part: " << n << std::endl;
+			std::cout << "criminal part position: " << parts.at(n)->position.x << "," << parts.at(n)->position.y << std::endl;
 			parts.at(n)->myBoxCell->printSubCellList(0);
 			printf("parts size: %d\n", parts.size());
-			printf("parts size: %d\n", parts.size());
 			printf("diff: %e\n", diff);
-			result = 0;
+			result = 1;
 		}
 #endif
-	}
+	} 
 
 #ifdef LIST
 	if (update)
@@ -547,26 +499,28 @@ void System::eraseDeadCells()
 
 	if (deadCells)
 	{
+		std::cout << "Some cells died" << std::endl;
 		this->constructPartsVector();
 		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
 	}
 }
 
-
-void System::duplicateCells()
+// loops over all cells and check if they are at the end of a division stage, using the partSpecs method "endOfDivisionStage".
+// if a cell is at the end of a division stage, then it divides
+void System::divideCells()
 {
-	bool duplicated = false;
+	bool divided = false;
 	for (size_t c = 0; c < cells.size(); c++)
 	{
 		Cell* cell = &cells.at(c);
 
-		if (partSpecs.at(0)->endOfDivisionStage(cell, box))
+		if (partSpecs.at(0)->endOfSuccessfullDivisionStage(cell, box))
 		{
 			// cell divides
 			std::vector<Cell> newCells;
 			
 			// new cells are created and put into newCells
-			this->partSpecs.at(0)->cellDuplicates(cell, &newCells, box, cellCounter, cycleLength);
+			this->partSpecs.at(0)->cellDivides(cell, &newCells, box, cellCounter, cycleLength);
 
 			// the vector of new cells is inserted into the cells vector
 			for (size_t i = 0; i < newCells.size(); i++)
@@ -574,16 +528,16 @@ void System::duplicateCells()
 				cells.push_back(newCells.at(i));
 			}
 
-			duplicated = true;
+			divided = true;
 		}
 		
 	}
 
 	// if new cells were created, update the parts vector and the subBoxes
-	if (duplicated)
+	if (divided)
 	{
 		this->constructPartsVector();
-		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the dead cells
+		this->setSubBoxes();			// TODO: should be possible to update only the box which contains the new cells
 	}
 }
 

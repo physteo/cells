@@ -2,31 +2,11 @@
 
 #include "Hdf5.h"
 #include "../math/Vector.h"
+#include "../particles/Part.h"
 
 // contains compound types defined by the user
-
 class Hdf5types
 {
-
-	struct LightPart
-	{
-		double  x;
-		double  y;
-		double vx;
-		double vy;
-	};
-
-	struct LightPartwCell
-	{
-		double  x;
-		double  y;
-		double vx;
-		double vy;
-		size_t cell;
-		size_t type;
-		size_t stage;
-	};
-
 private:
 	static H5::CompType* m_partType;
 	static H5::CompType* m_partTypewCell;
@@ -37,7 +17,6 @@ public:
 	static const H5::CompType& getPartTypewCell();
 	static const H5::CompType& getSimonType();
 
-
 	Hdf5types();
 	~Hdf5types();
 
@@ -47,6 +26,5 @@ public:
 	// ... or transferred (this is just for lazyness)
 	Hdf5types(Hdf5types&& other) = delete;
 	Hdf5types& operator=(Hdf5types&& other) = delete;
-
 };
 

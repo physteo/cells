@@ -1,7 +1,7 @@
 #pragma once
 
 #include "H5Cpp.h"
-
+#include <iostream>
 class Hdf5;
 
 
@@ -36,9 +36,8 @@ public:
 	double readAttributeDouble(const char* name, const char* attribute);
 	void   writeAttributeString(const char* name, const char* attribute, const std::string& value);
 	std::string readAttributeString(const char* name, const char* attribute);
-	
 
-
+	const char* readName(const char* name);
 
 public:
 	H5::Group  createGroupNoThrow(const char*);

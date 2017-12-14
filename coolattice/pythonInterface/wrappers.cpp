@@ -21,6 +21,7 @@ namespace pywrapper {
 
 		class_<Hdf5>("Hdf5", init<char*, unsigned int>())
 			.def("closeFile", &Hdf5::closeFile)
+			.def("readName", &Hdf5::readName)
 			;
 
 		class_<myOpenmp>("Omp", init<int>())
@@ -71,9 +72,8 @@ namespace pywrapper {
 			.def("save", pure_virtual(&PartSpecs::save))
 			.def("cellIsBroken", pure_virtual(&PartSpecs::cellIsBroken))
 			.def("cellIsDead", pure_virtual(&PartSpecs::cellIsDead))
-			.def("cellDuplicates", pure_virtual(&PartSpecs::cellDuplicates))
-			.def("endOfDivisionStage",	pure_virtual(&PartSpecs::endOfDivisionStage))
-			.def("divisionCriterion", pure_virtual(&PartSpecs::divisionCriterion))
+			.def("cellDivides", pure_virtual(&PartSpecs::cellDivides))
+			.def("endOfSuccessfullDivisionStage",	pure_virtual(&PartSpecs::endOfSuccessfullDivisionStage))
 			.def("updateStage", pure_virtual(&PartSpecs::updateStage))
 			;
 /*
@@ -107,16 +107,34 @@ namespace pywrapper {
 			;
 */
 
-		class_<SMTYSpecsCycleSoftCoreNOCIL, bases<PartSpecs> >("SMTYSpecsCycleSoftCoreNOCIL", init<>())
-			.def(init<Parameters*, size_t, size_t>())
-			.def("save", &SMTYSpecsCycleSoftCoreNOCIL::save)
-			.def("load", &SMTYSpecsCycleSoftCoreNOCIL::load)
-			.def("cellIsBroken", &SMTYSpecsCycleSoftCoreNOCIL::cellIsBroken)
-			.def("cellIsDead", &SMTYSpecsCycleSoftCoreNOCIL::cellIsDead)
-			.def("cellDuplicates", &SMTYSpecsCycleSoftCoreNOCIL::cellDuplicates)
-			.def("getCycleLength", &SMTYSpecsCycleSoftCoreNOCIL::getCycleLength)
+		class_<SMTYSpecsCycleLJ, bases<PartSpecs> >("SMTYSpecsCycleLJ", init<>())
+			.def(init<Parameters*, size_t, size_t, size_t, bool>())
+			.def("save", &SMTYSpecsCycleLJ::save)
+			.def("load", &SMTYSpecsCycleLJ::load)
+			.def("cellIsBroken",   &SMTYSpecsCycleLJ::cellIsBroken)
+			.def("cellIsDead",     &SMTYSpecsCycleLJ::cellIsDead)
+			.def("cellDivides",    &SMTYSpecsCycleLJ::cellDivides)
+			.def("getCycleLength", &SMTYSpecsCycleLJ::getCycleLength)
 			;
 
+		class_<SMTYSpecsCycleSoftCore, bases<PartSpecs> >("SMTYSpecsCycleSoftCore", init<>())
+			.def(init<Parameters*, size_t, size_t, size_t, bool>())
+			.def("save", &SMTYSpecsCycleSoftCore::save)
+			.def("load", &SMTYSpecsCycleSoftCore::load)
+			.def("cellIsBroken", &SMTYSpecsCycleSoftCore::cellIsBroken)
+			.def("cellIsDead", &SMTYSpecsCycleSoftCore::cellIsDead)
+			.def("cellDivides", &SMTYSpecsCycleSoftCore::cellDivides)
+			.def("getCycleLength", &SMTYSpecsCycleSoftCore::getCycleLength)
+			;
+
+		class_<SMTYSpecsCoarseGrained, bases<PartSpecs> >("SMTYSpecsCoarseGrained", init<>())
+			.def(init<Parameters*, size_t, size_t, bool>())
+			.def("save",			&SMTYSpecsCoarseGrained::save)
+			.def("load",			&SMTYSpecsCoarseGrained::load)
+			.def("cellIsBroken",	&SMTYSpecsCoarseGrained::cellIsBroken)
+			.def("cellIsDead",		&SMTYSpecsCoarseGrained::cellIsDead)
+			.def("cellDivides",		&SMTYSpecsCoarseGrained::cellDivides)
+			;
 /*
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
 			.def(init<double, double, double, double, double, double, double, double, double, double, double>())
@@ -164,7 +182,7 @@ namespace pywrapper {
 			.def("addVelocity", &System::addVelocity)
 			.def("updatePositions", &System::updatePositions)
 			.def("computeForces", &System::computeForces)
-			.def("computeForcesVoronoi", &System::computeForcesVoronoi)
+			//.def("computeForcesVoronoi", &System::computeForcesVoronoi)
 			//.def("collectForces",  &System::collect)
 			.def("getColony", &System::getColony)
 			.def("getNumberOfCells", &System::getNumberOfCells)
@@ -172,7 +190,7 @@ namespace pywrapper {
 			.def("twinCells", &System::twinCells)
 			.def("eraseDeadCells", &System::eraseDeadCells)
 			.def("eraseRegionCells", &System::eraseRegionCells)
-			.def("duplicateCells", &System::duplicateCells)
+			.def("divideCells", &System::divideCells)
 			.def("setTypeFriction", &System::setTypeFriction)
 			.def("getTypeFriction", &System::getTypeFriction)
 			.def("setPartSpecs", &System::setPartSpecs)

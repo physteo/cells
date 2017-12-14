@@ -1,12 +1,13 @@
-﻿#include "SMTYSpecsCycleSoftCoreNOCIL.h"
+#include "SMTYSpecsCycleLJ.h"
 
-SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL() : PartSpecs(2, 3)
+
+SMTYSpecsCycleLJ::SMTYSpecsCycleLJ()
 {
-	name = "SMTY-Cycle-SoftCore-NOCIL";
-	m_numberOfStages = this->partTypes.size();
+
 }
 
-void SMTYSpecsCycleSoftCoreNOCIL::build()
+
+void SMTYSpecsCycleLJ::build()
 {
 	std::cout << " *** System's steady-state(ss) characteristics *** " << std::endl;
 	std::cout << " - Cell Length = " << m_ssCellLength << std::endl;
@@ -15,22 +16,23 @@ void SMTYSpecsCycleSoftCoreNOCIL::build()
 
 	// stage EXTENSION
 	{
-		const double& sigAA     = this->partTypes.at(EXTENSION).getPartTypes().at(0).sig;
-		const double& sigBB     = this->partTypes.at(EXTENSION).getPartTypes().at(1).sig;
+		const double& sigAA = this->partTypes.at(EXTENSION).getPartTypes().at(0).sig;
+		const double& sigBB = this->partTypes.at(EXTENSION).getPartTypes().at(1).sig;
 		const double& frictionF = this->partTypes.at(EXTENSION).getPartTypes().at(0).friction;
 		const double& frictionB = this->partTypes.at(EXTENSION).getPartTypes().at(1).friction;
 
 		double sigAB = .5*(sigAA + sigBB);
 
 
-		SMSoftCore* scAA(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAA });
-		SMSoftCore* scAB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAB });
-		SMSoftCore* scBB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigBB });
+		LJForce* lja(new LJForce{ sigAA, m_epsilon, (sigAA *   sigAA * m_cut * m_cut) });
+		LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
+		LJForce* ljc(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
+		LJForce* ljd(new LJForce{ sigBB, m_epsilon, (sigBB *   sigBB * m_cut * m_cut) });
 
-		addInterForce(EXTENSION, 0, scAA);
-		addInterForce(EXTENSION, 1, scAB);
-		addInterForce(EXTENSION, 2, scAB);
-		addInterForce(EXTENSION, 3, scBB);
+		addInterForce(EXTENSION, 0, lja);
+		addInterForce(EXTENSION, 1, ljb);
+		addInterForce(EXTENSION, 2, ljc);
+		addInterForce(EXTENSION, 3, ljd);
 
 		FeneForce* feneAA(new FeneForce{ m_rMaxSquared, m_kappa });
 		FeneForce* feneAB(new FeneForce{ m_rMaxSquared, m_kappa });
@@ -42,10 +44,18 @@ void SMTYSpecsCycleSoftCoreNOCIL::build()
 		addIntraForce(EXTENSION, 2, feneBA);
 		addIntraForce(EXTENSION, 3, feneBB);
 
-		ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ m_motility * m_ssCellLength });
-		addIntraForce(EXTENSION, 1, nocil);
-		addIntraForce(EXTENSION, 2, nocil);
-		
+
+		if (m_CIL == false) {
+			ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ m_motility * m_ssCellLength });
+			addIntraForce(EXTENSION, 1, nocil);
+			addIntraForce(EXTENSION, 2, nocil);
+		}
+		else if (m_CIL == true)
+		{
+			CilForce*  cil(new CilForce{ m_motility });
+			addIntraForce(EXTENSION, 1, cil);
+			addIntraForce(EXTENSION, 2, cil);
+		}
 		// noise
 		//partSpecs.oneBodyForces.at(0).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7})))); // TODO URGENT: pass dt etc
 		//partSpecs.oneBodyForces.at(1).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7 })))); // TODO URGENT: pass dt etc
@@ -53,21 +63,22 @@ void SMTYSpecsCycleSoftCoreNOCIL::build()
 
 	// stage CONTRACTION
 	{
-		const double& sigAA     = this->partTypes.at(CONTRACTION).getPartTypes().at(0).sig;
-		const double& sigBB     = this->partTypes.at(CONTRACTION).getPartTypes().at(1).sig;
+		const double& sigAA = this->partTypes.at(CONTRACTION).getPartTypes().at(0).sig;
+		const double& sigBB = this->partTypes.at(CONTRACTION).getPartTypes().at(1).sig;
 		const double& frictionF = this->partTypes.at(CONTRACTION).getPartTypes().at(0).friction;
 		const double& frictionB = this->partTypes.at(CONTRACTION).getPartTypes().at(1).friction;
 
 		double sigAB = .5*(sigAA + sigBB);
 
-		SMSoftCore* scAA(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAA });
-		SMSoftCore* scAB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAB });
-		SMSoftCore* scBB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigBB });
+		LJForce* lja(new LJForce{ sigAA, m_epsilon, (sigAA *   sigAA * m_cut * m_cut) });
+		LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
+		LJForce* ljc(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
+		LJForce* ljd(new LJForce{ sigBB, m_epsilon, (sigBB *   sigBB * m_cut * m_cut) });
 
-		addInterForce(CONTRACTION, 0, scAA);
-		addInterForce(CONTRACTION, 1, scAB);
-		addInterForce(CONTRACTION, 2, scAB);
-		addInterForce(CONTRACTION, 3, scBB);
+		addInterForce(CONTRACTION, 0, lja);
+		addInterForce(CONTRACTION, 1, ljb);
+		addInterForce(CONTRACTION, 2, ljc);
+		addInterForce(CONTRACTION, 3, ljd);
 
 		FeneForce* feneAA(new FeneForce{ m_rMaxSquared, m_kappa });
 		FeneForce* feneAB(new FeneForce{ m_rMaxSquared, m_kappa });
@@ -78,7 +89,7 @@ void SMTYSpecsCycleSoftCoreNOCIL::build()
 		addIntraForce(CONTRACTION, 1, feneAB);
 		addIntraForce(CONTRACTION, 2, feneBA);
 		addIntraForce(CONTRACTION, 3, feneBB);
-		
+
 		// no motility force!
 
 		// noise
@@ -86,24 +97,27 @@ void SMTYSpecsCycleSoftCoreNOCIL::build()
 		//partSpecs.oneBodyForces.at(1).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7 })))); // TODO URGENT: pass dt etc
 	}
 
-	// stage DIVISION
-	{
-		const double& sigAA = this->partTypes.at(CONTRACTION).getPartTypes().at(0).sig;
-		const double& sigBB = this->partTypes.at(CONTRACTION).getPartTypes().at(1).sig;
-		const double& frictionF = this->partTypes.at(CONTRACTION).getPartTypes().at(0).friction;
-		const double& frictionB = this->partTypes.at(CONTRACTION).getPartTypes().at(1).friction;
+
+	if (m_division) {
+		// stage DIVISION
+
+		const double& sigAA = this->partTypes.at(DIVISION).getPartTypes().at(0).sig;
+		const double& sigBB = this->partTypes.at(DIVISION).getPartTypes().at(1).sig;
+		const double& frictionF = this->partTypes.at(DIVISION).getPartTypes().at(0).friction;
+		const double& frictionB = this->partTypes.at(DIVISION).getPartTypes().at(1).friction;
 
 		double sigAB = .5*(sigAA + sigBB);
 
 
-		SMSoftCore* scAA(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAA });
-		SMSoftCore* scAB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAB });
-		SMSoftCore* scBB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigBB });
+		LJForce* lja(new LJForce{ sigAA, m_epsilon, (sigAA *   sigAA * m_cut * m_cut) });
+		LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
+		LJForce* ljc(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
+		LJForce* ljd(new LJForce{ sigBB, m_epsilon, (sigBB *   sigBB * m_cut * m_cut) });
 
-		addInterForce(DIVISION, 0, scAA);
-		addInterForce(DIVISION, 1, scAB);
-		addInterForce(DIVISION, 2, scAB);
-		addInterForce(DIVISION, 3, scBB);
+		addInterForce(DIVISION, 0, lja);
+		addInterForce(DIVISION, 1, ljb);
+		addInterForce(DIVISION, 2, ljc);
+		addInterForce(DIVISION, 3, ljd);
 
 		FeneForce* feneAA(new FeneForce{ m_rMaxSquared, m_kappa });
 		FeneForce* feneAB(new FeneForce{ m_rMaxSquared, m_kappa });
@@ -115,34 +129,51 @@ void SMTYSpecsCycleSoftCoreNOCIL::build()
 		addIntraForce(DIVISION, 2, feneBA);
 		addIntraForce(DIVISION, 3, feneBB);
 
-		// no cil force
-		ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ 2.0 * m_motility * m_ssCellLength }); // TODO urgent: remove 5.0
+		// propulsion force to both parts
+		ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ 2.0 * m_motility * m_ssCellLength }); // TODO urgent: remove hard coded value 2.0
 		addIntraForce(DIVISION, 1, nocil);
 		addIntraForce(DIVISION, 2, nocil);
+
+		// cycle manager
+		cycleManager = new ExtensionContractionDivision{ m_cycleLength, m_divisionCycleLength, m_rateDuplication, DIVISION };
+
+	}
+	else {
+		cycleManager = new ExtensionContraction{ m_cycleLength };
 	}
 
+	std::cout << this << std::endl;
 
 }
 
 
-SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL(double sigAA, double sigBB, double motility,
-	double ewell, double ecore, double xi, double rMaxSquared, double kappa, double frictionF, double originalFrictionF,
+SMTYSpecsCycleLJ::SMTYSpecsCycleLJ(double sigAA, double sigBB, double motility,
+	double epsilon, double cut, double rMaxSquared, double kappa, double frictionF, double originalFrictionF,
 	double frictionB, double originalFrictionB, double massF, double massB,
 	double rateDuplication, double thresholdDuplication,
-	size_t cycleLength, size_t divisionCycleLength) : SMTYSpecsCycleSoftCoreNOCIL()
+	size_t cycleLength, size_t divisionCycleLength, bool CIL, bool division)
 {
 
-	m_motility = motility;
-	m_ewell = ewell;
-	m_ecore = ecore;
-	m_xi    = xi;
+	m_division = division;
+	m_numberOfStages = division ? 3 : 2;
 
-	m_rMaxSquared          = rMaxSquared;
-	m_kappa                = kappa;
-	m_cycleLength          = cycleLength;
-	m_rateDuplication      = rateDuplication;
+	this->init(2, m_numberOfStages, specsName);
+
+	std::cout << "build name: " << this->name << std::endl;
+
+	m_motility = motility;
+	m_epsilon = epsilon;
+	m_cut = cut;
+
+	m_rMaxSquared = rMaxSquared;
+	m_kappa = kappa;
+	m_cycleLength = cycleLength;
+	m_rateDuplication = rateDuplication;
 	m_thresholdDuplication = thresholdDuplication;
 	m_divisionCycleLength = divisionCycleLength;
+
+	m_CIL = CIL;
+
 
 	// stage Extension
 	{
@@ -160,7 +191,7 @@ SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL(double sigAA, double si
 		if (frictionB <= 0) {
 			this->partTypes.at(EXTENSION).getPartTypes().at(1).friction = std::numeric_limits<double>::infinity();
 		}
-		else{
+		else {
 			this->partTypes.at(EXTENSION).getPartTypes().at(1).friction = frictionB;
 		}
 	}
@@ -184,9 +215,8 @@ SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL(double sigAA, double si
 		this->partTypes.at(CONTRACTION).getPartTypes().at(1).friction = originalFrictionB;
 	}
 
+	if (m_division) {
 
-	// stage Division
-	{
 		this->partTypes.at(DIVISION).getPartTypes().at(0).name = "F";
 		this->partTypes.at(DIVISION).getPartTypes().at(1).name = "B";
 		this->partTypes.at(DIVISION).getPartTypes().at(0).mass = massF;
@@ -196,6 +226,7 @@ SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL(double sigAA, double si
 		this->partTypes.at(DIVISION).getPartTypes().at(0).friction = originalFrictionF;
 		this->partTypes.at(DIVISION).getPartTypes().at(1).friction = originalFrictionB;
 	}
+
 
 	// characteristics
 	m_ssCellLength = sqrt(m_rMaxSquared) * sqrt(1.0 - m_kappa * (1.0 / originalFrictionF + 1.0 / originalFrictionB) / (m_motility / originalFrictionF));
@@ -207,8 +238,8 @@ SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL(double sigAA, double si
 }
 
 
-SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL(const Parameters* params, size_t cycleLength, size_t divisionCycleLength) :
-	SMTYSpecsCycleSoftCoreNOCIL(params->getParam(0),
+SMTYSpecsCycleLJ::SMTYSpecsCycleLJ(const Parameters* params, size_t cycleLength, size_t divisionCycleLength, bool CIL, bool division) :
+	SMTYSpecsCycleLJ(params->getParam(0),
 		params->getParam(1),
 		params->getParam(2),
 		params->getParam(3),
@@ -223,34 +254,36 @@ SMTYSpecsCycleSoftCoreNOCIL::SMTYSpecsCycleSoftCoreNOCIL(const Parameters* param
 		params->getParam(12),
 		params->getParam(13),
 		params->getParam(14),
-		params->getParam(15),
-		cycleLength, divisionCycleLength)
+		cycleLength, divisionCycleLength, CIL, division)
 {
 }
 
 
-bool SMTYSpecsCycleSoftCoreNOCIL::load(Hdf5* file, const char* groupName)
+bool SMTYSpecsCycleLJ::load(Hdf5* file, const char* groupName)
 {
 	try {
 		H5::Group group = file->openGroup(groupName);
 
 		std::string readName = file->readAttributeString(groupName, "name");
 		// check if name is the same
-		if (readName != name)
+		if (readName != specsName)
 		{
 			std::cerr << "Error: Trying to load a '" << readName << "' SystemSpecs into a '" << name << "' SystemSpecs." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 
 		m_motility = file->readAttributeDouble(groupName, "motility");
-		m_ewell = file->readAttributeDouble(groupName, "ewell");
-		m_ecore = file->readAttributeDouble(groupName, "ecore");
-		m_xi = file->readAttributeDouble(groupName, "xi");
+		m_epsilon = file->readAttributeDouble(groupName, "epsilon");
+		m_cut = file->readAttributeDouble(groupName, "cut");
 		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
 		m_kappa = file->readAttributeDouble(groupName, "k");
 		m_rateDuplication = file->readAttributeDouble(groupName, "rateDuplication");
 		m_thresholdDuplication = file->readAttributeDouble(groupName, "thresholdDuplication");
 		m_cycleLength = file->readAttributeInteger(groupName, "cycleLength");
+		m_CIL = file->readAttributeBool(groupName, "CIL");
+		m_division = file->readAttributeBool(groupName, "division");
+
+		this->init(2, m_division ? 3 : 2, specsName);
 
 		// save partType
 		char partTypesGroupName[64];
@@ -262,10 +295,11 @@ bool SMTYSpecsCycleSoftCoreNOCIL::load(Hdf5* file, const char* groupName)
 		strcat(partTypesGroupName, "/Types_1");
 		this->partTypes.at(CONTRACTION).load(file, partTypesGroupName);
 
-		strcpy(partTypesGroupName, groupName);
-		strcat(partTypesGroupName, "/Types_2");
-		this->partTypes.at(DIVISION).load(file, partTypesGroupName);
-
+		if (m_division) {
+			strcpy(partTypesGroupName, groupName);
+			strcat(partTypesGroupName, "/Types_2");
+			this->partTypes.at(DIVISION).load(file, partTypesGroupName);
+		}
 
 		m_ssCellLength = file->readAttributeDouble(groupName, "ssCellLength");
 		m_ssSpeed = file->readAttributeDouble(groupName, "ssSpeed");
@@ -287,7 +321,7 @@ bool SMTYSpecsCycleSoftCoreNOCIL::load(Hdf5* file, const char* groupName)
 
 
 
-bool SMTYSpecsCycleSoftCoreNOCIL::save(Hdf5* file, const char* groupName) const
+bool SMTYSpecsCycleLJ::save(Hdf5* file, const char* groupName) const
 {
 	try {
 		file->createNewGroup(groupName);
@@ -295,9 +329,8 @@ bool SMTYSpecsCycleSoftCoreNOCIL::save(Hdf5* file, const char* groupName) const
 
 		file->writeAttributeString(groupName, "name", name.c_str());
 		file->writeAttributeDouble(groupName, "motility", m_motility);
-		file->writeAttributeDouble(groupName, "ewell", m_ewell);
-		file->writeAttributeDouble(groupName, "ecore", m_ecore);
-		file->writeAttributeDouble(groupName, "xi", m_xi);
+		file->writeAttributeDouble(groupName, "epsilon", m_epsilon);
+		file->writeAttributeDouble(groupName, "cut", m_cut);
 		file->writeAttributeDouble(groupName, "rMax2", m_rMaxSquared);
 		file->writeAttributeDouble(groupName, "k", m_kappa);
 		file->writeAttributeDouble(groupName, "rateDuplication", m_rateDuplication);
@@ -307,6 +340,8 @@ bool SMTYSpecsCycleSoftCoreNOCIL::save(Hdf5* file, const char* groupName) const
 		file->writeAttributeDouble(groupName, "ssCellLength", m_ssCellLength);
 		file->writeAttributeDouble(groupName, "ssSpeed", m_ssSpeed);
 		file->writeAttributeDouble(groupName, "migrationTime", m_migrationTime);
+		file->writeAttributeBool(groupName, "CIL", m_CIL);
+		file->writeAttributeBool(groupName, "division", m_division);
 
 
 		// save partType
@@ -319,10 +354,11 @@ bool SMTYSpecsCycleSoftCoreNOCIL::save(Hdf5* file, const char* groupName) const
 		strcat(partTypesGroupName, "/Types_1");
 		this->partTypes.at(CONTRACTION).save(file, partTypesGroupName);
 
-		strcpy(partTypesGroupName, groupName);
-		strcat(partTypesGroupName, "/Types_2");
-		this->partTypes.at(DIVISION).save(file, partTypesGroupName);
-
+		if (m_division) {
+			strcpy(partTypesGroupName, groupName);
+			strcat(partTypesGroupName, "/Types_2");
+			this->partTypes.at(DIVISION).save(file, partTypesGroupName);
+		}
 
 
 		return true;
@@ -335,93 +371,37 @@ bool SMTYSpecsCycleSoftCoreNOCIL::save(Hdf5* file, const char* groupName) const
 }
 
 
-bool SMTYSpecsCycleSoftCoreNOCIL::cellIsBroken(const Cell* cell, const Box* box) const
+bool SMTYSpecsCycleLJ::cellIsBroken(const Cell* cell, const Box* box) const
 {
-	// in the SMTY system a cell is broken when it's length is
+	// in the SMTY system a cell is broken when its length is
 	// bigger than Rmax
-	Vector vectorDistance;
-	double distance2 = box->computeDistanceSquaredPBC(cell->getPart(0).position, cell->getPart(1).position, vectorDistance);
-	if (distance2 > m_rMaxSquared)
-	{
-		std::cerr << "Broken cell detected." << std::endl;
-		return true;
-	}
-	else if (std::isnan(distance2))
-	{
-		std::cerr << "Cell distance is NaN." << std::endl;
-		return true;
-	}
-
-	return false;
-
+	return CheckBroken::tooLong(cell, box, m_rMaxSquared);
 }
 
-
-bool SMTYSpecsCycleSoftCoreNOCIL::cellIsDead(const Cell* cell, const Box* box)
+bool SMTYSpecsCycleLJ::cellIsDead(const Cell* cell, const Box* box)
 {
-	return false;
-}
-
-bool SMTYSpecsCycleSoftCoreNOCIL::divisionCriterion(Cell* cell, const Box* box) const
-{
-	Vector vectorDistance;
-	double distance2 = box->computeDistanceSquaredPBC(cell->getPart(0).position, cell->getPart(1).position, vectorDistance);
-
+	// in the SMTY system a cell is dead when it's length is
+	// bigger than sigAA and it is not in the division stage
 	const double& sigAA = partTypes.at(DIVISION).getPartTypes().at(0).sig;
+	return CheckDead::cellIsPulledApart(cell, box, sigAA * sigAA, DIVISION);
 
-	if (distance2 >=  1.0 * sigAA * sigAA)
-	{
-		return true;
-	}
-	else {
-		return false;
-	}
 }
 
-bool SMTYSpecsCycleSoftCoreNOCIL::cellDuplicates(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
+bool SMTYSpecsCycleLJ::divisionCriterion(Cell* cell, const Box* box) const
 {
-		// bla
-		Cell newcell = Cell(2);
-		newcell.getPart(0).type = 0;
-		newcell.getPart(0).cell = cellCounter;
-
-		newcell.getPart(0).position = cell->getPart(1).position;
-
-		newcell.getPart(1).type = 1;
-		newcell.getPart(1).cell = cellCounter;
-		newcell.getPart(1).position = cell->getPart(1).position;
+	const double& sigAA = partTypes.at(DIVISION).getPartTypes().at(0).sig;
+	return CheckLength::cellIsLongerThan(sigAA * sigAA, cell, box);
+}
 
 
-		// set velocities to zero
-		newcell.getPart(0).velocity = Vector{ 0.0, 0.0 };
-		newcell.getPart(1).velocity = Vector{ 0.0, 0.0 };
-
-		// assign stage
-		unsigned short cellStage = gsl_rng_uniform_int(g_rng, cycleLength);
-		newcell.getPart(0).stage = cellStage;
-		newcell.getPart(1).stage = cellStage;
-
-
-		newcell.getPart(0).currentStage = EXTENSION;
-		newcell.getPart(1).currentStage = EXTENSION;
-		newcell.getPart(0).currentStageTime = 0;
-		newcell.getPart(1).currentStageTime = 0;
-
-
-		newCells->push_back(newcell);
-		cellCounter++;
-
-		// modify old cell. Do not change its cell ID!
-		cell->getPart(1).position = cell->getPart(0).position;
-		cell->getPart(0).velocity = Vector{ 0.0,0.0 };
-		cell->getPart(1).velocity = Vector{ 0.0,0.0 };
-		return true;
-		
+bool SMTYSpecsCycleLJ::cellDivides(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
+{
+	return DivisionMethods::standardDivision(cell, newCells, box, cellCounter, cycleLength, EXTENSION);
 }
 
 
 
-bool SMTYSpecsCycleSoftCoreNOCIL::endOfDivisionStage(Cell* cell, const Box* box) const
+bool SMTYSpecsCycleLJ::endOfSuccessfullDivisionStage(Cell* cell, const Box* box) const
 {
 	Part* part = &cell->getPart(0);
 
@@ -429,7 +409,7 @@ bool SMTYSpecsCycleSoftCoreNOCIL::endOfDivisionStage(Cell* cell, const Box* box)
 	{
 		if (part->currentStageTime == (m_divisionCycleLength - 1))
 		{
-			// division stage has just terminated. Check if the cell has to be duplicated
+			// division stage has just terminated. Check if the cell has to be divided
 			if (divisionCriterion(cell, box))
 				return true;
 			else
@@ -440,50 +420,9 @@ bool SMTYSpecsCycleSoftCoreNOCIL::endOfDivisionStage(Cell* cell, const Box* box)
 	}
 
 	return false;
-
 }
 
 
-void SMTYSpecsCycleSoftCoreNOCIL::updateStage(size_t time, Cell* cell) const
-{
-	size_t currentCycleLength;
-
-	Part* part1 = &cell->getPart(0);
-	Part* part2 = &cell->getPart(1);
-
-	if (part1->currentStage == DIVISION)
-	{
-		currentCycleLength = m_divisionCycleLength;
-	}
-	else
-	{
-		currentCycleLength = m_cycleLength;
-	}
-
-
-
-	if (    part1->currentStageTime == (currentCycleLength - 1)   )
-	{
-		// update stage
-		if (gsl_rng_uniform(g_rng) < m_rateDuplication)
-		{
-			//std::cout << "a cell is dividing in "<< part1->position.x << "," << part1->position.y << std::endl;
-			part1->currentStage = DIVISION;
-			part2->currentStage = DIVISION;
-		}
-		else
-		{
-			part1->currentStage = (part1->currentStage + 1) % (m_numberOfStages - 1);
-			part2->currentStage = (part2->currentStage + 1) % (m_numberOfStages - 1);
-		}
-
-		part1->currentStageTime = 0;
-		part2->currentStageTime = 0;
-	}
-
-
-
-}
 
 
 // new features

@@ -12,12 +12,12 @@ class Part
 public:
 	Vector position;
 	Vector velocity;
+	
 	std::vector<double> data;
 
 	size_t type;
 	size_t cell;
-	unsigned short stage;
-	unsigned short currentStage;
+	size_t currentStage;
 	size_t currentStageTime;
 
 	BoxCell* myBoxCell;
@@ -27,21 +27,15 @@ public:
 
 
 public:
-	Part() :  position(), velocity(), type(), cell(), stage(0), myBoxCell(nullptr), next(nullptr), prev(nullptr)
+	Part() :  position(), velocity(), type(), cell(), currentStageTime(0), currentStage(0), myBoxCell(nullptr), next(nullptr), prev(nullptr)
 	{
 		data.resize(0);
 		currentStage = 0;
 		currentStageTime = 0;
 	}
 
-	//Part(const Vector& positionIn, const Vector& velocityIn, size_t typeIn, size_t cellIn)
-	//	: position{ positionIn }, velocity{ velocityIn }, type(typeIn), cell(cellIn), stage(0), myBoxCell(nullptr), next(nullptr), prev(nullptr)
-	//{
-	//	data.resize(0);
-	//}
-
-	Part(const Vector& positionIn, const Vector& velocityIn, size_t typeIn, size_t cellIn, size_t stageIn)
-		: position{ positionIn }, velocity{ velocityIn }, type(typeIn), cell(cellIn), stage(stageIn), myBoxCell(nullptr), next(nullptr), prev(nullptr)
+	Part(const Vector& positionIn, const Vector& velocityIn, size_t typeIn, size_t cellIn, size_t stageIn, size_t currentStageTimeIn)
+		: position{ positionIn }, velocity{ velocityIn }, type(typeIn), cell(cellIn), currentStage(stageIn), currentStageTime(currentStageTimeIn), myBoxCell(nullptr), next(nullptr), prev(nullptr)
 	{
 		data.resize(0);
 		currentStage = 0;
@@ -76,4 +70,24 @@ public:
 	}
 
 	inline size_t getCell() const { return this->cell; }
+};
+
+
+
+struct LightPart {
+	double x;
+	double y;
+	double vx;
+	double vy;
+};
+
+struct LightPartwCell {
+	double x;
+	double y;
+	double vx;
+	double vy;
+	size_t cell;
+	size_t type;
+	size_t currentStage;
+	size_t currentStageTime;
 };

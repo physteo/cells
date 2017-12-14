@@ -7,7 +7,6 @@ TwoBodyForceVectors::TwoBodyForceVectors(size_t numberOfTypes)
 	interForces.resize(numberOfTypes * numberOfTypes);
 }
 
-
 const std::vector< TwoBodyForce* >& TwoBodyForceVectors::operator()(const Part* part1, const Part* part2, size_t numberOfTypes) const
 {
 	size_t a = part1->type;
@@ -22,27 +21,28 @@ const std::vector< TwoBodyForce* >& TwoBodyForceVectors::operator()(const Part* 
 		return interForces.at(a * numberOfTypes + b);
 }
 
-
-
-PartSpecs::PartSpecs(size_t n, size_t numberOfStages)
+void PartSpecs::init(size_t numberOfTypesIn, size_t numberOfStagesIn, const std::string& nameIn)
 {
-	numberOfTypes = n;
-	partTypes.reserve(numberOfStages);
-	twoBodyForces.reserve(numberOfStages);
-	oneBodyForces.reserve(numberOfStages);
-	for (size_t i = 0; i < numberOfStages; i++)
+	numberOfTypes = numberOfTypesIn;
+	partTypes.reserve(numberOfStagesIn);
+	twoBodyForces.reserve(numberOfStagesIn);
+	oneBodyForces.reserve(numberOfStagesIn);
+
+	for (size_t i = 0; i < numberOfStagesIn; i++)
 	{
 		partTypes.push_back(PartTypeVector());
 		partTypes.back().getPartTypes().resize(numberOfTypes);
 
 		oneBodyForces.push_back(OneBodyForceVector());
-		oneBodyForces.back().resize(n);
+		oneBodyForces.back().resize(numberOfTypesIn);
 
 		twoBodyForces.push_back(TwoBodyForceVectors());
-		twoBodyForces.back() = TwoBodyForceVectors{ n };
+		twoBodyForces.back() = TwoBodyForceVectors{ numberOfTypesIn };
 	}
-	name = "";
+	name = nameIn;
+
 }
+
 
 TwoBodyForce* PartSpecs::getTwoBodyForce(const Part* part1, const Part* part2, size_t index, size_t stage) const
 {
@@ -74,19 +74,21 @@ void PartSpecs::addInterForce(size_t stage, size_t slot, TwoBodyForce* force)
 	addTwoBodyForce(stage, slot, 0, force);
 }
 
+void PartSpecs::updateStage(size_t time, Cell* cell) const
+{
+	cycleManager->manage(time, cell);
+}
 
 void PartSpecs::addTwoBodyForce(size_t stage, size_t slot, int intra, TwoBodyForce* force)
 {
-	// TODO: see if swtiching the first case with the second brings any performance benefits,
-	// since intercellular forces are more likely than intra
-	if (intra == 1)
-	{
-		std::vector< std::vector<TwoBodyForce* > >& forces = this->twoBodyForces.at(stage).getIntraForces();
-		forces.at(slot).push_back(force);
-	}
-	else if (intra == 0)
+	if (intra == 0)
 	{
 		std::vector< std::vector<TwoBodyForce* > >& forces = this->twoBodyForces.at(stage).getInterForces();
+		forces.at(slot).push_back(force);
+	}
+	else if (intra == 1)
+	{
+		std::vector< std::vector<TwoBodyForce* > >& forces = this->twoBodyForces.at(stage).getIntraForces();
 		forces.at(slot).push_back(force);
 	}
 	else {
@@ -96,11 +98,10 @@ void PartSpecs::addTwoBodyForce(size_t stage, size_t slot, int intra, TwoBodyFor
 
 }
 
-
 void PartSpecs::computeOneBodyForces(Part* part1, Box* box) const
 {
 	size_t stage = part1->currentStage;
-	for (size_t f = 0; f < this->oneBodyForces.at(part1->type).size(); f++)
+	for (size_t f = 0; f < this->oneBodyForces.at(stage).at(part1->type).size(); f++)
 	{
 		const OneBodyForce* force = this->oneBodyForces.at(stage).at(part1->type).at(f); // .get() <- not here anymore cause i swtiched to raw pointers in order to make python interface
 		Vector addedForce;
@@ -112,11 +113,13 @@ void PartSpecs::computeOneBodyForces(Part* part1, Box* box) const
 void PartSpecs::computeTwoBodyForces(Part* part1, const Part* part2, Box* box) const
 {
 	size_t stage = part1->currentStage;
+	size_t numberOfTwoBodyForces = this->numberOfTwoBodyForces(part1, part2, stage);
 
-	for (size_t f = 0; f < this->numberOfTwoBodyForces(part1, part2, stage); f++)
+	for (size_t f = 0; f < numberOfTwoBodyForces; f++)
 	{
 		const TwoBodyForce* force = this->getTwoBodyForce(part1, part2, f, stage);
 		Vector addedForce;
 		force->updateForce(part1, part2, box, addedForce);
+
 	}
 }

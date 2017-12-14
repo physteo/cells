@@ -13,10 +13,10 @@ void CellColony::addVelocity(double vx, double vy, size_t cell, size_t  type)
 	this->m_cells.at(cell).getPart(type).velocity += Vector{vx, vy};
 }
 
-void CellColony::addOnePartCell(double x, double y, double vx, double vy, unsigned short stage)
+void CellColony::addOnePartCell(double x, double y, double vx, double vy, unsigned short stage, size_t currentStageTime)
 {
 	size_t cell = m_cells.size();
-	Part p{ Vector{ x, y }, Vector{ vx, vy }, 0, cell, stage };
+	Part p{ Vector{ x, y }, Vector{ vx, vy }, 0, cell, stage, currentStageTime };
 	std::vector<Part> parts = { p };
 #ifdef OBJECTPOOL
 	this->m_cells.addBackElement(parts);
@@ -30,11 +30,11 @@ void CellColony::addOnePartCell(double x, double y, double vx, double vy, unsign
 }
 
 void CellColony::addTwoPartsCell(double x1, double y1, double vx1, double vy1,
-	double x2, double y2, double vx2, double vy2, unsigned short stage)
+	double x2, double y2, double vx2, double vy2, unsigned short stage, size_t currentStageTime)
 {
 	size_t cell = m_cells.size();
-	Part p1{ Vector{ x1, y1 }, Vector{ vx1, vy1 }, 0, cell, stage };
-	Part p2{ Vector{ x2, y2 }, Vector{ vx2, vy2 }, 1, cell, stage };
+	Part p1{ Vector{ x1, y1 }, Vector{ vx1, vy1 }, 0, cell, stage, currentStageTime };
+	Part p2{ Vector{ x2, y2 }, Vector{ vx2, vy2 }, 1, cell, stage, currentStageTime };
 
 	std::vector<Part> parts = { p1, p2 };
 
@@ -56,7 +56,7 @@ void CellColony::assignCycleStage(unsigned short cycleLength)
 		unsigned short cellStage = gsl_rng_uniform_int(g_rng, cycleLength);
 		for (size_t j = 0; j < m_cells.at(i).getNumOfParts(); j++)
 		{
-			m_cells.at(i).getPart(j).stage = cellStage;
+			m_cells.at(i).getPart(j).currentStageTime = cellStage;
 		}
 	}
 }
@@ -103,8 +103,10 @@ void CellColony::populateSlab(double N, double f, double boxLengthX, double boxL
 			cell.getPart(0).type = 0;
 			cell.getPart(1).type = 1;
 
-			cell.getPart(0).stage = 0;
-			cell.getPart(1).stage = 0;
+			cell.getPart(0).currentStage     = 0;
+			cell.getPart(1).currentStage     = 0;
+			cell.getPart(0).currentStageTime = 0;
+			cell.getPart(1).currentStageTime = 0;
 
 			cell.getPart(0).cell = numberOfCells;
 			cell.getPart(1).cell = numberOfCells;
@@ -149,8 +151,11 @@ void CellColony::populate(double numPerLineX, double numPerLineY, double boxLeng
 			cell.getPart(0).type = 0;
 			cell.getPart(1).type = 1;
 
-			cell.getPart(0).stage = 0;
-			cell.getPart(1).stage = 0;
+			cell.getPart(0).currentStageTime = 0;
+			cell.getPart(1).currentStageTime = 0;
+			cell.getPart(0).currentStage     = 0;
+			cell.getPart(1).currentStage     = 0;
+
 
 			cell.getPart(0).cell = numberOfCells;
 			cell.getPart(1).cell = numberOfCells;
@@ -182,7 +187,7 @@ bool CellColony::save(Hdf5* file, const char* name) const
 	for (size_t i = 0; i < m_cells.size(); i++) {
 		for (size_t j = 0; j < m_cells.at(i).getNumOfParts(); j++) {
 			const Part* part = &m_cells.at(i).getPart(j);
-			parts.at(partCounter) = LightPartwCell{ part->position.x, part->position.y, part->velocity.x, part->velocity.y, part->getCell(), part->type, part->stage };
+			parts.at(partCounter) = LightPartwCell{ part->position.x, part->position.y, part->velocity.x, part->velocity.y, part->getCell(), part->type, part->currentStage, part->currentStageTime };
 			partCounter++;
 		}
 	}
@@ -316,7 +321,9 @@ bool CellColony::load(Hdf5* file, const char* name)
 			partsInCell.resize(0);
 		}
 		Part part{ Vector{lightParts.at(i).x, lightParts.at(i).y}, Vector{ lightParts.at(i).vx , lightParts.at(i).vy },
-			lightParts.at(i).type , lightParts.at(i).cell, lightParts.at(i).stage };
+			lightParts.at(i).type , lightParts.at(i).cell, lightParts.at(i).currentStage, lightParts.at(i).currentStageTime };
+		
+		
 		partsInCell.push_back(part);
 	}
 		
@@ -328,7 +335,6 @@ bool CellColony::load(Hdf5* file, const char* name)
 #else
 	m_cells.push_back(partsInCell);
 #endif
-
 
 	return true;
 }

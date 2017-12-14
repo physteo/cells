@@ -18,5 +18,6 @@ void LJForce::updateForce(Part* part1, const Part* part2, const Box* box, Vector
 
 		part1->velocity += forceVector;
 	}
-
+	//if (Vector::dotProduct(forceVector, forceVector) > 1.0)
+	//	std::cout << "strongFOrce" << std::endl;
 }
