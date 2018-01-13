@@ -48,8 +48,6 @@ public:
 	void addPartSpecs(PartSpecs* partSpecsIn);
 	void setCycleLength(unsigned short cycleLengthIn);
 
-	void resizePartsDataSlots(size_t slots);
-
 	void clearSubBoxes();
 	void setSubBoxes();
 

@@ -6,6 +6,8 @@
 #include "Cell.h"
 #include "../utils/Hdf5types.h"
 
+#include "PartType.h"
+
 // iostream
 #include <iostream>
 
@@ -18,6 +20,7 @@
 #include "../utils/ObjectPool.h"
 #endif
 
+#include <algorithm>    // std::min
 #include <cmath>
 
 extern gsl_rng *g_rng;
@@ -44,15 +47,16 @@ private:
 public:
 	CellColony() : m_cells(0) {}
 	CellColony(size_t size) : m_cells(size) {}
-	void populate(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigMax);
-	void populateSlab(double N, double f, double boxLengthX, double boxLengthY, double sigMin);
+	void populate(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB);
+	void populateSlab(double N, double f, double boxLengthX, double boxLengthY, double sigA, double sigB);
 
 
 	void addVelocity(double vx, double vy, size_t cell, size_t  type);
 
-	void addOnePartCell(double x, double y, double vx, double vy, unsigned short stage, size_t currentStageTime);
+	void addOnePartCell(double x, double y, double vx, double vy, unsigned short stage, size_t currentStageTime, double sig);
 	void addTwoPartsCell(double x1, double y1, double vx1, double vy1,
-		double x2, double y2, double vx2, double vy2, unsigned short stage, size_t currentStageTime);
+						 double x2, double y2, double vx2, double vy2,
+						 unsigned short stage, size_t currentStageTime, double sigA, double sigB);
 	void assignCycleStage(unsigned short cycleLength);
 
 

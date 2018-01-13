@@ -26,14 +26,13 @@
 #include "../particles/SMTYSpecsCycleSoftCore.h"
 #include "../particles/SMTYSpecsCycleLJ.h"
 #include "../particles/SMTYSpecsCoarseGrained.h"
+#include "../particles/SMTYSpecsCoarseGrainedImproved.h"
 
 //#include "../particles/MonoZimm.h"
 
-
-
-
 #include "../system/System.h"
 #include "../system/SystemTrajectory.h"
+
 
 #ifdef VISUALS
 #include "../visuals/Display.h"

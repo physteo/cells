@@ -12,13 +12,13 @@ class Part
 public:
 	Vector position;
 	Vector velocity;
-	
-	std::vector<double> data;
 
 	size_t type;
 	size_t cell;
 	size_t currentStage;
 	size_t currentStageTime;
+	double currentSigma;
+
 
 	BoxCell* myBoxCell;
 
@@ -27,17 +27,17 @@ public:
 
 
 public:
-	Part() :  position(), velocity(), type(), cell(), currentStageTime(0), currentStage(0), myBoxCell(nullptr), next(nullptr), prev(nullptr)
+	Part() :  position(), velocity(), type(), cell(), currentStage(0), currentStageTime(0), currentSigma(1.0), myBoxCell(nullptr), next(nullptr), prev(nullptr)
 	{
-		data.resize(0);
 		currentStage = 0;
 		currentStageTime = 0;
 	}
 
-	Part(const Vector& positionIn, const Vector& velocityIn, size_t typeIn, size_t cellIn, size_t stageIn, size_t currentStageTimeIn)
-		: position{ positionIn }, velocity{ velocityIn }, type(typeIn), cell(cellIn), currentStage(stageIn), currentStageTime(currentStageTimeIn), myBoxCell(nullptr), next(nullptr), prev(nullptr)
+	Part(const Vector& positionIn, const Vector& velocityIn, size_t typeIn, size_t cellIn, size_t stageIn, size_t currentStageTimeIn, double currentSigmaIn)
+		: position{ positionIn }, velocity{ velocityIn }, type(typeIn), cell(cellIn),
+		currentStage(stageIn), currentStageTime(currentStageTimeIn), currentSigma(currentSigmaIn),
+		myBoxCell(nullptr), next(nullptr), prev(nullptr)
 	{
-		data.resize(0);
 		currentStage = 0;
 		currentStageTime = 0;
 	}
@@ -90,4 +90,15 @@ struct LightPartwCell {
 	size_t type;
 	size_t currentStage;
 	size_t currentStageTime;
+	double currentSigma;
+
+	LightPartwCell() : x(0.0), y(0.0), vx(0.0), vy(0.0), cell(0), type(0), currentStage(0),
+		currentStageTime(0), currentSigma(1.0)
+	{}
+
+	LightPartwCell(double xIn, double yIn, double vxIn, double vyIn, size_t cellIn,
+		size_t typeIn, size_t currentStageIn, size_t currentStageTimeIn, double currentSigmaIn)
+		: x(xIn), y(yIn), vx(vxIn), vy(vyIn), cell(cellIn), type(typeIn), currentStage(currentStageIn),
+		currentStageTime(currentStageTimeIn), currentSigma(currentSigmaIn)
+	{}
 };

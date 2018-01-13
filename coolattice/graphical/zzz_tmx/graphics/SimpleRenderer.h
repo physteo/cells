@@ -47,8 +47,9 @@ namespace tmx { namespace graphics {
 				auto viewMatrix = m_camera->getViewMatrix();
 				auto translation = glm::translate(glm::mat4(1.0), renderable->position);
 				auto rotation = glm::rotate(glm::mat4(1.0), renderable->angle, renderable->rotation);
+				auto scale = glm::scale(glm::mat4(1.0), renderable->scale, renderable->scale, (GLfloat) 1.0);
 				// first traslation and then rotation... that's because of opengl's fucked up column major order
-				auto transformationMatrix = translation * rotation;
+				auto transformationMatrix = translation * rotation * scale;
 
 				renderable->shader->loadMatrix("viewMatrix", viewMatrix);
 				renderable->shader->loadMatrix("transformationMatrix", transformationMatrix);

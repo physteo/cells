@@ -66,6 +66,8 @@ public:
 			part2->currentStageTime = 0;
 		}
 
+		part1->currentStageTime++;
+		part2->currentStageTime++;
 
 	}
 
@@ -99,6 +101,8 @@ public:
 		}
 
 
+		part1->currentStageTime++;
+		part2->currentStageTime++;
 	}
 
 };
@@ -159,8 +163,117 @@ public:
 			{
 				part1->currentStage = m_divisionStage;
 				part2->currentStage = m_divisionStage;
+				part1->currentStageTime = 0;
+				part2->currentStageTime = 0;
 			}
 		}
+
+		part1->currentStageTime++;
+		part2->currentStageTime++;
+	}
+
+
+
+};
+
+
+
+
+class SingleStageWithDivisionImproved : public CycleManager
+{
+private:
+	size_t			m_divisionCycleLength;
+	double			m_duplicationRate;
+	
+	size_t			m_divisionStage;
+
+//	double			m_finalSizeDivision;
+//	double			m_increment;
+	PartTypeVector* m_partTypeVector;
+
+public:
+	SingleStageWithDivisionImproved(size_t divisionCycleLength,
+		double duplicationRate, size_t divisionStage, PartTypeVector* partTypeVector) :
+		m_divisionCycleLength(divisionCycleLength),
+		m_duplicationRate(duplicationRate),  
+		m_divisionStage(divisionStage), m_partTypeVector(partTypeVector)
+	{
+	}
+
+	void advanceWithinStage(size_t time, Cell* cell)
+	{
+		Part* part1 = &cell->getPart(0);
+		Part* part2 = &cell->getPart(1);
+		if (part1->currentStage == m_divisionStage)
+		{
+	
+			const double& sig1 = m_partTypeVector->getPartTypes().at(0).sig;
+			const double& sig2 = m_partTypeVector->getPartTypes().at(1).sig;
+	
+			bool part2Increasing;
+			double finalSize;
+			double increment;
+	
+			if (sig1 > sig2)
+			{
+				part2Increasing = true;
+				finalSize = sig1;
+				increment = (sig1 - sig2) / m_divisionCycleLength;
+				part2->currentSigma += increment;
+			}
+			else {
+				part2Increasing = false;
+				finalSize = sig2;
+				increment = (sig2 - sig1) / m_divisionCycleLength;
+				part1->currentSigma += increment;
+			}
+	
+		}
+
+		part1->currentStageTime++;
+		part2->currentStageTime++;
+
+	}
+
+
+	void manage(size_t time, Cell* cell) override
+	{
+		Part* part1 = &cell->getPart(0);
+		Part* part2 = &cell->getPart(1);
+
+		const double& sig1 = m_partTypeVector->getPartTypes().at(0).sig;
+		const double& sig2 = m_partTypeVector->getPartTypes().at(1).sig;
+
+		if (part1->currentStage == m_divisionStage)
+		{
+			if (part1->currentStageTime == (m_divisionCycleLength)) // URGENT: is it 2 or 1
+			{
+				//std::cout << "End of division cycle." << std::endl;
+				//std::cout << "time: "<< time << ", sizes: (" << part1->currentSigma << " ," << part2->currentSigma  <<")" << std::endl;
+
+				part1->currentSigma = sig1;
+				part2->currentSigma = sig2;
+
+				part1->currentStage = 0;
+				part2->currentStage = 0;
+				part1->currentStageTime = 0;
+				part2->currentStageTime = 0;
+			}
+		}
+		else
+		{
+			// random number for going to division stage
+			if (gsl_rng_uniform(g_rng) < m_duplicationRate)
+			{
+				part1->currentStage = m_divisionStage;
+				part2->currentStage = m_divisionStage;
+				part1->currentStageTime = 0;
+				part2->currentStageTime = 0;
+			}
+		}
+
+
+		advanceWithinStage(time, cell);
 	}
 
 

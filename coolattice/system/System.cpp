@@ -61,13 +61,6 @@ void System::setCycleLength(unsigned short cycleLengthIn)
 }
 
 
-void System::resizePartsDataSlots(size_t slots)
-{
-	for (size_t n = 0; n < parts.size(); n++)
-	{
-		parts.at(n)->data.resize(slots);
-	}
-}
 
 
 void System::constructPartsVector()
@@ -201,6 +194,8 @@ void System::updateStages(size_t time)
 	{
 		// update the stage of the particle
 		partSpecs.at(0)->updateStage(time, &cells.at(c));
+		//for(size_t n = 0; n < cells.at(c).getNumOfParts(); n++)
+		//	cells.at(c).getPart(n).currentStageTime++;
 	}
 }
 
@@ -210,7 +205,7 @@ void System::updateStages(size_t time)
 void System::computeForces(size_t time, double dt)
 {
 	resetVelocities();
-	updateStages(time);
+//	updateStages(time);
 
 #ifdef OMP
 #pragma omp parallel for schedule(guided)
@@ -249,10 +244,11 @@ void System::computeForces(size_t time, double dt)
 			}
 
 		}
-	// update particle's internal time
-	part1->currentStageTime++;
 
 	}
+
+	
+
 
 }
 
@@ -409,6 +405,7 @@ int System::updatePositions(size_t time, double dt, bool update)
 		//x//size_t stage = computeStage(time, n);
 		//x//double friction = this->partSpecs.at(stage)->getFriction(pt);
 		//x//double mass = this->partSpecs.at(stage)->partTypes.getPartTypes().at(pt).mass;
+
 		double friction = this->partSpecs.at(0)->getFriction(parts.at(n));
 		double mass		= this->partSpecs.at(0)->getMass(parts.at(n));
 
@@ -445,6 +442,17 @@ int System::updatePositions(size_t time, double dt, bool update)
 		setSubBoxes();
 	}
 #endif
+
+
+	// URGENT: remove
+	// debug
+	//Vector pos1 = cells.at(0).getPart(0).position;
+	//Vector pos2 = cells.at(0).getPart(1).position;
+	//Vector distance = pos1 - pos2;
+	//std::cout << "Distance: " << sqrt(Vector::dotProduct(distance, distance)) << std::endl;
+	// end of URGENT
+
+
 	return result;
 }
 
@@ -530,6 +538,7 @@ void System::divideCells()
 
 			divided = true;
 		}
+
 		
 	}
 

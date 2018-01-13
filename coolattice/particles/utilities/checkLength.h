@@ -11,7 +11,7 @@ public:
 	{
 		Vector vectorDistance;
 		double distance2 = box->computeDistanceSquaredPBC(cell->getPart(0).position, cell->getPart(1).position, vectorDistance);
-		if (distance2 > thresholdSquared)
+		if (distance2 >= thresholdSquared)
 		{
 			//std::cout << "cell " << cell->getPart(0).cell << ", success: " << distance2 << std::endl;
 			return true;

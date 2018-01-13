@@ -2,7 +2,8 @@
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec2 textureCoords;
-layout (location = 2) in vec3 normal;
+
+//layout (location = 2) in vec3 normal;
 //layout (location = 3) in vec3 offset;
 //layout (location = 4) in vec4 col0;
 //layout (location = 5) in vec4 col1;
@@ -21,6 +22,7 @@ void main(void) {
 	
 	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
 	vec4 positionFromCamera = viewMatrix * worldPosition;
+
 
 	gl_Position = projectionMatrix * positionFromCamera;
 	//gl_Position = transformationMatrix * vec4(position, 1.0);

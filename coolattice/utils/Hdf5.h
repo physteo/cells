@@ -4,7 +4,6 @@
 #include <iostream>
 class Hdf5;
 
-
 class BinarySavable
 {
 public:
@@ -17,7 +16,7 @@ class Hdf5 : private H5::H5File
 {
 public:
 	Hdf5(const char* fileName, unsigned int flags) : H5::H5File(fileName, flags) {}
-	void closeFile() { H5File::close(); }
+	void closeFile();
 	void createNewGroup(const char* name) { createGroupNoThrow(name); }
 	H5::Group openGroup(const char* name) const { return H5::H5File::openGroup(name); }
 	hsize_t getNumObjs() const { return H5::H5File::getNumObjs(); }

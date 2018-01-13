@@ -127,9 +127,13 @@ void SMTYSpecsCycleSoftCore::build()
 		addIntraForce(DIVISION, 3, feneBB);
 
 		// propulsion force to both parts
-		ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ 2.0 * m_motility * m_ssCellLength }); // TODO urgent: remove hard coded value 2.0
-		addIntraForce(DIVISION, 1, nocil);
-		addIntraForce(DIVISION, 2, nocil);
+		//ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ 2.0 * m_motility * m_ssCellLength }); // TODO urgent: remove hard coded value 2.0
+		//addIntraForce(DIVISION, 1, nocil);
+		//addIntraForce(DIVISION, 2, nocil);
+
+		CilForce*  cil(new CilForce{ m_motility * 2.0 });
+		addIntraForce(DIVISION, 1, cil);
+		addIntraForce(DIVISION, 2, cil);
 
 		// cycle manager
 		cycleManager = new ExtensionContractionDivision{ m_cycleLength, m_divisionCycleLength, m_rateDuplication, DIVISION };
@@ -267,7 +271,7 @@ bool SMTYSpecsCycleSoftCore::load(Hdf5* file, const char* groupName)
 		// check if name is the same
 		if (readName != specsName)
 		{
-			std::cerr << "Error: Trying to load a '" << readName << "' SystemSpecs into a '" << name << "' SystemSpecs." << std::endl;
+			std::cerr << "Error: Trying to load a '" << readName << "' SystemSpecs into a '" << specsName << "' SystemSpecs." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 
@@ -397,7 +401,7 @@ bool SMTYSpecsCycleSoftCore::divisionCriterion(Cell* cell, const Box* box) const
 
 bool SMTYSpecsCycleSoftCore::cellDivides(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
 {
-	return DivisionMethods::standardDivision(cell, newCells, box, cellCounter, cycleLength, EXTENSION);
+	return DivisionMethods::standardDivision(cell, newCells, box, cellCounter, cycleLength, EXTENSION, &this->partTypes.at(0));
 }
 
 

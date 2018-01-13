@@ -66,47 +66,6 @@ gsl_rng *g_rng = NULL;
 
 
 
-#include <limits>
-typedef std::numeric_limits< double > dbl;
-// temp
-bool readSimonFile(std::vector<double>& scores, const std::string& filepath)
-{
-	scores.resize(0);
-
-	std::ifstream ifile(filepath, std::ios::in);
-	
-	//check to see that the file was opened correctly:
-	if (!ifile.is_open()) {
-		std::cerr << "There was a problem opening the input file!\n";
-		return false;//exit or do additional error checking
-	}
-	double num = 0.0;
-	//keep storing values from the text file so long as data exists:
-	while (ifile >> num) {
-		scores.push_back(num);
-	}
-	return true;
-}
-
-int main2()
-{
-	std::vector<double> pos;
-	readSimonFile(pos, "C:\\Users\\matte\\Downloads\\simonInput_pos.txt");
-
-	std::vector<double> vel;
-	readSimonFile(vel, "C:\\Users\\matte\\Downloads\\simonInput_vel.txt");
-
-
-	std::cout.precision(dbl::max_digits10);
-	for (size_t i = 0; i < pos.size() - 1; i+=2)
-	{
-		std::cout << pos.at(i) << ", " << pos.at(i+1) << std::endl;
-	}
-
-	return 0;
-}
-
- 
 int main(int argc, char* argv[])
 {	
 	using namespace boost::python;
@@ -114,7 +73,7 @@ int main(int argc, char* argv[])
 
 	// random number generator seed **********************************************
 	//TODO URGENT: change to proper seed.
-	std::string seedStr = "1";//inputJson.at("SIMULATION").at("seed").dump();
+	std::string seedStr = "2";//inputJson.at("SIMULATION").at("seed").dump();
 #ifdef LINUX
 	unsigned long int seed = mix(clock(), time(NULL), getpid());
 #else

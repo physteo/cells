@@ -10,11 +10,11 @@ namespace visuals {
 		m_renderer{ &m_camera },
 		m_shader{},
 		m_trajectory(trajectory),
-		m_activeSite{ (GLuint) width * adjustFactor * partSpecs->getVectorOfPartTypes().at(m_defaultStage).getPartTypes().at(0).sig / m_box->getLx(), (GLuint) height * adjustFactor * partSpecs->getVectorOfPartTypes().at(m_defaultStage).getPartTypes().at(0).sig / m_box->getLy(),
+		m_activeSite{ (GLuint) width * adjustFactor * 1.0 / m_box->getLx(), (GLuint) height * adjustFactor * 1.0 / m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/smile.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
-		m_inactiveSite{ (GLuint)width * adjustFactor * partSpecs->getVectorOfPartTypes().at(m_defaultStage).getPartTypes().at(partSpecs->getNumberOfTypes() - 1).sig / m_box->getLx(), (GLuint)height * adjustFactor * partSpecs->getVectorOfPartTypes().at(m_defaultStage).getPartTypes().at(partSpecs->getNumberOfTypes() - 1).sig / m_box->getLy(),
+		m_inactiveSite{ (GLuint)width * adjustFactor * 1.0 / m_box->getLx(), (GLuint)height * adjustFactor * 1.0 / m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/redsiteCool.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
-		m_dividingCell{ (GLuint)width * adjustFactor * partSpecs->getVectorOfPartTypes().at(m_defaultStage).getPartTypes().at(partSpecs->getNumberOfTypes() - 1).sig / m_box->getLx(), (GLuint)height * adjustFactor * partSpecs->getVectorOfPartTypes().at(m_defaultStage).getPartTypes().at(partSpecs->getNumberOfTypes() - 1).sig / m_box->getLy(),
+		m_dividingCell{ (GLuint)width * adjustFactor * 1.0 / m_box->getLx(), (GLuint)height * adjustFactor * 1.0 / m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/redsiteSmall.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
 		m_subBox{ (GLuint)width * 0.9 * m_box->getBoxCellLengthX() / m_box->getLx(), (GLuint)height * 0.9 * m_box->getBoxCellLengthY()/ m_box->getLy(),
 		{ "C:/Users/matte/Pictures/graphics_engine/coolattice/subBox.png" }, tmx::graphics::BGRA, tmx::graphics::RGBA, 0, 0 ,10.f,0.f,true },
@@ -482,12 +482,13 @@ namespace visuals {
 
 				if (part.type == 0) {
 					if (part.currentStage == 2) {
+
 						renderable.init(&m_dividingCell, &m_shader, glm::vec3{ (GLfloat)pbcPosition.x * m_window.getWidth() / m_box->getLx() ,//+   0.5 * m_window.getWidth(),
 																		 (GLfloat)pbcPosition.y * m_window.getHeight() / m_box->getLy() ,//+   0.5 * m_window.getHeight(),
 																		 (GLfloat) 0.0f },
 							glm::vec3{ 0,1,0 },
 							0.0f,
-							1.0f);
+							part.currentSigma);
 					}
 					else
 					{
@@ -496,7 +497,7 @@ namespace visuals {
 							(GLfloat) 0.0f },
 							glm::vec3{ 0,1,0 },
 							0.0f,
-							1.0f);
+							part.currentSigma);
 					}
 
 				}
@@ -508,7 +509,7 @@ namespace visuals {
 							(GLfloat) 0.0f },
 							glm::vec3{ 0,1,0 },
 							0.0f,
-							1.0f);
+							part.currentSigma);
 					}
 					else {
 						assert(false);

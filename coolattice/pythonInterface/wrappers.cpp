@@ -5,9 +5,8 @@ namespace pywrapper {
 	using namespace boost::python;
 
 	BOOST_PYTHON_MODULE(Cellulae) {
-
-
 		register_exception_translator<std::runtime_error>(&translate);
+
 
 		class_<Vector>("Vector", init<>())
 			// non default constructors
@@ -135,6 +134,17 @@ namespace pywrapper {
 			.def("cellIsDead",		&SMTYSpecsCoarseGrained::cellIsDead)
 			.def("cellDivides",		&SMTYSpecsCoarseGrained::cellDivides)
 			;
+
+		class_<SMTYSpecsCoarseGrainedImproved, bases<PartSpecs> >("SMTYSpecsCoarseGrainedImproved", init<>())
+			.def(init<Parameters*, size_t, size_t, bool>())
+			.def("save", &SMTYSpecsCoarseGrainedImproved::save)
+			.def("load", &SMTYSpecsCoarseGrainedImproved::load)
+			.def("cellIsBroken", &SMTYSpecsCoarseGrainedImproved::cellIsBroken)
+			.def("cellIsDead", &SMTYSpecsCoarseGrainedImproved::cellIsDead)
+			.def("cellDivides", &SMTYSpecsCoarseGrainedImproved::cellDivides)
+			;
+		
+		
 /*
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
 			.def(init<double, double, double, double, double, double, double, double, double, double, double>())
@@ -180,6 +190,7 @@ namespace pywrapper {
 
 		class_<System>("System", init<CellColony*, Box*, size_t>())
 			.def("addVelocity", &System::addVelocity)
+			.def("updateStages", &System::updateStages)
 			.def("updatePositions", &System::updatePositions)
 			.def("computeForces", &System::computeForces)
 			//.def("computeForcesVoronoi", &System::computeForcesVoronoi)

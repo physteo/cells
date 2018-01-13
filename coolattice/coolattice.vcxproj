@@ -181,6 +181,7 @@
     <ClCompile Include="particles\Part.cpp" />
     <ClCompile Include="particles\PartSpecs.cpp" />
     <ClCompile Include="particles\SMTYSpecsCoarseGrained.cpp" />
+    <ClCompile Include="particles\SMTYSpecsCoarseGrainedImproved.cpp" />
     <ClCompile Include="particles\SMTYSpecsCycleLJ.cpp" />
     <ClCompile Include="particles\SMTYSpecsCycleSoftCore.cpp" />
     <ClCompile Include="system\System.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="particles\PartSpecs.h" />
     <ClInclude Include="particles\PartType.h" />
     <ClInclude Include="particles\SMTYSpecsCoarseGrained.h" />
+    <ClInclude Include="particles\SMTYSpecsCoarseGrainedImproved.h" />
     <ClInclude Include="particles\SMTYSpecsCycleLJ.h" />
     <ClInclude Include="particles\SMTYSpecsCycleSoftCore.h" />
     <ClInclude Include="particles\utilities\checkBroken.h" />

@@ -12,6 +12,12 @@ bool Hdf5::exists(const char* name) const
 	return true;
 }
 
+void Hdf5::closeFile()
+{
+	//version.save(this, "version");
+	H5File::close();
+}
+
 bool Hdf5::loadObject(BinarySavable* object, const char* name)
 {
 	return object->load(this, name);

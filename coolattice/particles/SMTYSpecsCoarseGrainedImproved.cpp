@@ -1,48 +1,35 @@
-#include "SMTYSpecsCoarseGrained.h"
+#include "SMTYSpecsCoarseGrainedImproved.h"
 
 
-SMTYSpecsCoarseGrained::SMTYSpecsCoarseGrained()
+SMTYSpecsCoarseGrainedImproved::SMTYSpecsCoarseGrainedImproved()
 {
 
 }
 
 
-void SMTYSpecsCoarseGrained::build()
+void SMTYSpecsCoarseGrainedImproved::build()
 {
 	std::cout << " *** System's steady-state(ss) characteristics *** " << std::endl;
 	std::cout << " - Cell Length = " << m_ssCellLength << std::endl;
 	std::cout << " - Speed at ss = " << m_ssSpeed << std::endl;
 	std::cout << " - Migration t = " << m_migrationTime << std::endl;
 
+	NewLJForce* interForce(new NewLJForce{ m_epsilon, m_cut * m_cut });
+	//NewSMSoftCore* interForce(new NewSMSoftCore{ 0.025, 1.0, 0.1, 1.0 });
+
+	FeneForce* fene(new FeneForce{ m_rMaxSquared, m_kappa });
+	
 	// stage MIGRATION
 	{
-		const double& sigAA = this->partTypes.at(MIGRATION).getPartTypes().at(0).sig;
-		const double& sigBB = this->partTypes.at(MIGRATION).getPartTypes().at(1).sig;
-		const double& frictionF = this->partTypes.at(MIGRATION).getPartTypes().at(0).friction;
-		const double& frictionB = this->partTypes.at(MIGRATION).getPartTypes().at(1).friction;
+		addInterForce(MIGRATION, 0, interForce);
+		addInterForce(MIGRATION, 1, interForce);
+		addInterForce(MIGRATION, 2, interForce);
+		addInterForce(MIGRATION, 3, interForce);
 
-		double sigAB = .5*(sigAA + sigBB);
-
-
-		LJForce* lja(new LJForce{ sigAA, m_epsilon, (sigAA *   sigAA * m_cut * m_cut) });
-		LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
-		LJForce* ljc(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
-		LJForce* ljd(new LJForce{ sigBB, m_epsilon, (sigBB *   sigBB * m_cut * m_cut) });
-
-		addInterForce(MIGRATION, 0, lja);
-		addInterForce(MIGRATION, 1, ljb);
-		addInterForce(MIGRATION, 2, ljc);
-		addInterForce(MIGRATION, 3, ljd);
-
-		FeneForce* feneAA(new FeneForce{ m_rMaxSquared, m_kappa });
-		FeneForce* feneAB(new FeneForce{ m_rMaxSquared, m_kappa });
-		FeneForce* feneBA(new FeneForce{ m_rMaxSquared, m_kappa });
-		FeneForce* feneBB(new FeneForce{ m_rMaxSquared, m_kappa });
-
-		addIntraForce(MIGRATION, 0, feneAA);
-		addIntraForce(MIGRATION, 1, feneAB);
-		addIntraForce(MIGRATION, 2, feneBA);
-		addIntraForce(MIGRATION, 3, feneBB);
+		addIntraForce(MIGRATION, 0, fene);
+		addIntraForce(MIGRATION, 1, fene);
+		addIntraForce(MIGRATION, 2, fene);
+		addIntraForce(MIGRATION, 3, fene);
 
 
 		if (m_CIL == false) {
@@ -62,42 +49,29 @@ void SMTYSpecsCoarseGrained::build()
 
 	if (m_division) {
 		// stage DIVISION
+		addInterForce(DIVISION, 0, interForce);
+		addInterForce(DIVISION, 1, interForce);
+		addInterForce(DIVISION, 2, interForce);
+		addInterForce(DIVISION, 3, interForce);
 
-		const double& sigAA     = this->partTypes.at(DIVISION).getPartTypes().at(0).sig;
-		const double& sigBB     = this->partTypes.at(DIVISION).getPartTypes().at(1).sig;
-		const double& frictionF = this->partTypes.at(DIVISION).getPartTypes().at(0).friction;
-		const double& frictionB = this->partTypes.at(DIVISION).getPartTypes().at(1).friction;
-
-		double sigAB = .5*(sigAA + sigBB);
-
-
-		LJForce* lja(new LJForce{ sigAA, m_epsilon, (sigAA *   sigAA * m_cut * m_cut) });
-		LJForce* ljb(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
-		LJForce* ljc(new LJForce{ sigAB, m_epsilon, (sigAB *   sigAB * m_cut * m_cut) });
-		LJForce* ljd(new LJForce{ sigBB, m_epsilon, (sigBB *   sigBB * m_cut * m_cut) });
-
-		addInterForce(DIVISION, 0, lja);
-		addInterForce(DIVISION, 1, ljb);
-		addInterForce(DIVISION, 2, ljc);
-		addInterForce(DIVISION, 3, ljd);
-
-		FeneForce* feneAA(new FeneForce{ m_rMaxSquared, m_kappa });
-		FeneForce* feneAB(new FeneForce{ m_rMaxSquared, m_kappa });
-		FeneForce* feneBA(new FeneForce{ m_rMaxSquared, m_kappa });
-		FeneForce* feneBB(new FeneForce{ m_rMaxSquared, m_kappa });
-
-		addIntraForce(DIVISION, 0, feneAA);
-		addIntraForce(DIVISION, 1, feneAB);
-		addIntraForce(DIVISION, 2, feneBA);
-		addIntraForce(DIVISION, 3, feneBB);
+		addIntraForce(DIVISION, 0, fene);
+		addIntraForce(DIVISION, 1, fene);
+		addIntraForce(DIVISION, 2, fene);
+		addIntraForce(DIVISION, 3, fene);
 
 		// propulsion force to both parts
-		ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ 2.0 * m_motility * m_ssCellLength }); // TODO urgent: remove hard coded value 2.0
-		addIntraForce(DIVISION, 1, nocil);
-		addIntraForce(DIVISION, 2, nocil);
+//		ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ 1.0 * m_motility * m_ssCellLength }); // TODO urgent: remove hard coded value 2.0
+//		addIntraForce(DIVISION, 1, nocil);
+//		addIntraForce(DIVISION, 2, nocil);
+
+		CilForce*  cil(new CilForce{ m_motility });
+		addIntraForce(DIVISION, 1, cil);
+		addIntraForce(DIVISION, 2, cil);
+
+
 
 		// cycle manager
-		cycleManager = new SingleStageWithDivision{ m_divisionCycleLength, m_rateDuplication, DIVISION };
+		cycleManager = new SingleStageWithDivisionImproved{ m_divisionCycleLength, m_rateDuplication, DIVISION, &partTypes.at(DIVISION) };
 
 	}
 	else {
@@ -105,12 +79,10 @@ void SMTYSpecsCoarseGrained::build()
 	}
 
 
-
-
 }
 
 
-SMTYSpecsCoarseGrained::SMTYSpecsCoarseGrained(double sigAA, double sigBB, double motility,
+SMTYSpecsCoarseGrainedImproved::SMTYSpecsCoarseGrainedImproved(double sigAA, double sigBB, double motility,
 	double epsilon, double cut, double rMaxSquared, double kappa,
 	double frictionF, double frictionB, double massF, double massB,
 	double rateDuplication, double thresholdDuplication,
@@ -176,8 +148,8 @@ SMTYSpecsCoarseGrained::SMTYSpecsCoarseGrained(double sigAA, double sigBB, doubl
 }
 
 
-SMTYSpecsCoarseGrained::SMTYSpecsCoarseGrained(const Parameters* params, size_t divisionCycleLength, bool CIL, bool division) :
-	SMTYSpecsCoarseGrained(params->getParam(0),
+SMTYSpecsCoarseGrainedImproved::SMTYSpecsCoarseGrainedImproved(const Parameters* params, size_t divisionCycleLength, bool CIL, bool division) :
+	SMTYSpecsCoarseGrainedImproved(params->getParam(0),
 		params->getParam(1),
 		params->getParam(2),
 		params->getParam(3),
@@ -195,7 +167,7 @@ SMTYSpecsCoarseGrained::SMTYSpecsCoarseGrained(const Parameters* params, size_t 
 }
 
 
-bool SMTYSpecsCoarseGrained::load(Hdf5* file, const char* groupName)
+bool SMTYSpecsCoarseGrainedImproved::load(Hdf5* file, const char* groupName)
 {
 	try {
 		H5::Group group = file->openGroup(groupName);
@@ -252,7 +224,7 @@ bool SMTYSpecsCoarseGrained::load(Hdf5* file, const char* groupName)
 
 
 
-bool SMTYSpecsCoarseGrained::save(Hdf5* file, const char* groupName) const
+bool SMTYSpecsCoarseGrainedImproved::save(Hdf5* file, const char* groupName) const
 {
 	try {
 		file->createNewGroup(groupName);
@@ -298,49 +270,64 @@ bool SMTYSpecsCoarseGrained::save(Hdf5* file, const char* groupName) const
 }
 
 
-bool SMTYSpecsCoarseGrained::cellIsBroken(const Cell* cell, const Box* box) const
+bool SMTYSpecsCoarseGrainedImproved::cellIsBroken(const Cell* cell, const Box* box) const
 {
 	// in the SMTY system a cell is broken when its length is
 	// bigger than Rmax
 	return CheckBroken::tooLong(cell, box, m_rMaxSquared);
 }
 
-bool SMTYSpecsCoarseGrained::cellIsDead(const Cell* cell, const Box* box)
+bool SMTYSpecsCoarseGrainedImproved::cellIsDead(const Cell* cell, const Box* box)
 {
 	// in the SMTY system a cell is dead when it's length is
 	// bigger than sigAA and it is not in the division stage
 	const double& sigAA = partTypes.at(DIVISION).getPartTypes().at(0).sig;
 	return CheckDead::cellIsPulledApart(cell, box, sigAA * sigAA, DIVISION);
-
 }
 
-bool SMTYSpecsCoarseGrained::divisionCriterion(Cell* cell, const Box* box) const
+bool SMTYSpecsCoarseGrainedImproved::divisionCriterion(Cell* cell, const Box* box) const
 {
 	const double& sigAA = partTypes.at(DIVISION).getPartTypes().at(0).sig;
 	return CheckLength::cellIsLongerThan(1.0 * 1.0 * sigAA * sigAA, cell, box);
 }
 
 
-bool SMTYSpecsCoarseGrained::cellDivides(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
+bool SMTYSpecsCoarseGrainedImproved::cellDivides(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
 {
-	return DivisionMethods::standardDivision(cell, newCells, box, cellCounter, cycleLength, MIGRATION, &this->partTypes.at(0));
+	return DivisionMethods::standardDivisionWithRandomDisplacement(cell, newCells, box, cellCounter, cycleLength, MIGRATION, &this->partTypes.at(0));
 }
 
 
 
-bool SMTYSpecsCoarseGrained::endOfSuccessfullDivisionStage(Cell* cell, const Box* box) const
+bool SMTYSpecsCoarseGrainedImproved::endOfSuccessfullDivisionStage(Cell* cell, const Box* box) const
 {
 	Part* part = &cell->getPart(0);
 
 	if (part->currentStage == DIVISION)
 	{
-		if (part->currentStageTime == (m_divisionCycleLength - 1))
+		if (part->currentStageTime == (m_divisionCycleLength))
 		{
 			// division stage has just terminated. Check if the cell has to be divided
 			if (divisionCriterion(cell, box))
 				return true;
 			else
+			{
+				// debug
+				//Vector pos1 = cell->getPart(0).position;
+				//Vector pos2 = cell->getPart(1).position;
+				//
+				//Vector distance = pos1 - pos2;
+				//
+				//std::cout << "Failed. Distance: " << sqrt(Vector::dotProduct(distance, distance)) << std::endl;
+
+				// TODO: URGENT: remove this hack. Do that cyclemanager->magage also tells if the division is successfull or not and does the 
+				// proper decisions
+				cell->getPart(1).position = cell->getPart(0).position;
+				cell->getPart(1).position += Vector{ gsl_rng_uniform(g_rng), gsl_rng_uniform(g_rng) } * 0.01;
+
+				// this is correct:
 				return false;
+			}
 		}
 
 		return false;

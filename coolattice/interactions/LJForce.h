@@ -1,6 +1,18 @@
 #pragma once
 #include "TwoBodyForce.h"
 
+
+class NewLJForce : public TwoBodyForce
+{
+	double m_eps;
+	double m_rcut2coefficient;
+public:
+	NewLJForce(double eps, double rcut2coefficient)
+		: m_eps(eps), m_rcut2coefficient(rcut2coefficient) {}
+	void updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const override;
+};
+
+
 class LJForce : public TwoBodyForce
 {
 public:
