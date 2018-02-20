@@ -13,3 +13,7 @@
 #define NOLINUX
 
 #define OBJECTPOOL
+
+#define DDNO
+
+#define ATTRACTION_ONLY_BODY_NO

@@ -57,9 +57,10 @@ public:
 	void addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 						 double x2, double y2, double vx2, double vy2,
 						 unsigned short stage, size_t currentStageTime, double sigA, double sigB);
-	void assignCycleStage(unsigned short cycleLength);
+	
+	void assignCycleStageTime(unsigned short cycleLength, unsigned short numberOfStages);
 
-
+	void setPolydispersity(double sigMax, double sigMin, int species, double ratioBF, double accuracy);
 	// for comparison with john
 	inline double getPartX(size_t cell, int t) { return m_cells.at(cell).getPart(t).position.x; }
 	inline double getPartY(size_t cell, int t) { return m_cells.at(cell).getPart(t).position.y; }

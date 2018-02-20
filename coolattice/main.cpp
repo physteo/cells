@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 
 	std::cout << "rd: " << H5F_ACC_RDONLY << std::endl;
 	std::cout << "tr: " << H5F_ACC_TRUNC << std::endl;
-	 
+	
 	std::string currentExecName = argv[0];
 	std::string inputFilePath;
 
@@ -94,8 +94,10 @@ int main(int argc, char* argv[])
 		inputFilePath = argv[1];
 	}
 	else if (argc == 1) {
-		//inputFilePath = "C:/Users/matte/Desktop/scripts/script_load_cycle.py";
-		inputFilePath = "C:/Users/matte/Desktop/scripts/cycle-create-bf0.8-desync.py";
+		//old_input//inputFilePath = "C:/Users/matte/Desktop/scripts/script_load_cycle.py";
+		//old_input//inputFilePath = "C:/Users/matte/Desktop/scripts/cycle-create-bf0.8-desync.py";
+		//old_input//inputFilePath = "C:/Users/matte/Desktop/scripts/coarse_grained_tests.py";
+		inputFilePath = "C:/Users/matte/Desktop/scripts/cycle-LJadh-nodiv-create-bf0.8-desync.py";
 	}
 	else if (argc > 2) {
 		std::cerr << "maximum one input file." << std::endl;

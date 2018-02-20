@@ -17,6 +17,16 @@ void SMTYSpecsCoarseGrainedImproved::build()
 	NewLJForce* interForce(new NewLJForce{ m_epsilon, m_cut * m_cut });
 	//NewSMSoftCore* interForce(new NewSMSoftCore{ 0.025, 1.0, 0.1, 1.0 });
 
+	// URGENT: this is a try
+#ifdef ATTRACTION_ONLY_BODY
+	NewStickyAttraction* stickyAttraction(new NewStickyAttraction{ 0.1, 0.5, 1.0 });
+    // idx 0: 0.25, 0.025, 1.0
+	// idx 1: 0.1, 0.1, 1.0
+	// idx 2: 0.1, 0.5, 1.0
+	// idx 3: 0.25, 0.5, 1.0
+
+#endif
+
 	FeneForce* fene(new FeneForce{ m_rMaxSquared, m_kappa });
 	
 	// stage MIGRATION
@@ -25,6 +35,11 @@ void SMTYSpecsCoarseGrainedImproved::build()
 		addInterForce(MIGRATION, 1, interForce);
 		addInterForce(MIGRATION, 2, interForce);
 		addInterForce(MIGRATION, 3, interForce);
+
+#ifdef ATTRACTION_ONLY_BODY
+		addInterForce(MIGRATION, 3, stickyAttraction);
+#endif
+
 
 		addIntraForce(MIGRATION, 0, fene);
 		addIntraForce(MIGRATION, 1, fene);
@@ -41,6 +56,7 @@ void SMTYSpecsCoarseGrainedImproved::build()
 			CilForce*  cil(new CilForce{ m_motility });
 			addIntraForce(MIGRATION, 1, cil);
 		}
+
 		// noise
 		//partSpecs.oneBodyForces.at(0).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7})))); // TODO URGENT: pass dt etc
 		//partSpecs.oneBodyForces.at(1).push_back(std::move(std::make_unique<GaussianRandomForce>(std::move(GaussianRandomForce{ 1.0, 0.001,1.0,1.0,4.707646e-7 })))); // TODO URGENT: pass dt etc
@@ -54,6 +70,9 @@ void SMTYSpecsCoarseGrainedImproved::build()
 		addInterForce(DIVISION, 2, interForce);
 		addInterForce(DIVISION, 3, interForce);
 
+#ifdef ATTRACTION_ONLY_BODY
+		addInterForce(MIGRATION, 3, stickyAttraction);
+#endif
 		addIntraForce(DIVISION, 0, fene);
 		addIntraForce(DIVISION, 1, fene);
 		addIntraForce(DIVISION, 2, fene);
@@ -67,8 +86,6 @@ void SMTYSpecsCoarseGrainedImproved::build()
 		CilForce*  cil(new CilForce{ m_motility });
 		addIntraForce(DIVISION, 1, cil);
 		addIntraForce(DIVISION, 2, cil);
-
-
 
 		// cycle manager
 		cycleManager = new SingleStageWithDivisionImproved{ m_divisionCycleLength, m_rateDuplication, DIVISION, &partTypes.at(DIVISION) };

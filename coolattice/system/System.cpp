@@ -198,14 +198,89 @@ void System::updateStages(size_t time)
 		//	cells.at(c).getPart(n).currentStageTime++;
 	}
 }
+#ifdef DD
+void System::diameterDynamics(size_t init, double dt)
+{
+	if (init == 0)
+	{
+		for (size_t i = 0; i < parts.size(); i++)
+		{
+			this->sigmaSpeeds.push_back(0.0);
+		}
+	}
+
+	double omega = 0.1;
+	double xi = 1.0;
+	double sigBm = 0.5;
+	double sigBM = 1.2;
+	double sigFm = 0.8;
+	double sigFM = 1.4;
+	double lengthMax = 0.37;
+
+#ifdef OMP
+#pragma omp parallel for schedule(guided)
+#endif
+	for (int c = 0; c < this->cells.size(); c++)
+	{
+		Cell* cell = &this->cells.at(c);
+		Vector rbf;
+		double rbfModule = sqrt(this->box->computeDistanceSquaredPBC(cell->getPart(0).position, cell->getPart(1).position, rbf));
+		
+		double l0F = (rbfModule * (sigFM - sigFm) + lengthMax * sigFm) / lengthMax;
+		double l0B = (rbfModule * (sigBM - sigBm) + lengthMax * sigBm) / lengthMax;
+
+		double& sigmaF0 = cell->getPart(0).currentSigma;
+		double& sigmaB0 = cell->getPart(1).currentSigma;
+
+		double&  velF0   = this->sigmaSpeeds.at(c + 0);
+		double&  velB0   = this->sigmaSpeeds.at(c + 1);
+
+		double coeff_F = omega * (sigmaF0 - l0F) + velF0;
+		double coeff_B = omega * (sigmaB0 - l0B) + velB0;
+
+		double exp_dt_omega = exp(-dt * omega);//1 + (-dt * omega) + (-dt * omega)*(-dt * omega)/2.0 + (-dt * omega)*(-dt * omega)*(-dt * omega)/6.0;
+
+		sigmaB0 = exp_dt_omega * (sigmaB0 - l0B + dt * coeff_B) + l0B;
+		sigmaF0 = exp_dt_omega * (sigmaF0 - l0F + dt * coeff_F) + l0F;
+
+		velF0 = -(sigmaF0 - l0F) * omega + exp_dt_omega * coeff_F;
+		velB0 = -(sigmaB0 - l0B) * omega + exp_dt_omega * coeff_B;
 
 
+		//double xF = sigmaF - l0F;
+		//double xB = sigmaB - l0B;
+		//
+		//// update speeds
+		//this->sigmaSpeeds.at(c + 0) = this->sigmaSpeeds.at(c + 0) - omega2 * dt * xF - 2 * omega2 * xi * this->sigmaSpeeds.at(c + 0) * dt;
+		//this->sigmaSpeeds.at(c + 1) = this->sigmaSpeeds.at(c + 1) - omega2 * dt * xB - 2 * omega2 * xi * this->sigmaSpeeds.at(c + 1) * dt;
+		//
+		//// update positions
+		//xF = this->sigmaSpeeds.at(c + 0) * dt;
+		//xB = this->sigmaSpeeds.at(c + 1) * dt;
+		//
+		//sigmaF = xF + l0F;
+		//sigmaB = xB + l0B;
+
+	}
+
+}
+// dv = -2 si omega2 dx - omega2 x dt
+// dv = f(x) * dt
+// dx = v * dt
+//
+//
+//
+#endif
 
 
 void System::computeForces(size_t time, double dt)
 {
 	resetVelocities();
 //	updateStages(time);
+
+#ifdef DD
+		diameterDynamics(time, dt);
+#endif
 
 #ifdef OMP
 #pragma omp parallel for schedule(guided)
@@ -217,6 +292,7 @@ void System::computeForces(size_t time, double dt)
 
 		// apply one body forces
 		computeOneBodyForces(part1);
+
 
 #ifdef LIST
 		// get the cell of this part

@@ -103,6 +103,10 @@ private:
 	//x//size_t computeStage(size_t time, size_t n);
 	//x//size_t computeStage(size_t time, Part* part);
 
+#ifdef DD
+	std::vector<double> sigmaSpeeds;
+	void diameterDynamics(size_t init, double dt);
+#endif
 
 
 	// TODO: make sense out of these constructors

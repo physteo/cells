@@ -1,5 +1,35 @@
 #include "SMSoftCore.h"
 
+void NewStickyAttraction::updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const
+{
+	Vector distance{};
+	double r2 = box->computeDistanceSquaredPBC(part1->position, part2->position, distance);
+
+	double sig = 0.5 * (part1->currentSigma + part2->currentSigma);
+
+	forceVector = Vector{ 0.0, 0.0 };
+
+	if (r2 < m_rcut2coefficient * (sig + m_xi) * (sig + m_xi))
+	{
+		double r = sqrt(r2) - (0.2246204831); // TODO URGENT: remove this shift (that is to match repulsive LJ)
+		double y = r - sig;
+		double force = 0.0;
+
+		if (y > 0)
+		{
+			if (y <= m_xi)
+			{
+				force = -m_ewell * t_prime(y) / r;
+			}
+		}
+
+		forceVector = distance * force;
+		part1->velocity += forceVector;
+
+	}
+
+}
+
 void NewSMSoftCore::updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const
 {
 	Vector distance{};

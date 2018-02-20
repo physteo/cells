@@ -49,14 +49,16 @@ void CellColony::addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 }
 
 
-void CellColony::assignCycleStage(unsigned short cycleLength)
+void CellColony::assignCycleStageTime(unsigned short cycleLength, unsigned short numberOfStages)
 {
 	for (size_t i = 0; i < m_cells.size(); i++)
 	{
-		unsigned short cellStage = gsl_rng_uniform_int(g_rng, cycleLength);
+		unsigned short currentStage     = gsl_rng_uniform_int(g_rng, numberOfStages);
+		unsigned short currentStageTime = gsl_rng_uniform_int(g_rng, cycleLength);
 		for (size_t j = 0; j < m_cells.at(i).getNumOfParts(); j++)
 		{
-			m_cells.at(i).getPart(j).currentStageTime = cellStage;
+			m_cells.at(i).getPart(j).currentStage     = currentStage;
+			m_cells.at(i).getPart(j).currentStageTime = currentStageTime;
 		}
 	}
 }
@@ -122,6 +124,64 @@ void CellColony::populateSlab(double N, double f, double boxLengthX, double boxL
 	}
 	std::cout << "Number of cells: " << this->size() << std::endl;
 }
+
+void CellColony::setPolydispersity(double sigMax, double sigMin, int species, double ratioBF, double accuracy)
+{
+	bool goodToGo = false;
+
+
+	while (!goodToGo)
+	{
+
+		if (sigMax < sigMin)
+		{
+			double tmp = sigMin;
+			sigMin = sigMax;
+			sigMax = tmp;
+		}
+
+		std::vector<double> sizesF;
+		std::vector<size_t> populations;
+
+		double sigInterval = (sigMax - sigMin) / (double)(species - 1);
+
+		for (int i = 0; i < species; i++)
+		{
+			sizesF.push_back(sigMin + sigInterval * i);
+			populations.push_back(0);
+		}
+
+		for (size_t i = 0; i < m_cells.size(); i++)
+		{
+			Part& front = m_cells.at(i).getPart(0);
+			Part& back = m_cells.at(i).getPart(1);
+
+
+			// assign randomly the sigma
+			unsigned short index = gsl_rng_uniform_int(g_rng, species);
+			populations.at(index)++;
+
+			front.currentSigma = sizesF.at(index);
+			back.currentSigma = ratioBF * front.currentSigma;
+		}
+
+		goodToGo = true;
+
+		// check quality of randomization
+		size_t numberOfCells = m_cells.size();
+		double perfectRatio = 1.0 / ((double)species);
+		for (size_t i = 0; i < populations.size(); i++)
+		{
+			double value = std::abs( populations.at(i) / ((double)numberOfCells) - perfectRatio);
+			if (value > accuracy)
+			{
+				goodToGo = false;
+			}
+		}
+
+	}
+}
+
 
 void CellColony::populate(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB)
 {

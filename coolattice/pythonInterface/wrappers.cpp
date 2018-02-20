@@ -44,7 +44,8 @@ namespace pywrapper {
 			.def("totalNumberOfParts",	&CellColony::totalNumberOfParts)
 			.def("getPartX",			&CellColony::getPartX)
 			.def("getPartY",			&CellColony::getPartY)
-			.def("assignCycleStage",	&CellColony::assignCycleStage)
+			.def("assignCycleStage",	&CellColony::assignCycleStageTime)
+			.def("setPolydispersity",   &CellColony::setPolydispersity)
 			;
 
 		class_<Box>("Box", init<>())
@@ -67,6 +68,7 @@ namespace pywrapper {
 
 		class_<PartSpecsWrap, boost::noncopyable>("PartSpecs")
 			.def("addOneBodyForce", &PartSpecs::addOneBodyForce)
+			.def("getNumberOfStages", &PartSpecs::getNumberOfStages)
 			.def("load", pure_virtual(&PartSpecs::load))
 			.def("save", pure_virtual(&PartSpecs::save))
 			.def("cellIsBroken", pure_virtual(&PartSpecs::cellIsBroken))
@@ -216,7 +218,7 @@ namespace pywrapper {
 			.def("size", &SystemTrajectory::size)
 			.def("push_back", &SystemTrajectory::push_back)
 			.def("copyColony", &SystemTrajectory::copyColony)
-			.def("assignCycleStage", &SystemTrajectory::assignCycleStage)
+			//.def("assignCycleStage", &SystemTrajectory::assignCycleStageTime) // TODO: change the name of the interfaced method to assignCycleStageTime
 			;
 
 

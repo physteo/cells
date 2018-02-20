@@ -481,8 +481,7 @@ namespace visuals {
 				}
 
 				if (part.type == 0) {
-					if (part.currentStage == 2) {
-
+					if (part.currentStage == 1) {
 						renderable.init(&m_dividingCell, &m_shader, glm::vec3{ (GLfloat)pbcPosition.x * m_window.getWidth() / m_box->getLx() ,//+   0.5 * m_window.getWidth(),
 																		 (GLfloat)pbcPosition.y * m_window.getHeight() / m_box->getLy() ,//+   0.5 * m_window.getHeight(),
 																		 (GLfloat) 0.0f },

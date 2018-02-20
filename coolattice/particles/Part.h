@@ -38,8 +38,8 @@ public:
 		currentStage(stageIn), currentStageTime(currentStageTimeIn), currentSigma(currentSigmaIn),
 		myBoxCell(nullptr), next(nullptr), prev(nullptr)
 	{
-		currentStage = 0;
-		currentStageTime = 0;
+		//BUG//currentStage = 0;
+		//BUG//currentStageTime = 0;
 	}
 
 	void insert(Part* newOne)

@@ -1,5 +1,8 @@
 #pragma once
 
+#define AT_OPTIMIZED
+
+
 #include <vector>
 #include <assert.h>
 #include <memory>
@@ -65,6 +68,8 @@ public:
 	// computes all the two-body forces that act on part1 caused by part2, and updates only part1's forces 
 	// ( -> third principle of newton is not exployed. This is to make parallelization easier)
 	void computeTwoBodyForces(Part* part1, const Part* part2, Box* box) const;
+	void optimized_CG_computeTwoBodyForces(Part* part1, const Part* part2, Box* box) const;
+
 
 	// checks if the cell has terminated successfully the division stage, if there is any.
 	virtual bool   endOfSuccessfullDivisionStage(Cell* cell, const Box* box) const = 0;
@@ -103,8 +108,13 @@ protected:
 private:
 	std::vector<OneBodyForceVector>		oneBodyForces;
 	std::vector<TwoBodyForceVectors>	twoBodyForces;
+	
+	std::array<std::vector<std::vector<size_t> >, 2>   tableNumberOfTwoBodyForces;
+
 
 	void addTwoBodyForce(size_t stage, size_t slot, int intra, TwoBodyForce* force);	
+
+	//TwoBodyForce*		test_get_TwoBodyForce(const Part* part1, const Part* part2) const;
 
 	TwoBodyForce*		getTwoBodyForce(const Part* part1, const Part* part2, size_t index, size_t stage) const;
 	size_t				numberOfTwoBodyForces(const Part* part1, const Part* part2, size_t stage) const;
@@ -121,6 +131,7 @@ public:
 
 	std::vector< std::vector<TwoBodyForce* > >&  getIntraForces() { return intraForces; }
 	std::vector< std::vector<TwoBodyForce* > >&  getInterForces() { return interForces; }
+
 
 	const std::vector< TwoBodyForce* >& operator()(const Part* part1, const Part* part2, size_t numberOfTypes) const;
 
