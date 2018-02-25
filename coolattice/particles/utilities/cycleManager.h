@@ -47,7 +47,7 @@ public:
 			currentCycleLength = m_cycleLength;
 		}
 
-		if (part1->currentStageTime == (currentCycleLength - 1))
+		if (part1->currentStageTime >= (currentCycleLength - 1))
 		{
 			// update stage
 			if (gsl_rng_uniform(g_rng) < m_duplicationRate)
@@ -65,9 +65,10 @@ public:
 			part1->currentStageTime = 0;
 			part2->currentStageTime = 0;
 		}
-
-		part1->currentStageTime++;
-		part2->currentStageTime++;
+		else {
+			part1->currentStageTime++;
+			part2->currentStageTime++;
+		}
 
 	}
 
@@ -92,17 +93,17 @@ public:
 		Part* part1 = &cell->getPart(0);
 		Part* part2 = &cell->getPart(1);
 
-		if (part1->currentStageTime == (currentCycleLength - 1))
+		if (part1->currentStageTime >= (currentCycleLength - 1))
 		{
 			part1->currentStage = (part1->currentStage + 1) % m_numberOfStages;
-			part2->currentStage = (part2->currentStage + 1) % m_numberOfStages;
+			part2->currentStage = part1->currentStage;
 			part1->currentStageTime = 0;
 			part2->currentStageTime = 0;
 		}
-
-
-		part1->currentStageTime++;
-		part2->currentStageTime++;
+		else {
+			part1->currentStageTime++;
+			part2->currentStageTime++;
+		}
 	}
 
 };
@@ -146,14 +147,19 @@ public:
 		Part* part1 = &cell->getPart(0);
 		Part* part2 = &cell->getPart(1);
 
+		bool  remainSameStage = false;
+
 		if (part1->currentStage == m_divisionStage)
 		{
-			if (part1->currentStageTime == (m_divisionCycleLength - 1))
+			if (part1->currentStageTime >= (m_divisionCycleLength - 1))
 			{
 				part1->currentStage = 0;
 				part2->currentStage = 0;
 				part1->currentStageTime = 0;
 				part2->currentStageTime = 0;
+			}
+			else {
+				remainSameStage = true;
 			}
 		}
 		else
@@ -166,10 +172,16 @@ public:
 				part1->currentStageTime = 0;
 				part2->currentStageTime = 0;
 			}
+			else {
+				remainSameStage = true;
+			}
 		}
 
-		part1->currentStageTime++;
-		part2->currentStageTime++;
+		if (remainSameStage) {
+			part1->currentStageTime++;
+			part2->currentStageTime++;
+		}
+
 	}
 
 

@@ -1,27 +1,27 @@
-#include "SMTYSpecsCoarseGrainedImproved.h"
+#include "SMTYSpecsCoarseGrainedImprovedMorse.h"
 
 
-SMTYSpecsCoarseGrainedImproved::SMTYSpecsCoarseGrainedImproved()
+SMTYSpecsCoarseGrainedImprovedMorse::SMTYSpecsCoarseGrainedImprovedMorse()
 {
 
 }
 
 
-void SMTYSpecsCoarseGrainedImproved::build()
+void SMTYSpecsCoarseGrainedImprovedMorse::build()
 {
 	std::cout << " *** System's steady-state(ss) characteristics *** " << std::endl;
 	std::cout << " - Cell Length = " << m_ssCellLength << std::endl;
 	std::cout << " - Speed at ss = " << m_ssSpeed << std::endl;
 	std::cout << " - Migration t = " << m_migrationTime << std::endl;
 
-	NewLJForce* interForce(new NewLJForce{ m_epsilon, m_cut * m_cut });
-	//MorseForce* interForce(new MorseForce{m_epsilon, 20.0, 1.5});
+	//NewLJForce* interForce(new NewLJForce{ m_epsilon, m_cut * m_cut });
+	MorseForce* interForce(new MorseForce{ m_epsilon, m_rho, m_cut });
 	//NewSMSoftCore* interForce(new NewSMSoftCore{ 0.025, 1.0, 0.1, 1.0 });
 
 	// URGENT: this is a try
 #ifdef ATTRACTION_ONLY_BODY
 	NewStickyAttraction* stickyAttraction(new NewStickyAttraction{ 0.1, 0.5, 1.0 });
-    // idx 0: 0.25, 0.025, 1.0
+	// idx 0: 0.25, 0.025, 1.0
 	// idx 1: 0.1, 0.1, 1.0
 	// idx 2: 0.1, 0.5, 1.0
 	// idx 3: 0.25, 0.5, 1.0
@@ -29,7 +29,7 @@ void SMTYSpecsCoarseGrainedImproved::build()
 #endif
 
 	FeneForce* fene(new FeneForce{ m_rMaxSquared, m_kappa });
-	
+
 	// stage MIGRATION
 	{
 		addInterForce(MIGRATION, 0, interForce);
@@ -80,9 +80,9 @@ void SMTYSpecsCoarseGrainedImproved::build()
 		addIntraForce(DIVISION, 3, fene);
 
 		// propulsion force to both parts
-//		ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ 1.0 * m_motility * m_ssCellLength }); // TODO urgent: remove hard coded value 2.0
-//		addIntraForce(DIVISION, 1, nocil);
-//		addIntraForce(DIVISION, 2, nocil);
+		//		ConstantPropulsionForce* nocil(new ConstantPropulsionForce{ 1.0 * m_motility * m_ssCellLength }); // TODO urgent: remove hard coded value 2.0
+		//		addIntraForce(DIVISION, 1, nocil);
+		//		addIntraForce(DIVISION, 2, nocil);
 
 		CilForce*  cil(new CilForce{ m_motility });
 		addIntraForce(DIVISION, 1, cil);
@@ -100,8 +100,8 @@ void SMTYSpecsCoarseGrainedImproved::build()
 }
 
 
-SMTYSpecsCoarseGrainedImproved::SMTYSpecsCoarseGrainedImproved(double sigAA, double sigBB, double motility,
-	double epsilon, double cut, double rMaxSquared, double kappa,
+SMTYSpecsCoarseGrainedImprovedMorse::SMTYSpecsCoarseGrainedImprovedMorse(double sigAA, double sigBB, double motility,
+	double epsilon, double rho, double cut, double rMaxSquared, double kappa,
 	double frictionF, double frictionB, double massF, double massB,
 	double rateDuplication, double thresholdDuplication,
 	size_t divisionCycleLength, bool CIL, bool division)
@@ -116,6 +116,7 @@ SMTYSpecsCoarseGrainedImproved::SMTYSpecsCoarseGrainedImproved(double sigAA, dou
 
 	m_motility = motility;
 	m_epsilon = epsilon;
+	m_rho = rho;
 	m_cut = cut;
 
 	m_rMaxSquared = rMaxSquared;
@@ -166,8 +167,8 @@ SMTYSpecsCoarseGrainedImproved::SMTYSpecsCoarseGrainedImproved(double sigAA, dou
 }
 
 
-SMTYSpecsCoarseGrainedImproved::SMTYSpecsCoarseGrainedImproved(const Parameters* params, size_t divisionCycleLength, bool CIL, bool division) :
-	SMTYSpecsCoarseGrainedImproved(params->getParam(0),
+SMTYSpecsCoarseGrainedImprovedMorse::SMTYSpecsCoarseGrainedImprovedMorse(const Parameters* params, size_t divisionCycleLength, bool CIL, bool division) :
+	SMTYSpecsCoarseGrainedImprovedMorse(params->getParam(0),
 		params->getParam(1),
 		params->getParam(2),
 		params->getParam(3),
@@ -180,12 +181,13 @@ SMTYSpecsCoarseGrainedImproved::SMTYSpecsCoarseGrainedImproved(const Parameters*
 		params->getParam(10),
 		params->getParam(11),
 		params->getParam(12),
+		params->getParam(13),
 		divisionCycleLength, CIL, division)
 {
 }
 
 
-bool SMTYSpecsCoarseGrainedImproved::load(Hdf5* file, const char* groupName)
+bool SMTYSpecsCoarseGrainedImprovedMorse::load(Hdf5* file, const char* groupName)
 {
 	try {
 		H5::Group group = file->openGroup(groupName);
@@ -200,6 +202,7 @@ bool SMTYSpecsCoarseGrainedImproved::load(Hdf5* file, const char* groupName)
 
 		m_motility = file->readAttributeDouble(groupName, "motility");
 		m_epsilon = file->readAttributeDouble(groupName, "epsilon");
+		m_rho = file->readAttributeDouble(groupName, "rho");
 		m_cut = file->readAttributeDouble(groupName, "cut");
 		m_rMaxSquared = file->readAttributeDouble(groupName, "rMax2");
 		m_kappa = file->readAttributeDouble(groupName, "k");
@@ -242,7 +245,7 @@ bool SMTYSpecsCoarseGrainedImproved::load(Hdf5* file, const char* groupName)
 
 
 
-bool SMTYSpecsCoarseGrainedImproved::save(Hdf5* file, const char* groupName) const
+bool SMTYSpecsCoarseGrainedImprovedMorse::save(Hdf5* file, const char* groupName) const
 {
 	try {
 		file->createNewGroup(groupName);
@@ -251,6 +254,7 @@ bool SMTYSpecsCoarseGrainedImproved::save(Hdf5* file, const char* groupName) con
 		file->writeAttributeString(groupName, "name", name.c_str());
 		file->writeAttributeDouble(groupName, "motility", m_motility);
 		file->writeAttributeDouble(groupName, "epsilon", m_epsilon);
+		file->writeAttributeDouble(groupName, "rho", m_rho);
 		file->writeAttributeDouble(groupName, "cut", m_cut);
 		file->writeAttributeDouble(groupName, "rMax2", m_rMaxSquared);
 		file->writeAttributeDouble(groupName, "k", m_kappa);
@@ -288,14 +292,14 @@ bool SMTYSpecsCoarseGrainedImproved::save(Hdf5* file, const char* groupName) con
 }
 
 
-bool SMTYSpecsCoarseGrainedImproved::cellIsBroken(const Cell* cell, const Box* box) const
+bool SMTYSpecsCoarseGrainedImprovedMorse::cellIsBroken(const Cell* cell, const Box* box) const
 {
 	// in the SMTY system a cell is broken when its length is
 	// bigger than Rmax
 	return CheckBroken::tooLong(cell, box, m_rMaxSquared);
 }
 
-bool SMTYSpecsCoarseGrainedImproved::cellIsDead(const Cell* cell, const Box* box)
+bool SMTYSpecsCoarseGrainedImprovedMorse::cellIsDead(const Cell* cell, const Box* box)
 {
 	// in the SMTY system a cell is dead when it's length is
 	// bigger than sigAA and it is not in the division stage
@@ -303,21 +307,21 @@ bool SMTYSpecsCoarseGrainedImproved::cellIsDead(const Cell* cell, const Box* box
 	return CheckDead::cellIsPulledApart(cell, box, sigAA * sigAA, DIVISION);
 }
 
-bool SMTYSpecsCoarseGrainedImproved::divisionCriterion(Cell* cell, const Box* box) const
+bool SMTYSpecsCoarseGrainedImprovedMorse::divisionCriterion(Cell* cell, const Box* box) const
 {
 	const double& sigAA = partTypes.at(DIVISION).getPartTypes().at(0).sig;
 	return CheckLength::cellIsLongerThan(1.0 * 1.0 * sigAA * sigAA, cell, box);
 }
 
 
-bool SMTYSpecsCoarseGrainedImproved::cellDivides(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
+bool SMTYSpecsCoarseGrainedImprovedMorse::cellDivides(Cell* cell, std::vector<Cell>* newCells, const Box* box, size_t& cellCounter, size_t cycleLength) const
 {
 	return DivisionMethods::standardDivisionWithRandomDisplacement(cell, newCells, box, cellCounter, cycleLength, MIGRATION, &this->partTypes.at(0));
 }
 
 
 
-bool SMTYSpecsCoarseGrainedImproved::endOfSuccessfullDivisionStage(Cell* cell, const Box* box) const
+bool SMTYSpecsCoarseGrainedImprovedMorse::endOfSuccessfullDivisionStage(Cell* cell, const Box* box) const
 {
 	Part* part = &cell->getPart(0);
 
@@ -341,7 +345,7 @@ bool SMTYSpecsCoarseGrainedImproved::endOfSuccessfullDivisionStage(Cell* cell, c
 				// TODO: URGENT: remove this hack. Do that cyclemanager->magage also tells if the division is successfull or not and does the 
 				// proper decisions
 				cell->getPart(1).position = cell->getPart(0).position;
-				cell->getPart(1).position += Vector{ gsl_rng_uniform(g_rng), gsl_rng_uniform(g_rng) } * 0.01;
+				cell->getPart(1).position += Vector{ gsl_rng_uniform(g_rng), gsl_rng_uniform(g_rng) } *0.01;
 
 				// this is correct:
 				return false;

@@ -27,6 +27,8 @@
 #include "../particles/SMTYSpecsCycleLJ.h"
 #include "../particles/SMTYSpecsCoarseGrained.h"
 #include "../particles/SMTYSpecsCoarseGrainedImproved.h"
+#include "../particles/SMTYSpecsCoarseGrainedImprovedMorse.h"
+
 
 //#include "../particles/MonoZimm.h"
 

@@ -44,3 +44,25 @@ void LJForce::updateForce(Part* part1, const Part* part2, const Box* box, Vector
 		part1->velocity += forceVector;
 	}
 }
+
+
+
+
+void MorseForce::updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const
+{
+	Vector distance{};
+	double r2 = box->computeDistanceSquaredPBC(part1->position, part2->position, distance);
+	
+	double r = sqrt(r2);
+	double sig = 0.5 * (part1->currentSigma + part2->currentSigma);
+
+	if (r < m_cut)
+	{
+		double exp_rho_sigma_minus_r = exp(m_rho * (sig - r));
+
+		double force = 2.0 * m_eps * m_rho * exp_rho_sigma_minus_r * (exp_rho_sigma_minus_r - 1.0) / r;
+		forceVector = distance * force;
+
+		part1->velocity += forceVector;
+	}
+}

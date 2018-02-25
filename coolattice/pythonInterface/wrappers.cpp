@@ -146,7 +146,14 @@ namespace pywrapper {
 			.def("cellDivides", &SMTYSpecsCoarseGrainedImproved::cellDivides)
 			;
 		
-		
+		class_<SMTYSpecsCoarseGrainedImprovedMorse, bases<PartSpecs> >("SMTYSpecsCoarseGrainedImprovedMorse", init<>())
+			.def(init<Parameters*, size_t, size_t, bool>())
+			.def("save", &SMTYSpecsCoarseGrainedImprovedMorse::save)
+			.def("load", &SMTYSpecsCoarseGrainedImprovedMorse::load)
+			.def("cellIsBroken", &SMTYSpecsCoarseGrainedImprovedMorse::cellIsBroken)
+			.def("cellIsDead", &SMTYSpecsCoarseGrainedImprovedMorse::cellIsDead)
+			.def("cellDivides", &SMTYSpecsCoarseGrainedImprovedMorse::cellDivides)
+			;
 /*
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
 			.def(init<double, double, double, double, double, double, double, double, double, double, double>())

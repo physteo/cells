@@ -28,3 +28,15 @@ public:
 	void updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const override;
 };
 
+class MorseForce : public TwoBodyForce
+{
+
+	double m_eps;
+	double m_rho;
+	double m_cut;
+public:
+	MorseForce(double eps, double rho, double cut) : m_eps(eps), m_rho(rho), m_cut(cut) {}
+	~MorseForce() {}
+
+	void updateForce(Part* part1, const Part* part2, const Box* box, Vector& forceVector) const override;
+};

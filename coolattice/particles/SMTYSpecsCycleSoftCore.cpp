@@ -27,6 +27,12 @@ void SMTYSpecsCycleSoftCore::build()
 		SMSoftCore* scAA(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAA });
 		SMSoftCore* scAB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAB });
 		SMSoftCore* scBB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigBB });
+		//NewSMSoftCore* scAA(new NewSMSoftCore{ m_ewell, m_ecore, m_xi, 1.0 });
+		//NewSMSoftCore* scAB(new NewSMSoftCore{ m_ewell, m_ecore, m_xi, 1.0 });
+		//NewSMSoftCore* scBB(new NewSMSoftCore{ m_ewell, m_ecore, m_xi, 1.0 });
+
+
+
 
 		addInterForce(EXTENSION, 0, scAA);
 		addInterForce(EXTENSION, 1, scAB);
@@ -72,6 +78,9 @@ void SMTYSpecsCycleSoftCore::build()
 		SMSoftCore* scAA(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAA });
 		SMSoftCore* scAB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigAB });
 		SMSoftCore* scBB(new SMSoftCore{ m_ewell, m_ecore, m_xi, sigBB });
+		//NewSMSoftCore* scAA(new NewSMSoftCore{ m_ewell, m_ecore, m_xi, 1.0 });
+		//NewSMSoftCore* scAB(new NewSMSoftCore{ m_ewell, m_ecore, m_xi, 1.0 });
+		//NewSMSoftCore* scBB(new NewSMSoftCore{ m_ewell, m_ecore, m_xi, 1.0 });
 
 		addInterForce(CONTRACTION, 0, scAA);
 		addInterForce(CONTRACTION, 1, scAB);
