@@ -154,6 +154,16 @@ namespace pywrapper {
 			.def("cellIsDead", &SMTYSpecsCoarseGrainedImprovedMorse::cellIsDead)
 			.def("cellDivides", &SMTYSpecsCoarseGrainedImprovedMorse::cellDivides)
 			;
+
+		class_<SpecsTopological, bases<PartSpecs> >("SpecsTopological", init<>())
+			.def(init<Parameters*, size_t, size_t, bool>())
+			.def("save", &SpecsTopological::save)
+			.def("load", &SpecsTopological::load)
+			.def("cellIsBroken", &SpecsTopological::cellIsBroken)
+			.def("cellIsDead",   &SpecsTopological::cellIsDead)
+			.def("cellDivides",  &SpecsTopological::cellDivides)
+			;
+		
 /*
 		class_<SMTYSpecsAdhesion, bases<PartSpecs> >("SMTYSpecsAdhesion", init<>())
 			.def(init<double, double, double, double, double, double, double, double, double, double, double>())

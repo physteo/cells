@@ -36,8 +36,8 @@ void Box::createCubic()
 			subBox.head.clear();
 
 			// set boundaries of the cell
-			subBox.downLeftCorner = { ((double)x) * m_subBoxesLengthX, ((double)y) * m_subBoxesLengthY };
-			subBox.upperRightCorner = { (((double)x) + 1) * m_subBoxesLengthX, (((double)y) + 1) * m_subBoxesLengthX };
+			subBox.downLeftCorner =   { ((double)x) * m_subBoxesLengthX, ((double)y) * m_subBoxesLengthY };
+			subBox.upperRightCorner = { (((double)x) + 1) * m_subBoxesLengthX, (((double)y) + 1) * m_subBoxesLengthY };
 
 			// set neighbours
 			// TODO: case of no periodic boundaries

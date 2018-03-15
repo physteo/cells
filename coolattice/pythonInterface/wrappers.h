@@ -28,7 +28,7 @@
 #include "../particles/SMTYSpecsCoarseGrained.h"
 #include "../particles/SMTYSpecsCoarseGrainedImproved.h"
 #include "../particles/SMTYSpecsCoarseGrainedImprovedMorse.h"
-
+#include "../particles/SpecsTopological.h"
 
 //#include "../particles/MonoZimm.h"
 

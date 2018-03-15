@@ -231,6 +231,9 @@
     <ClCompile Include="particles\SMTYSpecsCoarseGrainedImprovedMorse.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="particles\SpecsTopological.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphical\graphics\buffers\buffer.h">
@@ -546,6 +549,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="particles\SMTYSpecsCoarseGrainedImprovedMorse.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\SpecsTopological.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

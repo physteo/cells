@@ -63,7 +63,7 @@ void CellColony::assignCycleStageTime(unsigned short cycleLength, unsigned short
 	}
 }
 
-void CellColony::populateLane(double N, double f, double boxLengthX, double boxLengthY, double sigA, double sigB)
+void CellColony::populateSlab(double N, double f, double boxLengthX, double boxLengthY, double sigA, double sigB)
 {
 	double numPerLineX = static_cast<int>(sqrt(f * N));
 	double numPerLineY = static_cast<int>(sqrt(N / f));
@@ -126,6 +126,7 @@ void CellColony::populateLane(double N, double f, double boxLengthX, double boxL
 
 // N is the total number of particles we want. The resulting number of particles will be close to that number.
 // f is the slab dimension, as a submultiple of the boxLengthX 
+/*
 void CellColony::populateSlab(double N, double f, double boxLengthX, double boxLengthY, double sigA, double sigB)
 {
 	double numPerLineX = static_cast<int>(sqrt(f * N));
@@ -185,7 +186,60 @@ void CellColony::populateSlab(double N, double f, double boxLengthX, double boxL
 	}
 	std::cout << "Number of cells: " << this->size() << std::endl;
 }
+*/
 
+void CellColony::populateRectangle(double N, double xMin, double yMin, double lx, double ly, double sigA, double sigB)
+{
+	double sigMin = std::min(sigA, sigB);
+	int numPerLineX;
+	int numPerLineY;
+
+	size_t numberOfCells = 0;
+
+	for (int x = 0; x < numPerLineX; x++)
+	{
+		for (int y = 0; y < numPerLineY; y++)
+		{
+			Cell cell = Cell(2);
+
+			Vector positionF{ (x + 0.5)*lx, (y + 0.5)*ly };
+			Vector positionB = positionF +
+				Vector{ (lx - sigMin) * (2.0 * gsl_rng_uniform(g_rng) - 1.0),
+				(ly - sigMin) * (2.0 * gsl_rng_uniform(g_rng) - 1.0) } *0.5;
+			// check if the distance is bigger than rmax.. or better sigMin so i dont have to pass more stuff inside
+			Vector distanceVector = positionB - positionF;
+			double distance2 = Vector::dotProduct(distanceVector, distanceVector);
+
+			if (distance2 > sigMin*sigMin)
+			{
+				positionB = positionF;
+			}
+
+			cell.getPart(0).position = positionF;
+			cell.getPart(1).position = positionB;
+			cell.getPart(0).velocity = Vector{ 0.0,0.0 };
+			cell.getPart(1).velocity = Vector{ 0.0,0.0 };
+			cell.getPart(0).type = 0;
+			cell.getPart(1).type = 1;
+
+			cell.getPart(0).currentStageTime = 0;
+			cell.getPart(1).currentStageTime = 0;
+			cell.getPart(0).currentStage = 0;
+			cell.getPart(1).currentStage = 0;
+			cell.getPart(0).currentSigma = sigA;
+			cell.getPart(1).currentSigma = sigB;
+
+
+			cell.getPart(0).cell = numberOfCells;
+			cell.getPart(1).cell = numberOfCells;
+
+			this->push_back(cell);
+			numberOfCells++;
+		}
+	}
+	std::cout << "Number of cells: " << this->size() << std::endl;
+
+}
 
 void CellColony::setPolydispersity(double sigMax, double sigMin, int species, double ratioBF, double accuracy)
 {
