@@ -49,6 +49,7 @@ public:
 	CellColony(size_t size) : m_cells(size) {}
 	void populateSlab(double N, double f, double boxLengthX, double boxLengthY, double sigA, double sigB);
 	void populateLane(double N, double f, double boxLengthX, double boxLengthY, double sigA, double sigB);
+	void populate(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB);
 
 	void addVelocity(double vx, double vy, size_t cell, size_t  type);
 

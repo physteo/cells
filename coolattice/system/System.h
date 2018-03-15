@@ -82,7 +82,7 @@ public:
 
 	void setPartSpecs(PartSpecs* partSpecsIn);
 
-	// to eliminate:
+	// to eliFminate:
 	void addVelocity(double vx, double vy, size_t cell, size_t type)
 	{
 		this->cells.addVelocity(vx, vy, cell, type);
