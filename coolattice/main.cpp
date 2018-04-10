@@ -97,12 +97,12 @@ int main(int argc, char* argv[])
 		//old_input//inputFilePath = "C:/Users/matte/Desktop/scripts/script_load_cycle.py";
 		//old_input//inputFilePath = "C:/Users/matte/Desktop/scripts/cycle-create-bf0.8-desync.py";
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/topological.py";
-		//inputFilePath = "C:/Users/matte/Desktop/scripts/coarse_grained_tests.py";
-		
-		inputFilePath = "C:/Users/matte/Desktop/scripts/traffic_lanes.py";
+		inputFilePath = "C:/Users/matte/Desktop/scripts/coarse_grained_tests.py";
+		//inputFilePath = "C:/Users/matte/Desktop/scripts/test_single_cell.py";
+		inputFilePath = "C:/Users/matte/Desktop/scripts/directed_coarse_grained_tests_repulsion.py";
+
+		//inputFilePath = "C:/Users/matte/Desktop/scripts/traffic_lanes.py";
 		//inputFilePath = "C:/Users/matte/Desktop/morse_coarse_grained_tests.py";
-
-
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/cycle-LJadh-nodiv-create-bf0.8-desync.py";
 	}
 	else if (argc > 2) {

@@ -63,66 +63,25 @@ void CellColony::assignCycleStageTime(unsigned short cycleLength, unsigned short
 	}
 }
 
-void CellColony::populateLane(double N, double f, double boxLengthX, double boxLengthY, double sigA, double sigB)
+void CellColony::populateLane(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB, double offsetx, double offsety)
 {
-	double numPerLineX = static_cast<int>(sqrt(f * N));
-	double numPerLineY = static_cast<int>(sqrt(N / f));
-
-	double lx = boxLengthX / numPerLineX;
-	double ly = boxLengthY / numPerLineY; // they're the same if boxLengthX == boxLengthY
-
-	double startX = 0.0;
-	double startY = 0.0;
-
-	double sigMax = std::max(sigA, sigB);
-	double sigMin = std::min(sigA, sigB);
-
-	size_t numberOfCells = 0;
-	for (int x = 0; x < numPerLineX; x++)
+	this->populate(numPerLineX, numPerLineY, boxLengthX, boxLengthY, sigA, sigB);
+	
+// apply offset
+	for (size_t i = 0; i < m_cells.size(); i++)
 	{
-		for (int y = 0; y < numPerLineY; y++)
+		Cell& c = this->m_cells.at(i);
+		for (size_t j = 0; j < c.getNumOfParts(); j++)
 		{
-			//std::vector<Part> cell;
-			Cell cell = Cell(2);
-			Vector positionF{ startX + (x + 0.5) * lx, startY + (y + 0.5) * ly };
-
-			Vector positionB = positionF +
-				Vector{ (2.0 * gsl_rng_uniform(g_rng) - 1.0),
-				(2.0 * gsl_rng_uniform(g_rng) - 1.0) } *(sigMax - sigMin) * 0.1;
-
-			// check if the distance is bigger than rmax.. or better sigMin so i dont have to pass more stuff inside
-			Vector distanceVector = positionB - positionF;
-			double distance2 = Vector::dotProduct(distanceVector, distanceVector);
-
-			if (distance2 > sigMin*sigMin)
-			{
-				positionB = positionF;
-			}
-			cell.getPart(0).position = positionF;
-			cell.getPart(1).position = positionB;
-			cell.getPart(0).velocity = Vector{ 0.0,0.0 };
-			cell.getPart(1).velocity = Vector{ 0.0,0.0 };
-			cell.getPart(0).type = 0;
-			cell.getPart(1).type = 1;
-
-			cell.getPart(0).currentStage = 0;
-			cell.getPart(1).currentStage = 0;
-			cell.getPart(0).currentStageTime = 0;
-			cell.getPart(1).currentStageTime = 0;
-			cell.getPart(0).currentSigma = sigA;
-			cell.getPart(1).currentSigma = sigB;
-
-			cell.getPart(0).cell = numberOfCells;
-			cell.getPart(1).cell = numberOfCells;
-
-
-			this->push_back(cell);
-			numberOfCells++;
+			Part& p = c.getPart(j);
+			p.position.x += offsetx;
+			p.position.y += offsety;
 		}
-	}
-	std::cout << "Number of cells: " << this->size() << std::endl;
 
+	}
 }
+
+
 
 // N is the total number of particles we want. The resulting number of particles will be close to that number.
 // f is the slab dimension, as a submultiple of the boxLengthX 
@@ -244,6 +203,27 @@ void CellColony::setPolydispersity(double sigMax, double sigMin, int species, do
 	}
 }
 
+
+void CellColony::populateDirected(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB)
+{
+	double lx = boxLengthX / numPerLineX;
+	double ly = boxLengthY / numPerLineY;
+
+	double sigMin = std::min(sigA, sigB);
+
+	this->populate(numPerLineX, numPerLineY, boxLengthX, boxLengthY, sigA, sigB);
+
+	// put all back disks on the left side of the front disk
+	for (size_t c = 0; c < this->size(); c++)
+	{
+
+		Cell& cell = this->at(c);
+		Vector& positionF = cell.getPart(0).position;
+		Vector& positionB = cell.getPart(1).position;
+		Vector displacement = positionF - positionB;
+		positionB.x = positionF.x - abs(displacement.x);
+	}
+}
 
 void CellColony::populate(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB)
 {

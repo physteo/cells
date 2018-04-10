@@ -36,6 +36,7 @@ namespace pywrapper {
 			.def("save",				&CellColony::save)
 			.def("load",				&CellColony::load)
 			.def("populate",			&CellColony::populate)
+			.def("populateDirected",    &CellColony::populateDirected)
 			.def("populateLane",        &CellColony::populateLane)
 			.def("populateSlab",		&CellColony::populateSlab)
 			.def("addOnePartCell",		&CellColony::addOnePartCell)
