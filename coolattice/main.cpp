@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 
 	// random number generator seed **********************************************
 	//TODO URGENT: change to proper seed.
-	std::string seedStr = "2";//inputJson.at("SIMULATION").at("seed").dump();
+	std::string seedStr = "";//inputJson.at("SIMULATION").at("seed").dump();
 #ifdef LINUX
 	unsigned long int seed = mix(clock(), time(NULL), getpid());
 #else
@@ -97,9 +97,14 @@ int main(int argc, char* argv[])
 		//old_input//inputFilePath = "C:/Users/matte/Desktop/scripts/script_load_cycle.py";
 		//old_input//inputFilePath = "C:/Users/matte/Desktop/scripts/cycle-create-bf0.8-desync.py";
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/topological.py";
-		inputFilePath = "C:/Users/matte/Desktop/scripts/coarse_grained_tests.py";
-		//inputFilePath = "C:/Users/matte/Desktop/scripts/test_single_cell.py";
-		inputFilePath = "C:/Users/matte/Desktop/scripts/directed_coarse_grained_tests_repulsion.py";
+		
+		// studying the influence of the stickying to the surface
+		//inputFilePath = "C:/Users/matte/Desktop/scripts/general-cycle-LJrep-nodiv-1300.py";
+		
+
+		//inputFilePath = "C:/Users/matte/Desktop/scripts/coarse_grained_tests.py";
+		inputFilePath = "C:/Users/matte/Desktop/scripts/test_single_cell.py";
+		//inputFilePath = "C:/Users/matte/Desktop/scripts/directed_coarse_grained_tests_repulsion.py";
 
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/traffic_lanes.py";
 		//inputFilePath = "C:/Users/matte/Desktop/morse_coarse_grained_tests.py";

@@ -7,7 +7,6 @@
 #include <omp.h>
 #endif
 
-#define NOTRAJ
 #define VISUALS
 
 #define NOLINUX

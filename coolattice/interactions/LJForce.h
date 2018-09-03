@@ -1,6 +1,6 @@
 #pragma once
 #include "TwoBodyForce.h"
-
+#include <cmath>
 
 class NewLJForce : public TwoBodyForce
 {

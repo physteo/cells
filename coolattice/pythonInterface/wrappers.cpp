@@ -46,6 +46,7 @@ namespace pywrapper {
 			.def("totalNumberOfParts",	&CellColony::totalNumberOfParts)
 			.def("getPartX",			&CellColony::getPartX)
 			.def("getPartY",			&CellColony::getPartY)
+			.def("assignSingleCellStageAndTime", &CellColony::assignSingleCellStageAndTime)
 			.def("assignCycleStage",	&CellColony::assignCycleStageTime)
 			.def("setPolydispersity",   &CellColony::setPolydispersity)
 			;

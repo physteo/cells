@@ -61,7 +61,8 @@ public:
 	void addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 						 double x2, double y2, double vx2, double vy2,
 						 unsigned short stage, size_t currentStageTime, double sigA, double sigB);
-	
+
+	void assignSingleCellStageAndTime(int cellID, unsigned short currentStageTime, unsigned short currentStage);
 	void assignCycleStageTime(unsigned short cycleLength, unsigned short numberOfStages);
 
 	void setPolydispersity(double sigMax, double sigMin, int species, double ratioBF, double accuracy);

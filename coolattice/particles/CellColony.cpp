@@ -49,6 +49,18 @@ void CellColony::addTwoPartsCell(double x1, double y1, double vx1, double vy1,
 }
 
 
+void CellColony::assignSingleCellStageAndTime(int cellID, unsigned short currentStageTime, unsigned short currentStage)
+{
+	m_cells.at(cellID).getPart(0).currentStage = currentStage;
+	m_cells.at(cellID).getPart(0).currentStageTime = currentStageTime;
+
+	m_cells.at(cellID).getPart(1).currentStage = currentStage;
+	m_cells.at(cellID).getPart(1).currentStageTime = currentStageTime;
+
+
+}
+
+
 void CellColony::assignCycleStageTime(unsigned short cycleLength, unsigned short numberOfStages)
 {
 	for (size_t i = 0; i < m_cells.size(); i++)
@@ -221,7 +233,7 @@ void CellColony::populateDirected(double numPerLineX, double numPerLineY, double
 		Vector& positionF = cell.getPart(0).position;
 		Vector& positionB = cell.getPart(1).position;
 		Vector displacement = positionF - positionB;
-		positionB.x = positionF.x - abs(displacement.x);
+		positionB.x = positionF.x - std::abs(displacement.x);
 	}
 }
 
