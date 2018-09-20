@@ -21,6 +21,7 @@ namespace pywrapper {
 		class_<Hdf5>("Hdf5", init<char*, unsigned int>())
 			.def("closeFile", &Hdf5::closeFile)
 			.def("readName", &Hdf5::readName)
+			.def("writeAttributeDouble", &Hdf5::writeAttributeDouble)
 			;
 
 		class_<myOpenmp>("Omp", init<int>())
@@ -56,6 +57,8 @@ namespace pywrapper {
 			.def("clearSubBoxes", &Box::clearSubBoxes)
 			.def("save", &Box::save)
 			.def("load", &Box::load)
+			.def("getLx", &Box::getLx)
+			.def("getLy", &Box::getLy)
 			;
 
 		//class_<PartSpecs>("PartSpecs", no_init)
@@ -241,6 +244,11 @@ namespace pywrapper {
 			//.def("assignCycleStage", &SystemTrajectory::assignCycleStageTime) // TODO: change the name of the interfaced method to assignCycleStageTime
 			;
 
+
+		class_<Analyzer>("Analyzer", init<Box*, PartSpecs*, SystemTrajectory*>())
+			.def("computeCorrelationFunctions", &Analyzer::computeCorrelationFunctions)
+			;
+		
 
 
 #ifdef VISUALS

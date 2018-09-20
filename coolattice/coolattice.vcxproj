@@ -186,6 +186,7 @@
     <ClCompile Include="particles\SMTYSpecsCycleLJ.cpp" />
     <ClCompile Include="particles\SMTYSpecsCycleSoftCore.cpp" />
     <ClCompile Include="particles\SpecsTopological.cpp" />
+    <ClCompile Include="system\analysis\Analyzer.cpp" />
     <ClCompile Include="system\System.cpp" />
     <ClCompile Include="system\SystemTrajectory.cpp" />
     <ClCompile Include="utils\Hdf5.cpp" />
@@ -287,6 +288,7 @@
     <ClInclude Include="particles\utilities\cycleManager.h" />
     <ClInclude Include="pythonInterface\Parameters.h" />
     <ClInclude Include="pythonInterface\wrappers.h" />
+    <ClInclude Include="system\analysis\Analyzer.h" />
     <ClInclude Include="system\System.h" />
     <ClInclude Include="system\SystemTrajectory.h" />
     <ClInclude Include="utils\Hdf5.h" />

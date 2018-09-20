@@ -7,6 +7,8 @@
 #include "../definitions.h"
 #include "../utils/Hdf5.h"
 
+#include "../particles/CellColony.h"
+
 class Box : public BinarySavable
 {
 public:
@@ -29,7 +31,8 @@ public:
 	inline double getNumberOfBoxCellsY() const { return m_numberOfBoxCellsY; }
 
 	void clearSubBoxes();
-	void putPartInSubBox(Part* part, int n);
+	void putPartInSubBox(Part* part);
+	void putAllPartsInSubBox(CellColony* cells);
 
 	void remap(Vector& position);
 

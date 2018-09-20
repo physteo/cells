@@ -35,6 +35,9 @@
 #include "../system/System.h"
 #include "../system/SystemTrajectory.h"
 
+#include "../system/analysis/Analyzer.h"
+
+
 
 #ifdef VISUALS
 #include "../visuals/Display.h"

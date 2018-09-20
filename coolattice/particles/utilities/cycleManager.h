@@ -12,6 +12,8 @@ class CycleManager
 {
 public:
 	virtual void manage(size_t time, Cell* cell) = 0;
+	virtual size_t getStageDuration(size_t stage) const = 0;
+
 };
 
 // \brief Manages the cycle for cells that have a simple cycle of extension-contraction with occasional division.
@@ -30,6 +32,23 @@ public:
 		m_cycleLength(cycleLength), m_divisionCycleLength(divisionCycleLength),
 		m_duplicationRate(duplicationRate), m_numberOfStages(3), m_divisionStage(divisionStage)
 	{}
+
+	size_t getStageDuration(size_t stage) const override
+	{
+		if (stage == 0 || stage == 1)
+		{
+			return m_cycleLength;
+		}
+		else if (stage == 2)
+		{
+			return m_divisionCycleLength;
+		}
+		else {
+			std::cerr << "CycleManager: Error, stage " << stage << " does not exist." << std::endl;
+			assert(false);
+		}
+	};
+
 
 	void manage(size_t time, Cell* cell) override
 	{
@@ -86,6 +105,12 @@ public:
 		m_cycleLength(cycleLength), m_numberOfStages(2)
 	{}
 
+
+	size_t getStageDuration(size_t stage) const override
+	{
+		return m_cycleLength;
+	}
+
 	void manage(size_t time, Cell* cell) override
 	{
 		const size_t currentCycleLength = m_cycleLength;
@@ -120,6 +145,13 @@ public:
 		m_numberOfStages(1)
 	{}
 
+
+	size_t getStageDuration(size_t stage) const override
+	{
+		return 0;
+	}
+
+
 	void manage(size_t time, Cell* cell) override
 	{
 	}
@@ -141,6 +173,11 @@ public:
 		m_divisionCycleLength(divisionCycleLength),
 		m_duplicationRate(duplicationRate), m_numberOfStages(2), m_divisionStage(divisionStage)
 	{}
+
+	size_t getStageDuration(size_t stage) const override
+	{
+		return m_divisionCycleLength;
+	}
 
 	void manage(size_t time, Cell* cell) override
 	{
@@ -210,6 +247,11 @@ public:
 		m_duplicationRate(duplicationRate),  
 		m_divisionStage(divisionStage), m_partTypeVector(partTypeVector)
 	{
+	}
+
+	size_t getStageDuration(size_t stage) const override
+	{
+		return m_divisionCycleLength;
 	}
 
 	void advanceWithinStage(size_t time, Cell* cell)

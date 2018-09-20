@@ -103,7 +103,12 @@ int main(int argc, char* argv[])
 		
 
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/coarse_grained_tests.py";
-		inputFilePath = "C:/Users/matte/Desktop/scripts/test_single_cell.py";
+		
+		//inputFilePath = "C:/Users/matte/Desktop/scripts/test_single_cell.py";
+		inputFilePath = "C:/Users/matte/Desktop/scripts/general-cycle-LJrep-nodiv-1200.py";
+
+		
+		
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/directed_coarse_grained_tests_repulsion.py";
 
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/traffic_lanes.py";

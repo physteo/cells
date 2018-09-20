@@ -55,7 +55,7 @@ void Box::createCubic()
 }
 
 
-void Box::putPartInSubBox(Part* part, int n)
+void Box::putPartInSubBox(Part* part)
 {
 	int tempX = static_cast<int> (part->position.x / m_subBoxesLengthX);
 	int tempY = static_cast<int> (part->position.y / m_subBoxesLengthY);
@@ -85,6 +85,17 @@ void Box::putPartInSubBox(Part* part, int n)
 		subBox->head.insert(part);
 	}
 
+}
+
+void Box::putAllPartsInSubBox(CellColony* cells)
+{
+	for (size_t c = 0; c < cells->size(); c++)
+	{
+		for (size_t p = 0; p < cells->at(c).getNumOfParts(); p++)
+		{
+			putPartInSubBox(&cells->at(c).getPart(p));
+		}
+	}
 }
 
 

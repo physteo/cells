@@ -53,6 +53,7 @@ public:
 
 	size_t getNumberOfStages() { return partTypes.size(); }
 	size_t getNumberOfTypes() { return numberOfTypes; }
+	size_t getStageDuration(size_t stage) const { return cycleManager->getStageDuration(stage); }
 	const std::vector<PartTypeVector>& getVectorOfPartTypes() { return partTypes; }
 
 	void addOneBodyForce(size_t stage, size_t slot, OneBodyForce* force);

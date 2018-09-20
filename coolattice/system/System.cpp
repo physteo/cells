@@ -126,15 +126,8 @@ void System::setSubBoxes()
 	//#ifdef OMP
 	//#pragma omp parallel for
 	//#endif
-	size_t n = 0;
-	for (size_t c = 0; c < cells.size(); c++)
-	{
-		for (size_t p = 0; p < cells.at(c).getNumOfParts(); p++)
-		{
-			box->putPartInSubBox(&cells.at(c).getPart(p), n);
-		}
-		n += cells.at(c).getNumOfParts();
-	}
+	
+	box->putAllPartsInSubBox(&cells);
 
 	//for (size_t n = 0; n < parts.size(); n++) {
 	//	Part* particle = parts.at(n);
