@@ -51,7 +51,7 @@ public:
 		return gsl_histogram2d_div(m_histograms.at(whichHistogram1), m_histograms.at(whichHistogram2));
 	}
 
-	int divideIfNotZero(size_t whichHistogram1, size_t whichHistogram2)
+	void divideIfNotZero(size_t whichHistogram1, size_t whichHistogram2)
 	{
 		gsl_histogram2d* h1 = m_histograms.at(whichHistogram1);
 		gsl_histogram2d* h2 = m_histograms.at(whichHistogram2);
@@ -112,7 +112,7 @@ public:
 		: m_box(box), m_partSpecs(partSpecs), m_traj(traj) {}
 
 	void computeCorrelationFunctions(const std::string& outfile, int numBins, double rMin, double rMax, int start, int end, int stride);
-
+	void computeCorrelationFunctionsSingleDiskCells(const std::string& outfile, int numBins, double rMin, double rMax, int start, int end, int stride);
 private:
 	const double PI = 3.141592653589793;
 

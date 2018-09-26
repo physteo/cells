@@ -237,6 +237,51 @@ void CellColony::populateDirected(double numPerLineX, double numPerLineY, double
 	}
 }
 
+void CellColony::populateSingleDiskCells(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sig)
+{
+	double lx = boxLengthX / numPerLineX;
+	double ly = boxLengthY / numPerLineY;
+
+	double sigMin = sig;
+
+	size_t numberOfCells = 0;
+	for (int x = 0; x < numPerLineX; x++)
+	{
+		for (int y = 0; y < numPerLineY; y++)
+		{
+			Cell cell = Cell(1);
+
+			Vector positionF{ (x + 0.5)*lx, (y + 0.5)*ly };
+			Vector positionB = positionF +
+				Vector{ (lx - sigMin) * (2.0 * gsl_rng_uniform(g_rng) - 1.0),
+				(ly - sigMin) * (2.0 * gsl_rng_uniform(g_rng) - 1.0) } *0.5;
+			// check if the distance is bigger than rmax.. or better sigMin so i dont have to pass more stuff inside
+			Vector distanceVector = positionB - positionF;
+			double distance2 = Vector::dotProduct(distanceVector, distanceVector);
+
+			if (distance2 > sigMin*sigMin)
+			{
+				positionB = positionF;
+			}
+
+			cell.getPart(0).position = positionB;
+			cell.getPart(0).velocity = Vector{ 0.0,0.0 };
+			cell.getPart(0).type = 0;
+
+			cell.getPart(0).currentStageTime = 0;
+			cell.getPart(0).currentStage = 0;
+			cell.getPart(0).currentSigma = sig;
+
+			cell.getPart(0).cell = numberOfCells;
+
+			this->push_back(cell);
+			numberOfCells++;
+		}
+	}
+	std::cout << "Number of cells: " << this->size() << std::endl;
+
+}
+
 void CellColony::populate(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB)
 {
 	double lx = boxLengthX / numPerLineX;

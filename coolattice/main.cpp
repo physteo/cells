@@ -65,7 +65,6 @@ gsl_rng *g_rng = NULL;
 #include "pythonInterface/wrappers.cpp"
 
 
-
 int main(int argc, char* argv[])
 {	
 	using namespace boost::python;
@@ -105,8 +104,10 @@ int main(int argc, char* argv[])
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/coarse_grained_tests.py";
 		
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/test_single_cell.py";
-		inputFilePath = "C:/Users/matte/Desktop/scripts/general-cycle-LJrep-nodiv-1200.py";
-
+		inputFilePath = "C:/Users/matte/Desktop/scripts/analyze-cycle-LJrep-nodiv.py";
+		
+		// active matter
+		//inputFilePath = "C:/Users/matte/Desktop/scripts/active-matter-test.py";
 		
 		
 		//inputFilePath = "C:/Users/matte/Desktop/scripts/directed_coarse_grained_tests_repulsion.py";

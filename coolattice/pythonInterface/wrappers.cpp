@@ -34,19 +34,20 @@ namespace pywrapper {
 
 		class_<CellColony>("CellColony", init<>())
 			.def(init<int>())
-			.def("save",				&CellColony::save)
-			.def("load",				&CellColony::load)
-			.def("populate",			&CellColony::populate)
-			.def("populateDirected",    &CellColony::populateDirected)
-			.def("populateLane",        &CellColony::populateLane)
-			.def("populateSlab",		&CellColony::populateSlab)
-			.def("addOnePartCell",		&CellColony::addOnePartCell)
-			.def("addTwoPartsCell",		&CellColony::addTwoPartsCell )
-			.def("size",				&CellColony::size)
-			.def("reserve",				&CellColony::reserve)
-			.def("totalNumberOfParts",	&CellColony::totalNumberOfParts)
-			.def("getPartX",			&CellColony::getPartX)
-			.def("getPartY",			&CellColony::getPartY)
+			.def("save",					&CellColony::save)
+			.def("load",					&CellColony::load)
+			.def("populate",				&CellColony::populate)
+			.def("populateDirected",		&CellColony::populateDirected)
+			.def("populateLane",			&CellColony::populateLane)
+			.def("populateSlab",			&CellColony::populateSlab)
+			.def("populateSingleDiskCells",	&CellColony::populateSingleDiskCells)
+			.def("addOnePartCell",			&CellColony::addOnePartCell)
+			.def("addTwoPartsCell",			&CellColony::addTwoPartsCell )
+			.def("size",					&CellColony::size)
+			.def("reserve",					&CellColony::reserve)
+			.def("totalNumberOfParts",		&CellColony::totalNumberOfParts)
+			.def("getPartX",				&CellColony::getPartX)
+			.def("getPartY",				&CellColony::getPartY)
 			.def("assignSingleCellStageAndTime", &CellColony::assignSingleCellStageAndTime)
 			.def("assignCycleStage",	&CellColony::assignCycleStageTime)
 			.def("setPolydispersity",   &CellColony::setPolydispersity)
@@ -113,6 +114,15 @@ namespace pywrapper {
 			.def("getCycleLength", &SMTYSpecsCycleSoftCore::getCycleLength)
 			;
 */
+
+		class_<ActiveParticles, bases<PartSpecs> >("SpecsActiveParticles", init<>())
+			.def(init<double, double, double, double, double, double, double>())
+			.def("save", &ActiveParticles::save)
+			.def("load", &ActiveParticles::load)
+			.def("cellIsBroken",   &ActiveParticles::cellIsBroken)
+			.def("cellIsDead",     &ActiveParticles::cellIsDead)
+			.def("cellDivides",    &ActiveParticles::cellDivides)
+			;
 
 		class_<SMTYSpecsCycleLJ, bases<PartSpecs> >("SMTYSpecsCycleLJ", init<>())
 			.def(init<Parameters*, size_t, size_t, size_t, bool>())
@@ -247,6 +257,7 @@ namespace pywrapper {
 
 		class_<Analyzer>("Analyzer", init<Box*, PartSpecs*, SystemTrajectory*>())
 			.def("computeCorrelationFunctions", &Analyzer::computeCorrelationFunctions)
+			.def("computeCorrelationFunctionsSingleDiskCells", &Analyzer::computeCorrelationFunctionsSingleDiskCells)
 			;
 		
 

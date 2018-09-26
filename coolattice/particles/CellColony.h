@@ -50,6 +50,7 @@ public:
 	void populateSlab(double N, double f, double boxLengthX, double boxLengthY, double sigA, double sigB);
 
 	void populateLane(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB, double offsetx, double offsety);
+	void populateSingleDiskCells(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sig);
 
 	void populate(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB);
 	void populateDirected(double numPerLineX, double numPerLineY, double boxLengthX, double boxLengthY, double sigA, double sigB);

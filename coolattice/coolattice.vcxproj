@@ -176,6 +176,7 @@
     <ClCompile Include="interactions\ZimmermannRepAdh.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Vector.cpp" />
+    <ClCompile Include="particles\ActiveParticles.cpp" />
     <ClCompile Include="particles\Cell.cpp" />
     <ClCompile Include="particles\CellColony.cpp" />
     <ClCompile Include="particles\Part.cpp" />
@@ -269,6 +270,7 @@
     <ClInclude Include="interactions\ZimmermannRepAdh.h" />
     <ClInclude Include="math\Vector.h" />
     <ClInclude Include="definitions.h" />
+    <ClInclude Include="particles\ActiveParticles.h" />
     <ClInclude Include="particles\Cell.h" />
     <ClInclude Include="particles\CellColony.h" />
     <ClInclude Include="particles\CellSpecs.h" />

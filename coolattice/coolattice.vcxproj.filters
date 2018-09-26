@@ -237,6 +237,9 @@
     <ClCompile Include="system\analysis\Analyzer.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="particles\ActiveParticles.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphical\graphics\buffers\buffer.h">
@@ -558,6 +561,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="system\analysis\Analyzer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="particles\ActiveParticles.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
