@@ -7,18 +7,64 @@ static int nint(double a)
 }
 
 
+void Analyzer::computePairCorrelations(const Cell& ci, const Cell& cj, Histogram2D& histograms)
+{
+	double cycleDurationDouble = (double)m_partSpecs->getStageDuration(0);
+
+	Vector position_i = ci.getPart(0).position;
+	Vector position_j = cj.getPart(0).position;
+
+	Vector distance_vec;
+	double r_ij_squared = m_box->computeDistanceSquaredPBC(position_i, position_j, distance_vec);
+	// now position them correctly with respect to each other, accounting for PBC
+	position_j = position_i - distance_vec;
+
+	double px_i = position_i.x;
+	double py_i = position_i.y;
+	double px_j = position_j.x;
+	double py_j = position_j.y;
+
+	Vector axis;
+	double length = sqrt(m_box->computeDistanceSquaredPBC(ci.getPart(0).position, ci.getPart(1).position, axis));
+	axis *= 1.0 / length;
+
+	// cell i and cell j: compute distance (front-front) and coeff_ij
+	double old_deltax = px_j - px_i;
+	double old_deltay = py_j - py_i;
+
+
+	double deltax = axis.y * old_deltax - axis.x * old_deltay;
+	double deltay = axis.x * old_deltax + axis.y * old_deltay;
+
+
+	double cycleTimeDifference = ((double)ci.getPart(0).currentStageTime) - ((double)cj.getPart(0).currentStageTime) +
+		cycleDurationDouble * (((double)ci.getPart(0).currentStage) - ((double)cj.getPart(0).currentStage));
+
+	double coeff_ij = cos((PI / cycleDurationDouble) * (cycleTimeDifference));
+
+	double stagestage = 2.0 * ((!(!(ci.getPart(0).currentStage) != !(cj.getPart(0).currentStage))) - 0.5);
+	//std::cout << ci.getPart(0).currentStage << "," << cj.getPart(0).currentStage << " -> " << stagestage  << std::endl;
+
+	Vector axis_j;
+	double length_j = sqrt(m_box->computeDistanceSquaredPBC(cj.getPart(0).position, cj.getPart(1).position, axis_j));
+	axis_j *= 1.0 / length_j;
+
+	double axisCorrelation = Vector::dotProduct(axis_j, axis);
+
+	histograms.accumulate(STAGETIMECORR, +deltax, +deltay, coeff_ij);
+	histograms.accumulate(STAGECORR, +deltax, +deltay, stagestage);
+	histograms.accumulate(RDF_PROPER, +deltax, +deltay, 1.0);
+	histograms.accumulate(AXISCORR, +deltax, +deltay, axisCorrelation);
+	histograms.accumulate(RDF, old_deltax, old_deltay, 1.0);
+}
+
 void Analyzer::computeCorrelationFunctions(const std::string& outfile, int numBins, double rMin, double rMax, int start, int end, int stride)
 {
-	const size_t STAGETIMECORR = 0;
-	const size_t STAGECORR = 1;
-	const size_t RDF_PROPER = 2;
-	const size_t RDF = 3;
-	const size_t AXISCORR = 4;
-
 	// 0-> correlation stagetime
 	// 1-> correlation stage
 	// 2-> g(r) from particle's axis
 	// 3-> g(r) 
+	// 4-? axis correlation
 	Histogram2D histograms{ 5, numBins, numBins, rMin, rMax, rMin, rMax };
 
 	double frames = double(floor((end - start) / stride));
@@ -29,9 +75,6 @@ void Analyzer::computeCorrelationFunctions(const std::string& outfile, int numBi
 	double rdf_normalization = frames * bin_size_x * bin_size_y * num_particles * rho;
 
 
-	double cycleDurationDouble = (double) m_partSpecs->getStageDuration(0);
-
-	
 	// loop over time
 	for (size_t t = start; t < end; t+=stride)
 	{
@@ -40,66 +83,15 @@ void Analyzer::computeCorrelationFunctions(const std::string& outfile, int numBi
 		// double loop over cells
 		for (size_t i = 0; i < cells->size(); i++)
 		{
+			//for (size_t j = i + 1; j < cells->size(); j++)
 			for (size_t j = i + 1; j < cells->size(); j++)
 			{
 				// first displace the particles to the correct distance, taking into account PBC
-				Cell& ci = cells->at(i);
-				Cell& cj = cells->at(j);
+				const Cell& ci = cells->at(i);
+				const Cell& cj = cells->at(j);
 
-				Vector position_i = ci.getPart(0).position;
-				Vector position_j = cj.getPart(0).position;
-
-				Vector distance_vec;
-				double r_ij_squared = m_box->computeDistanceSquaredPBC(position_i, position_j, distance_vec);
-				// now position them correctly with respect to each other, accounting for PBC
-				position_j = position_i - distance_vec;
-
-				double px_i = position_i.x;
-				double py_i = position_i.y;
-				double px_j = position_j.x;
-				double py_j = position_j.y;
-
-				Vector axis;
-				double length = sqrt(m_box->computeDistanceSquaredPBC(ci.getPart(0).position, ci.getPart(1).position, axis));
-				axis *= 1.0 / length;
-			
-				// cell i and cell j: compute distance (front-front) and coeff_ij
-				double old_deltax = px_j - px_i;
-				double old_deltay = py_j - py_i;
-
-
-				double deltax = axis.y * old_deltax - axis.x * old_deltay;
-				double deltay = axis.x * old_deltax + axis.y * old_deltay;
-
-			
-				double cycleTimeDifference = ((double)ci.getPart(0).currentStageTime) - ((double)cj.getPart(0).currentStageTime) +
-					cycleDurationDouble * (((double)ci.getPart(0).currentStage) - ((double)cj.getPart(0).currentStage));
-
-				double coeff_ij = cos((PI / cycleDurationDouble) * (cycleTimeDifference));
-
-				double stagestage = 2.0 * ((!(!(ci.getPart(0).currentStage) != !(cj.getPart(0).currentStage))) - 0.5);
-				//std::cout << ci.getPart(0).currentStage << "," << cj.getPart(0).currentStage << " -> " << stagestage  << std::endl;
-
-				Vector axis_j;
-				double length_j = sqrt(m_box->computeDistanceSquaredPBC(cj.getPart(0).position, cj.getPart(1).position, axis_j));
-				axis_j *= 1.0 / length_j;
-
-				double axisCorrelation = Vector::dotProduct(axis_j, axis);
-
-				histograms.accumulate(STAGETIMECORR, +deltax, +deltay, coeff_ij);
-				histograms.accumulate(STAGETIMECORR, -deltax, -deltay, coeff_ij);
-
-				histograms.accumulate(STAGECORR, +deltax, +deltay, stagestage);
-				histograms.accumulate(STAGECORR, -deltax, -deltay, stagestage);
-				
-				histograms.accumulate(RDF_PROPER, +deltax, +deltay, 1.0);
-				histograms.accumulate(RDF_PROPER, -deltax, -deltay, 1.0);
-
-				histograms.accumulate(AXISCORR, +deltax, +deltay, axisCorrelation);
-				histograms.accumulate(AXISCORR, -deltax, -deltay, axisCorrelation);
-
-				histograms.accumulate(RDF, old_deltax, old_deltay, 2.0);
-				histograms.accumulate(RDF, old_deltax, old_deltay, 2.0);
+				computePairCorrelations(ci, cj, histograms);
+				computePairCorrelations(cj, ci, histograms);
 
 			}
 		}

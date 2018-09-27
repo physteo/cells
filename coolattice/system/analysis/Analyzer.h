@@ -114,6 +114,14 @@ public:
 	void computeCorrelationFunctions(const std::string& outfile, int numBins, double rMin, double rMax, int start, int end, int stride);
 	void computeCorrelationFunctionsSingleDiskCells(const std::string& outfile, int numBins, double rMin, double rMax, int start, int end, int stride);
 private:
+	void computePairCorrelations(const Cell& ci, const Cell& cj, Histogram2D& histograms);
+
+private:
+	const size_t STAGETIMECORR = 0;
+	const size_t STAGECORR = 1;
+	const size_t RDF_PROPER = 2;
+	const size_t RDF = 3;
+	const size_t AXISCORR = 4;
 	const double PI = 3.141592653589793;
 
 	Box* m_box;
